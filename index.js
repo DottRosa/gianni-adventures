@@ -57,7 +57,7 @@ let partnerDrift = { x: 0, y: 0 };
 let mainPlayer = "gianni";
 let partnerPlayer = "fabris";
 
-const DISTANCE_BETWEEN_PARTNERS = 50;
+const DISTANCE_BETWEEN_PARTNERS = 35;
 
 function handlePlayersMovement() {
   const moveX = keyboard.isRight ? -1 : keyboard.isLeft ? 1 : 0;
