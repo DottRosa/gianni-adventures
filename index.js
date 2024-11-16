@@ -66,16 +66,28 @@ function handlePlayersMovement() {
   const nextValueX = background.position.x + moveX * PLAYER_VELOCITY;
   const nextValueY = background.position.y + moveY * PLAYER_VELOCITY;
 
-  if (collision.isColliding(nextValueX, background.position.y)) {
-    backgroundPosition.y += moveY * PLAYER_VELOCITY;
+  let canMoveX = !collision.isColliding(nextValueX, background.position.y);
+  let canMoveY = !collision.isColliding(background.position.x, nextValueY);
+
+  // Diagonal check
+  if (moveX !== 0 && moveY !== 0) {
+    if (!canMoveX && !canMoveY) {
+      // No movement if both directions have collisions
+      canMoveX = false;
+      canMoveY = false;
+    } else if (!canMoveX) {
+      canMoveY = true;
+      canMoveX = false;
+    } else if (!canMoveY) {
+      canMoveX = true;
+      canMoveY = false;
+    }
   }
 
-  if (collision.isColliding(background.position.x, nextValueY)) {
+  if (canMoveX) {
     backgroundPosition.x += moveX * PLAYER_VELOCITY;
   }
-
-  if (!collision.isColliding(nextValueX, nextValueY)) {
-    backgroundPosition.x += moveX * PLAYER_VELOCITY;
+  if (canMoveY) {
     backgroundPosition.y += moveY * PLAYER_VELOCITY;
   }
 
@@ -134,6 +146,14 @@ function handleSwitch() {
     const temp = mainPlayer;
     mainPlayer = partnerPlayer;
     partnerPlayer = temp;
+
+    backgrounds.forEach((b) => {
+      b.position.x -= partnerDrift.x;
+      b.position.y -= partnerDrift.y;
+    });
+
+    partnerDrift.x *= -1;
+    partnerDrift.y *= -1;
 
     keyboard.unsetSwitch();
   }
