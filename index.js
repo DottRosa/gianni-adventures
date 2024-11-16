@@ -26,7 +26,7 @@ const collisionsGround = new Background({
   imageSrc: `${ASSETS_FOLDER}/collisions.png`,
 });
 
-const backgrounds = [background, collisionsGround];
+const backgrounds = [background];
 
 const PLAYER_VELOCITY = FRAME_VELOCITY;
 
@@ -146,14 +146,6 @@ function handleSwitch() {
     const temp = mainPlayer;
     mainPlayer = partnerPlayer;
     partnerPlayer = temp;
-
-    backgrounds.forEach((b) => {
-      b.position.x -= partnerDrift.x;
-      b.position.y -= partnerDrift.y;
-    });
-
-    partnerDrift.x *= -1;
-    partnerDrift.y *= -1;
 
     keyboard.unsetSwitch();
   }
