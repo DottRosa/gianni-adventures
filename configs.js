@@ -21,3 +21,5 @@ const TILES_FROM_CENTER_X = Math.floor(TILES_PER_X / 2);
 const TILES_FROM_CENTER_Y = Math.floor(TILES_PER_Y / 2);
 
 const ASSETS_FOLDER = "./assets";
+
+const KEYBOARD_SWITCH_KEY = "s";

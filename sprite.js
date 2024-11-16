@@ -32,7 +32,7 @@ class Sprite {
     }
   }
 
-  draw() {
+  draw(driftX = 0, driftY = 0) {
     const image = this.image[this.currentDirection];
 
     ctx.drawImage(
@@ -41,8 +41,8 @@ class Sprite {
       0,
       image.width,
       image.height * 4,
-      CANVAS_WIDTH / 2 - image.width / 4 / 2,
-      CANVAS_HEIGHT / 2 - image.height / 2,
+      CANVAS_WIDTH / 2 - image.width / 4 / 2 + driftX,
+      CANVAS_HEIGHT / 2 - image.height / 2 + driftY,
       image.width / 4,
       image.height
     );

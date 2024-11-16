@@ -1,10 +1,3 @@
-const DIRECTION_KEYS = {
-  up: "up",
-  down: "down",
-  left: "left",
-  right: "right",
-};
-
 /**
  * Calculate the coordinates of the upper left corner so that the desired box is in the center
  * @param {number} cellX the x coord of the tile
