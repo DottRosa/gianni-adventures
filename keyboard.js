@@ -40,6 +40,13 @@ class Keyboard {
     return this.keysPressed.ArrowRight;
   }
 
+  get oneMovementKeyIsPressed() {
+    const trueCount = Object.values(this.keysPressed).filter(
+      (value) => value === true
+    ).length;
+    return trueCount === 1;
+  }
+
   get isEnter() {
     return this.keysPressed.Enter;
   }

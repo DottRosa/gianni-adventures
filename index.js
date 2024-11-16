@@ -12,59 +12,79 @@ canvas.height = CANVAS_HEIGHT;
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+const collision = new Collision(COLLISIONS_FIRST_MAP, 70);
+
+const START_COORDS = { cellX: 16, cellY: 21 };
+
 const background = new Background({
-  position: getCoordsByCell(16, 21),
+  position: getCoordsByCell(START_COORDS.cellX, START_COORDS.cellY),
   imageSrc: `${ASSETS_FOLDER}/first-map.png`,
 });
+
+const collisionsGround = new Background({
+  position: getCoordsByCell(16, 21),
+  imageSrc: `${ASSETS_FOLDER}/collisions.png`,
+});
+
+const backgrounds = [background, collisionsGround];
 
 const PLAYER_VELOCITY = FRAME_VELOCITY;
 
 const players = {
   gianni: new Sprite({
     spriteImages: {
-      left: `${ASSETS_FOLDER}/gianni.png`,
-      right: `${ASSETS_FOLDER}/gianni.png`,
+      left: `${ASSETS_FOLDER}/gianni-sprite-left.png`,
+      right: `${ASSETS_FOLDER}/gianni-sprite-right.png`,
     },
     velocity: PLAYER_VELOCITY,
   }),
   fabris: new Sprite({
     spriteImages: {
-      left: `${ASSETS_FOLDER}/fabris.png`,
-      right: `${ASSETS_FOLDER}/fabris.png`,
+      left: `${ASSETS_FOLDER}/fabris-sprite-left.png`,
+      right: `${ASSETS_FOLDER}/fabris-sprite-right.png`,
     },
     velocity: PLAYER_VELOCITY,
   }),
 };
 
-// Gestione delle chiavi
-const keys = {
-  ArrowUp: {
-    pressed: false,
-  },
-  ArrowDown: {
-    pressed: false,
-  },
-  ArrowLeft: {
-    pressed: false,
-  },
-  ArrowRight: {
-    pressed: false,
-  },
-};
-
-let startPosition = { ...background.position };
+let backgroundPosition = { x: 0, y: 0 };
 let partnerDrift = { x: 0, y: 0 };
 let mainPlayer = "gianni";
 let partnerPlayer = "fabris";
 
-const DISTANCE_BETWEEN_PARTNERS = 35;
+const DISTANCE_BETWEEN_PARTNERS = 50;
 
 function handlePlayersMovement() {
   const moveX = keyboard.isRight ? -1 : keyboard.isLeft ? 1 : 0;
   const moveY = keyboard.isDown ? -1 : keyboard.isUp ? 1 : 0;
 
-  background.position.x += moveX * PLAYER_VELOCITY;
-  background.position.y += moveY * PLAYER_VELOCITY;
+  if (moveX !== 0) {
+    players[partnerPlayer].direction = moveX > 0 ? "left" : "right";
+    players[mainPlayer].direction = moveX > 0 ? "left" : "right";
+  }
+
+  const nextValueX = background.position.x + moveX * PLAYER_VELOCITY;
+  const nextValueY = background.position.y + moveY * PLAYER_VELOCITY;
+
+  if (collision.isColliding(nextValueX, background.position.y)) {
+    backgroundPosition.y += moveY * PLAYER_VELOCITY;
+  }
+
+  if (collision.isColliding(background.position.x, nextValueY)) {
+    backgroundPosition.x += moveX * PLAYER_VELOCITY;
+  }
+
+  if (!collision.isColliding(nextValueX, nextValueY)) {
+    backgroundPosition.x += moveX * PLAYER_VELOCITY;
+    backgroundPosition.y += moveY * PLAYER_VELOCITY;
+  }
+
+  backgrounds.forEach((b) => {
+    b.position.x += backgroundPosition.x;
+    b.position.y += backgroundPosition.y;
+  });
+
+  backgroundPosition = { x: 0, y: 0 };
 
   // The partner follows the path of the main player
   if (keyboard.isRight) {
@@ -119,14 +139,48 @@ function handleSwitch() {
   }
 }
 
+function debug() {
+  // Specifiche del box bianco
+  const boxX = 10; // Posizione orizzontale del box
+  const boxY = 10; // Posizione verticale del box
+  const boxWidth = 200; // Larghezza del box
+  const boxHeight = 50; // Altezza del box
+
+  // Disegna il box bianco con bordo nero
+  ctx.fillStyle = "white"; // Colore di riempimento del box
+  ctx.fillRect(boxX, boxY, boxWidth, boxHeight); // Disegna il rettangolo
+  ctx.strokeStyle = "black"; // Colore del bordo
+  ctx.strokeRect(boxX, boxY, boxWidth, boxHeight); // Disegna il bordo
+
+  // Specifiche del testo
+  ctx.font = "10px Arial"; // Font e dimensione del testo
+  ctx.fillStyle = "black"; // Colore del testo
+  ctx.textAlign = "left"; // Allinea il testo a sinistra
+  ctx.textBaseline = "top"; // Posiziona il testo dall'alto
+
+  // Scrivi il testo all'interno del box
+  ctx.fillText(
+    `x: ${background.position.x}, y: ${background.position.y}`,
+    boxX + 10,
+    boxY + 10
+  );
+
+  const cell = getCellByCoords(background.position.x, background.position.y);
+
+  ctx.fillText(`cellX: ${cell.cellX}, y: ${cell.cellY}`, boxX + 10, boxY + 20);
+}
+
 // Funzione di animazione
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
-  background.draw();
+  backgrounds.forEach((b) => b.draw());
   players[partnerPlayer].draw(partnerDrift.x, partnerDrift.y);
   players[mainPlayer].draw();
   handlePlayersMovement();
   handleSwitch();
+
+  debug();
+
   window.requestAnimationFrame(animate);
 }
 

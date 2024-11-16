@@ -10,3 +10,27 @@ function getCoordsByCell(cellX, cellY) {
     y: -TILE_DIM * (cellY - TILES_FROM_CENTER_Y),
   };
 }
+
+function getCellByCoords(x, y) {
+  const realXCenter = TILES_FROM_CENTER_X * TILE_DIM;
+  const realYCenter = TILES_FROM_CENTER_Y * TILE_DIM;
+
+  let cellX = 0;
+  if (x >= 0) {
+    cellX = Math.round(Math.abs(realXCenter - x) / TILE_DIM);
+  } else {
+    cellX = Math.round(Math.abs(x) / TILE_DIM + TILES_FROM_CENTER_X);
+  }
+
+  let cellY = 0;
+  if (y >= 0) {
+    cellY = Math.round(Math.abs(realYCenter - y) / TILE_DIM);
+  } else {
+    cellY = Math.round(Math.abs(y) / TILE_DIM + TILES_FROM_CENTER_Y);
+  }
+
+  return {
+    cellX,
+    cellY,
+  };
+}
