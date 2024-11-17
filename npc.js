@@ -4,6 +4,7 @@ class NPC extends Sprite {
     startDirection = "right",
     mapPositionCell = { cellX: 0, cellY: 0 },
     background,
+    dialogue = null,
   }) {
     super({ spriteImages, startDirection });
     this.mapPositionCell = mapPositionCell;
@@ -12,6 +13,7 @@ class NPC extends Sprite {
       mapPositionCell.cellY
     );
     this.background = background;
+    this.dialogue = dialogue;
 
     this.updatePosition();
   }
@@ -47,5 +49,15 @@ class NPC extends Sprite {
       image.width / 4,
       image.height
     );
+  }
+
+  drawDialogue() {
+    const boxHeight = 60;
+    const boxX = this.position.x + 20;
+    const boxY = this.position.y - boxHeight;
+    ctx.fillStyle = "white"; // Sfondo bianco
+    ctx.fillRect(boxX, boxY, 100, boxHeight); // Rettangolo del fumetto
+    ctx.strokeStyle = "black"; // Bordo nero
+    ctx.strokeRect(boxX, boxY, 100, boxHeight); // Disegna il bordo
   }
 }

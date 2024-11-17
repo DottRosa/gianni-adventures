@@ -25,6 +25,10 @@ const collisionsGround = new Background({
   imageSrc: `${ASSETS_FOLDER}/collisions.png`,
 });
 
+const dialogue = new Dialogue({
+  textBlocks: ["Ciao", "Mi chiamo Pippo"],
+});
+
 const npcs = [
   new NPC({
     spriteImages: {
@@ -36,6 +40,7 @@ const npcs = [
       cellY: 22,
     },
     background,
+    dialogue: dialogue,
   }),
   new NPC({
     spriteImages: {
@@ -47,6 +52,7 @@ const npcs = [
       cellY: 17,
     },
     background,
+    dialogue: dialogue,
   }),
 ];
 
@@ -204,6 +210,12 @@ function debug() {
   ctx.fillText(`cellX: ${cell.cellX}, y: ${cell.cellY}`, boxX + 10, boxY + 20);
 }
 
+function drawDialogues() {
+  npcs.forEach((npc) => {
+    npc.drawDialogue();
+  });
+}
+
 // Funzione di animazione
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
@@ -211,6 +223,8 @@ function animate() {
   npcs.forEach((n) => {
     n.draw();
   });
+
+  drawDialogues();
 
   players[partnerPlayer].draw(partnerDrift.x, partnerDrift.y);
   players[mainPlayer].draw();
