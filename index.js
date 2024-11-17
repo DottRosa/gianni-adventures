@@ -5,6 +5,7 @@ const keyboard = new Keyboard();
 
 let dialogueInProgress = false;
 let npcDialogueInvolved = null;
+let interactionCooldown = 0;
 
 const MOVEMENT_FRAMES = 12;
 const FRAME_VELOCITY = TILE_DIM / MOVEMENT_FRAMES;
@@ -44,6 +45,7 @@ const npcs = [
     },
     background,
     dialogue: dialogue,
+    name: "Pippo",
   }),
   new NPC({
     spriteImages: {
@@ -56,6 +58,7 @@ const npcs = [
     },
     background,
     dialogue: dialogue,
+    name: "Giulio",
   }),
 ];
 
@@ -218,16 +221,39 @@ function drawDialogues() {
 }
 
 function handleInteractions() {
-  if (keyboard.isInteract) {
+  const now = Date.now();
+
+  if (keyboard.isInteract && now > interactionCooldown) {
+    interactionCooldown = now + INTERACTION_COOLDOWN_TIME;
+
+    if (dialogueInProgress && npcDialogueInvolved) {
+      npcDialogueInvolved.continueDialogue();
+
+      if (npcDialogueInvolved.dialogIsEnded) {
+        dialogueInProgress = false;
+        npcDialogueInvolved = null;
+      }
+      return;
+    }
     const npc = npcs.find((npc) => {
       const npcPosition = npc.position;
       const playerPosition = players[mainPlayer].position;
 
-      const distance = Math.sqrt(
-        Math.pow(npcPosition.x - playerPosition.x, 2) +
-          Math.pow(npcPosition.y - playerPosition.y, 2)
-      );
+      const deltaX = npcPosition.x - playerPosition.x;
+      const deltaY = npcPosition.y - playerPosition.y;
 
+      let npcDirection;
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        npcDirection = deltaX > 0 ? "right" : "left";
+      } else {
+        npcDirection = deltaY > 0 ? "down" : "up";
+      }
+
+      if (players[mainPlayer].currentDirection !== npcDirection) {
+        return false;
+      }
+
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       return distance <= PLAYER_INTERACTION_AREA;
     });
     if (npc) {

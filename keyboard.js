@@ -1,3 +1,5 @@
+const INTERACTION_COOLDOWN_TIME = 300;
+
 const KEYBOARD_SWITCH_KEY = "s";
 const KEYBOARD_INTERACT_KEY = "a";
 
@@ -74,5 +76,9 @@ class Keyboard {
 
   unsetSwitch() {
     this.keysPressed.Switch = false;
+  }
+
+  unsetInteract() {
+    this.keysPressed.Interact = false;
   }
 }
