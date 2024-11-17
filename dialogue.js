@@ -11,4 +11,8 @@ class Dialogue {
       this.currentDialog = 0;
     }
   }
+
+  get text() {
+    return this.textBlocks[this.currentDialog];
+  }
 }

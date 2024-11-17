@@ -55,9 +55,20 @@ class NPC extends Sprite {
     const boxHeight = 60;
     const boxX = this.position.x + 20;
     const boxY = this.position.y - boxHeight;
-    ctx.fillStyle = "white"; // Sfondo bianco
-    ctx.fillRect(boxX, boxY, 100, boxHeight); // Rettangolo del fumetto
-    ctx.strokeStyle = "black"; // Bordo nero
-    ctx.strokeRect(boxX, boxY, 100, boxHeight); // Disegna il bordo
+    ctx.fillStyle = "white";
+    ctx.fillRect(boxX, boxY, 100, boxHeight);
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(boxX, boxY, 100, boxHeight);
+
+    ctx.font = `12px Comic Sans MS`; // Font Comic Sans
+    ctx.fillStyle = "black"; // Colore del testo
+    ctx.textAlign = "center"; // Allineamento centrale
+    ctx.textBaseline = "middle"; // Allinea il testo verticalmente
+    ctx.fillText(
+      this.dialogue.text,
+      boxX + 20,
+      boxY + 20,
+      boxY + boxHeight / 2
+    );
   }
 }

@@ -3,6 +3,9 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const keyboard = new Keyboard();
 
+let dialogueInProgress = false;
+let npcDialogueInvolved = null;
+
 const MOVEMENT_FRAMES = 12;
 const FRAME_VELOCITY = TILE_DIM / MOVEMENT_FRAMES;
 
@@ -211,9 +214,27 @@ function debug() {
 }
 
 function drawDialogues() {
-  npcs.forEach((npc) => {
-    npc.drawDialogue();
-  });
+  npcDialogueInvolved.drawDialogue();
+}
+
+function handleInteractions() {
+  if (keyboard.isInteract) {
+    const npc = npcs.find((npc) => {
+      const npcPosition = npc.position;
+      const playerPosition = players[mainPlayer].position;
+
+      const distance = Math.sqrt(
+        Math.pow(npcPosition.x - playerPosition.x, 2) +
+          Math.pow(npcPosition.y - playerPosition.y, 2)
+      );
+
+      return distance <= PLAYER_INTERACTION_AREA;
+    });
+    if (npc) {
+      dialogueInProgress = true;
+      npcDialogueInvolved = npc;
+    }
+  }
 }
 
 // Funzione di animazione
@@ -224,13 +245,16 @@ function animate() {
     n.draw();
   });
 
-  drawDialogues();
-
   players[partnerPlayer].draw(partnerDrift.x, partnerDrift.y);
   players[mainPlayer].draw();
 
-  handlePlayersMovement();
-  handleSwitch();
+  if (!dialogueInProgress) {
+    handlePlayersMovement();
+    handleSwitch();
+  } else {
+    drawDialogues();
+  }
+  handleInteractions();
 
   debug();
 

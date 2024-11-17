@@ -1,3 +1,6 @@
+const KEYBOARD_SWITCH_KEY = "s";
+const KEYBOARD_INTERACT_KEY = "a";
+
 class Keyboard {
   keysPressed = {
     ArrowUp: false,
@@ -6,22 +9,32 @@ class Keyboard {
     ArrowLeft: false,
     Enter: false,
     Switch: false,
+    Interact: false,
   };
 
   registerKeyPressed(keyboardEvent) {
-    if (keyboardEvent.key.toLowerCase() === KEYBOARD_SWITCH_KEY) {
-      this.keysPressed.Switch = true;
-    } else {
-      this.keysPressed[keyboardEvent.key] = true;
-    }
+    this.toggleKeyPressed(keyboardEvent, true);
   }
 
   unsetKeyPressed(keyboardEvent) {
-    if (keyboardEvent.key.toLowerCase() === KEYBOARD_SWITCH_KEY) {
-      this.keysPressed.Switch = false;
-    } else {
-      this.keysPressed[keyboardEvent.key] = false;
+    this.toggleKeyPressed(keyboardEvent, false);
+  }
+
+  toggleKeyPressed(keyboardEvent, pressed) {
+    const key = keyboardEvent.key.toLowerCase();
+
+    switch (key) {
+      case KEYBOARD_SWITCH_KEY: {
+        this.keysPressed.Switch = pressed;
+        return;
+      }
+      case KEYBOARD_INTERACT_KEY: {
+        this.keysPressed.Interact = pressed;
+        return;
+      }
     }
+
+    this.keysPressed[keyboardEvent.key] = pressed;
   }
 
   get isUp() {
@@ -53,6 +66,10 @@ class Keyboard {
 
   get isSwitch() {
     return this.keysPressed.Switch;
+  }
+
+  get isInteract() {
+    return this.keysPressed.Interact;
   }
 
   unsetSwitch() {
