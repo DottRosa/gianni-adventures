@@ -16,7 +16,7 @@ class NPC extends Sprite {
     startDirection = "right",
     mapPositionCell = { cellX: 0, cellY: 0 },
     background,
-    dialogue = null,
+    dialogueManager = null,
     name = "Unknown",
   }) {
     super({ spriteImages, startDirection });
@@ -26,7 +26,7 @@ class NPC extends Sprite {
       mapPositionCell.cellY
     );
     this.background = background;
-    this.dialogue = dialogue;
+    this.dialogueManager = dialogueManager;
     this.name = name;
 
     this.updatePosition();
@@ -63,37 +63,19 @@ class NPC extends Sprite {
     );
   }
 
+  startDialogue() {
+    this.dialogueManager.start();
+  }
+
   continueDialogue() {
-    this.dialogue.next();
+    return this.dialogueManager.next();
   }
 
   get dialogIsEnded() {
-    if (this.dialogue.ended) {
-      this.dialogue.ended = false;
-
-      return true;
-    }
-    return false;
+    return this.dialogueManager.ended;
   }
 
   drawDialogue() {
-    const boxHeight = 60;
-    const boxX = this.position.x + 20;
-    const boxY = this.position.y - boxHeight;
-
-    ctx.fillStyle = NPC_DIALOGUE_BALLOON_COLOR;
-    ctx.fillRect(boxX, boxY, 100, boxHeight);
-
-    ctx.strokeStyle = NPC_DIALOGUE_BALLOON_BORDER_COLOR;
-    ctx.strokeRect(boxX, boxY, 100, boxHeight);
-
-    ctx.textAlign = "left";
-    ctx.font = NPC_DIALOGUE_FONT_BOLD;
-    ctx.fillStyle = NPC_DIALOGUE_NAME_COLOR;
-    ctx.fillText(this.name, boxX + 5, boxY + 5, boxY + boxHeight / 2);
-
-    ctx.font = NPC_DIALOGUE_FONT_NORMAL;
-    ctx.fillStyle = NPC_DIALOGUE_TEXT_COLOR;
-    ctx.fillText(this.dialogue.text, boxX + 5, boxY + 20, boxY + boxHeight / 2);
+    this.dialogueManager.draw(this.position, this.name);
   }
 }

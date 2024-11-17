@@ -23,3 +23,8 @@ const TILES_FROM_CENTER_Y = Math.floor(TILES_PER_Y / 2);
 const ASSETS_FOLDER = "./assets";
 
 const PLAYER_INTERACTION_AREA = TILE_DIM;
+
+const PLAYER_FABRISSAZZO = "fabrissazzo";
+const PLAYER_GIANNI = "gianni";
+let mainPlayer = PLAYER_GIANNI;
+let partnerPlayer = PLAYER_FABRISSAZZO;

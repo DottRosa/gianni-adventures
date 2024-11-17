@@ -29,10 +29,6 @@ const collisionsGround = new Background({
   imageSrc: `${ASSETS_FOLDER}/collisions.png`,
 });
 
-const dialogue = new Dialogue({
-  textBlocks: ["Ciao", "Mi chiamo Pippo"],
-});
-
 const npcs = [
   new NPC({
     spriteImages: {
@@ -44,8 +40,8 @@ const npcs = [
       cellY: 22,
     },
     background,
-    dialogue: dialogue,
-    name: "Pippo",
+    dialogueManager,
+    name: "Furlanetto",
   }),
   new NPC({
     spriteImages: {
@@ -57,7 +53,7 @@ const npcs = [
       cellY: 17,
     },
     background,
-    dialogue: dialogue,
+    // dialogue: dialogue,
     name: "Giulio",
   }),
 ];
@@ -85,8 +81,6 @@ const collision = new Collision(COLLISIONS_FIRST_MAP, 70, npcs);
 
 let backgroundPosition = { x: 0, y: 0 };
 let partnerDrift = { x: 0, y: 0 };
-let mainPlayer = PLAYER_GIANNI;
-let partnerPlayer = PLAYER_FABRISSAZZO;
 
 const DISTANCE_BETWEEN_PARTNERS = 50;
 
@@ -229,9 +223,9 @@ function handleInteractions() {
     interactionCooldown = now + INTERACTION_COOLDOWN_TIME;
 
     if (dialogueInProgress && npcDialogueInvolved) {
-      npcDialogueInvolved.continueDialogue();
+      const canContinue = npcDialogueInvolved.continueDialogue();
 
-      if (npcDialogueInvolved.dialogIsEnded) {
+      if (!canContinue) {
         dialogueInProgress = false;
         npcDialogueInvolved = null;
       }
@@ -261,6 +255,7 @@ function handleInteractions() {
     if (npc) {
       dialogueInProgress = true;
       npcDialogueInvolved = npc;
+      npcDialogueInvolved.startDialogue();
     }
   }
 }
