@@ -64,27 +64,29 @@ const npcs = [
 
 const backgrounds = [background];
 
-const players = {
-  gianni: new Sprite({
-    spriteImages: {
-      left: `${ASSETS_FOLDER}/gianni-sprite-left.png`,
-      right: `${ASSETS_FOLDER}/gianni-sprite-right.png`,
-    },
-  }),
-  fabris: new Sprite({
-    spriteImages: {
-      left: `${ASSETS_FOLDER}/fabris-sprite-left.png`,
-      right: `${ASSETS_FOLDER}/fabris-sprite-right.png`,
-    },
-  }),
-};
+const players = {};
+players[PLAYER_FABRISSAZZO] = new Player({
+  spriteImages: {
+    left: `${ASSETS_FOLDER}/fabris-sprite-left.png`,
+    right: `${ASSETS_FOLDER}/fabris-sprite-right.png`,
+  },
+  name: PLAYER_FABRISSAZZO,
+});
+
+players[PLAYER_GIANNI] = new Player({
+  spriteImages: {
+    left: `${ASSETS_FOLDER}/gianni-sprite-left.png`,
+    right: `${ASSETS_FOLDER}/gianni-sprite-right.png`,
+  },
+  name: PLAYER_GIANNI,
+});
 
 const collision = new Collision(COLLISIONS_FIRST_MAP, 70, npcs);
 
 let backgroundPosition = { x: 0, y: 0 };
 let partnerDrift = { x: 0, y: 0 };
-let mainPlayer = "gianni";
-let partnerPlayer = "fabris";
+let mainPlayer = PLAYER_GIANNI;
+let partnerPlayer = PLAYER_FABRISSAZZO;
 
 const DISTANCE_BETWEEN_PARTNERS = 50;
 
