@@ -1,9 +1,12 @@
 class Sprite {
   currentFrame = 0;
   currentDirection = "right";
+  position = {
+    x: 0,
+    y: 0,
+  };
 
-  constructor({ spriteImages, startDirection = "right", velocity }) {
-    this.velocity = velocity;
+  constructor({ spriteImages, startDirection = "right" }) {
     this.currentDirection = startDirection;
 
     this.image = {
@@ -35,14 +38,24 @@ class Sprite {
   draw(driftX = 0, driftY = 0) {
     const image = this.image[this.currentDirection];
 
+    this.position.x =
+      CANVAS_WIDTH / 2 - this.image[this.currentDirection].width / 4 / 2;
+    this.position.y =
+      CANVAS_HEIGHT / 2 - this.image[this.currentDirection].height / 2;
+
+    let xPos = this.position.x + driftX;
+    let yPos = this.position.y + driftY;
+
+    // console.log(xPos, yPos);
+
     ctx.drawImage(
       image,
       this.currentFrame * (image.width / 4),
       0,
       image.width / 4,
       image.height,
-      CANVAS_WIDTH / 2 - image.width / 4 / 2 + driftX,
-      CANVAS_HEIGHT / 2 - image.height / 2 + driftY,
+      xPos,
+      yPos,
       image.width / 4,
       image.height
     );

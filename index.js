@@ -14,6 +14,7 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 const collision = new Collision(COLLISIONS_FIRST_MAP, 70);
 
+const PLAYER_VELOCITY = FRAME_VELOCITY;
 const START_COORDS = { cellX: 16, cellY: 21 };
 
 const background = new Background({
@@ -26,9 +27,38 @@ const collisionsGround = new Background({
   imageSrc: `${ASSETS_FOLDER}/collisions.png`,
 });
 
-const backgrounds = [background];
+const npcs = [
+  new NPC({
+    spriteImages: {
+      left: `${ASSETS_FOLDER}/npc-sprite.png`,
+      right: `${ASSETS_FOLDER}/npc-sprite.png`,
+    },
+    mapPositionCell: {
+      cellX: 17,
+      cellY: 22,
+    },
+    backgroundPosition: {
+      x: background.position.x,
+      y: background.position.y,
+    },
+  }),
+  new NPC({
+    spriteImages: {
+      left: `${ASSETS_FOLDER}/npc-sprite.png`,
+      right: `${ASSETS_FOLDER}/npc-sprite.png`,
+    },
+    mapPositionCell: {
+      cellX: 36,
+      cellY: 17,
+    },
+    backgroundPosition: {
+      x: background.position.x,
+      y: background.position.y,
+    },
+  }),
+];
 
-const PLAYER_VELOCITY = FRAME_VELOCITY;
+const backgrounds = [background];
 
 const players = {
   gianni: new Sprite({
@@ -36,14 +66,12 @@ const players = {
       left: `${ASSETS_FOLDER}/gianni-sprite-left.png`,
       right: `${ASSETS_FOLDER}/gianni-sprite-right.png`,
     },
-    velocity: PLAYER_VELOCITY,
   }),
   fabris: new Sprite({
     spriteImages: {
       left: `${ASSETS_FOLDER}/fabris-sprite-left.png`,
       right: `${ASSETS_FOLDER}/fabris-sprite-right.png`,
     },
-    velocity: PLAYER_VELOCITY,
   }),
 };
 
@@ -186,10 +214,17 @@ function debug() {
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
   backgrounds.forEach((b) => b.draw());
+
   players[partnerPlayer].draw(partnerDrift.x, partnerDrift.y);
   players[mainPlayer].draw();
+
   handlePlayersMovement();
   handleSwitch();
+
+  npcs.forEach((n) => {
+    n.updatePosition(backgrounds[0].position);
+    n.draw();
+  });
 
   debug();
 
