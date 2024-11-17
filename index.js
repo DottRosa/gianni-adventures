@@ -12,8 +12,6 @@ canvas.height = CANVAS_HEIGHT;
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const collision = new Collision(COLLISIONS_FIRST_MAP, 70);
-
 const PLAYER_VELOCITY = FRAME_VELOCITY;
 const START_COORDS = { cellX: 16, cellY: 21 };
 
@@ -68,6 +66,8 @@ const players = {
     },
   }),
 };
+
+const collision = new Collision(COLLISIONS_FIRST_MAP, 70, npcs);
 
 let backgroundPosition = { x: 0, y: 0 };
 let partnerDrift = { x: 0, y: 0 };

@@ -6,6 +6,7 @@ class NPC extends Sprite {
     background,
   }) {
     super({ spriteImages, startDirection });
+    this.mapPositionCell = mapPositionCell;
     this.mapCoords = getCoordsByCell(
       mapPositionCell.cellX,
       mapPositionCell.cellY
