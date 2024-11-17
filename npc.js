@@ -3,36 +3,37 @@ class NPC extends Sprite {
     spriteImages,
     startDirection = "right",
     mapPositionCell = { cellX: 0, cellY: 0 },
-    backgroundPosition = { x: 0, y: 0 },
+    background,
   }) {
     super({ spriteImages, startDirection });
-    this.mapPositionCell = mapPositionCell;
+    this.mapCoords = getCoordsByCell(
+      mapPositionCell.cellX,
+      mapPositionCell.cellY
+    );
+    this.background = background;
 
-    this.updatePosition(backgroundPosition);
+    this.updatePosition();
   }
 
-  updatePosition(backgroundPosition = { x: 0, y: 0 }) {
-    const cellCoords = getCoordsByCell(
-      this.mapPositionCell.cellX,
-      this.mapPositionCell.cellY
-    );
+  updatePosition() {
+    // Calcola lo shift relativo al background senza Math.abs
+    const shiftX = this.background.position.x - this.mapCoords.x;
+    const shiftY = this.background.position.y - this.mapCoords.y;
 
-    const shiftX = Math.abs(backgroundPosition.x) - Math.abs(cellCoords.x);
-    const shiftY = Math.abs(backgroundPosition.y) - Math.abs(cellCoords.y);
-
+    // Calcola la posizione dell'NPC sulla canvas
     this.position = {
-      x: TILES_FROM_CENTER_X * TILE_DIM - shiftX,
-      y: TILES_FROM_CENTER_Y * TILE_DIM - shiftY,
+      x: TILES_FROM_CENTER_X * TILE_DIM + shiftX,
+      y: TILES_FROM_CENTER_Y * TILE_DIM + shiftY,
     };
   }
 
   draw() {
     const image = this.image[this.currentDirection];
 
+    this.updatePosition();
+
     let xPos = this.position.x;
     let yPos = this.position.y;
-
-    // console.log(xPos, yPos);
 
     ctx.drawImage(
       image,

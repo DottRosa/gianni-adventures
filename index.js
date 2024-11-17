@@ -37,10 +37,7 @@ const npcs = [
       cellX: 17,
       cellY: 22,
     },
-    backgroundPosition: {
-      x: background.position.x,
-      y: background.position.y,
-    },
+    background,
   }),
   new NPC({
     spriteImages: {
@@ -51,10 +48,7 @@ const npcs = [
       cellX: 36,
       cellY: 17,
     },
-    backgroundPosition: {
-      x: background.position.x,
-      y: background.position.y,
-    },
+    background,
   }),
 ];
 
@@ -214,17 +208,15 @@ function debug() {
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
   backgrounds.forEach((b) => b.draw());
+  npcs.forEach((n) => {
+    n.draw();
+  });
 
   players[partnerPlayer].draw(partnerDrift.x, partnerDrift.y);
   players[mainPlayer].draw();
 
   handlePlayersMovement();
   handleSwitch();
-
-  npcs.forEach((n) => {
-    n.updatePosition(backgrounds[0].position);
-    n.draw();
-  });
 
   debug();
 

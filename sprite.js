@@ -46,8 +46,6 @@ class Sprite {
     let xPos = this.position.x + driftX;
     let yPos = this.position.y + driftY;
 
-    // console.log(xPos, yPos);
-
     ctx.drawImage(
       image,
       this.currentFrame * (image.width / 4),
