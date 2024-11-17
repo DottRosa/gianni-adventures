@@ -7,16 +7,12 @@ let dialogueInProgress = false;
 let npcDialogueInvolved = null;
 let interactionCooldown = 0;
 
-const MOVEMENT_FRAMES = 12;
-const FRAME_VELOCITY = TILE_DIM / MOVEMENT_FRAMES;
-
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const PLAYER_VELOCITY = FRAME_VELOCITY;
 const START_COORDS = { cellX: 16, cellY: 21 };
 
 const background = new Background({
@@ -81,8 +77,6 @@ const collision = new Collision(COLLISIONS_FIRST_MAP, 70, npcs);
 
 let backgroundPosition = { x: 0, y: 0 };
 let partnerDrift = { x: 0, y: 0 };
-
-const DISTANCE_BETWEEN_PARTNERS = 50;
 
 function handlePlayersMovement() {
   const moveX = keyboard.isRight ? -1 : keyboard.isLeft ? 1 : 0;
@@ -241,8 +235,6 @@ function handleInteractions() {
       let npcDirection;
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         npcDirection = deltaX > 0 ? "right" : "left";
-      } else {
-        npcDirection = deltaY > 0 ? "down" : "up";
       }
 
       if (players[mainPlayer].currentDirection !== npcDirection) {
