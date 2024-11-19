@@ -154,11 +154,9 @@ class DialogueManager {
   }
 
   draw({ position, name, players, partnerDrift }) {
-    const boxHeight = 60;
-
     // when the npc is speaking
     let boxX = position.x + 20;
-    let boxY = position.y - boxHeight;
+    let boxY = position.y - CONFIG.dialogue.balloon.height;
     let entityName = name;
 
     // when a player is speaking
@@ -167,28 +165,44 @@ class DialogueManager {
 
       if (this.currentDialogue.speaker === mainPlayer) {
         boxX = player.position.x + 20;
-        boxY = player.position.y - boxHeight;
+        boxY = player.position.y - CONFIG.dialogue.balloon.height;
       } else {
         boxX = player.position.x + 20 + partnerDrift.x;
-        boxY = player.position.y - boxHeight + partnerDrift.y;
+        boxY =
+          player.position.y - CONFIG.dialogue.balloon.height + partnerDrift.y;
       }
 
       entityName = player.name;
     }
 
-    ctx.fillStyle = NPC_DIALOGUE_BALLOON_COLOR;
-    ctx.fillRect(boxX, boxY, 100, boxHeight);
+    ctx.fillStyle = CONFIG.dialogue.balloon.backgroundColor;
+    ctx.fillRect(
+      boxX,
+      boxY,
+      CONFIG.dialogue.balloon.width,
+      CONFIG.dialogue.balloon.height
+    );
 
-    ctx.strokeStyle = NPC_DIALOGUE_BALLOON_BORDER_COLOR;
-    ctx.strokeRect(boxX, boxY, 100, boxHeight);
+    ctx.strokeStyle = CONFIG.dialogue.balloon.borderColor;
+    ctx.strokeRect(
+      boxX,
+      boxY,
+      CONFIG.dialogue.balloon.width,
+      CONFIG.dialogue.balloon.height
+    );
 
-    ctx.textAlign = "left";
-    ctx.font = NPC_DIALOGUE_FONT_BOLD;
-    ctx.fillStyle = NPC_DIALOGUE_NAME_COLOR;
-    ctx.fillText(entityName, boxX + 5, boxY + 5, boxY + boxHeight / 2);
+    ctx.textAlign = CONFIG.dialogue.textAlign;
+    ctx.font = CONFIG.dialogue.fontBold;
+    ctx.fillStyle = CONFIG.dialogue.nameColor;
+    ctx.fillText(
+      entityName,
+      boxX + 5,
+      boxY + 5,
+      boxY + CONFIG.dialogue.balloon.height / 2
+    );
 
-    ctx.font = NPC_DIALOGUE_FONT_NORMAL;
-    ctx.fillStyle = NPC_DIALOGUE_TEXT_COLOR;
+    ctx.font = CONFIG.dialogue.fontNormal;
+    ctx.fillStyle = CONFIG.dialogue.textColor;
 
     if (this.currentDialogue.choices) {
       if (!this.choiceInProgress) {
@@ -202,7 +216,7 @@ class DialogueManager {
           `${prefix}${choice.text}`,
           boxX + (prefix ? 5 : 15),
           boxY + 20 + index * 15,
-          boxY + boxHeight / 2 + index * 15
+          boxY + CONFIG.dialogue.balloon.height / 2 + index * 15
         );
       });
     } else {
@@ -210,7 +224,7 @@ class DialogueManager {
         this.currentDialogText,
         boxX + 5,
         boxY + 20,
-        boxY + boxHeight / 2
+        boxY + CONFIG.dialogue.balloon.height / 2
       );
     }
   }

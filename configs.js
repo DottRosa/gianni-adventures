@@ -31,12 +31,23 @@ const INTERACTION_CHOICES_COOLDOWN_TIME = 100;
 const KEYBOARD_SWITCH_KEY = "s";
 const KEYBOARD_INTERACT_KEY = "a";
 
-// --- NPC ---
-const NPC_DIALOGUE_FONT_SIZE = 12;
-const NPC_DIALOGUE_FONT_FAMILY = "Comic Sans MS";
-const NPC_DIALOGUE_FONT_NORMAL = `${NPC_DIALOGUE_FONT_SIZE}px ${NPC_DIALOGUE_FONT_FAMILY}`;
-const NPC_DIALOGUE_FONT_BOLD = `bold ${NPC_DIALOGUE_FONT_SIZE}px ${NPC_DIALOGUE_FONT_FAMILY}`;
-const NPC_DIALOGUE_NAME_COLOR = "red";
-const NPC_DIALOGUE_TEXT_COLOR = "black";
-const NPC_DIALOGUE_BALLOON_COLOR = "white";
-const NPC_DIALOGUE_BALLOON_BORDER_COLOR = "black";
+const CONFIG = {
+  dialogue: {
+    fontSize: 13,
+    fontFamily: "Comic Sans MS",
+    textAlign: "left",
+    fontNormal: null, // calcolato dopo
+    fontBold: null, // calcolato dopo
+    nameColor: "red",
+    textColor: "black",
+    balloon: {
+      backgroundColor: "white",
+      borderColor: "black",
+      height: 75,
+      width: 150,
+    },
+  },
+};
+
+CONFIG.dialogue.fontNormal = `${CONFIG.dialogue.fontSize}px ${CONFIG.dialogue.fontFamily}`;
+CONFIG.dialogue.fontBold = `bold ${CONFIG.dialogue.fontSize}px ${CONFIG.dialogue.fontFamily}`;
