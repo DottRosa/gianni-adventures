@@ -18,19 +18,19 @@ const START_COORDS = { cellX: 16, cellY: 21 };
 
 const background = new Background({
   position: getCoordsByCell(START_COORDS.cellX, START_COORDS.cellY),
-  imageSrc: `${ASSETS_FOLDER}/first-map.png`,
+  imageSrc: `${CONFIG.assetsFolder}/first-map.png`,
 });
 
 const collisionsGround = new Background({
   position: getCoordsByCell(16, 21),
-  imageSrc: `${ASSETS_FOLDER}/collisions.png`,
+  imageSrc: `${CONFIG.assetsFolder}/collisions.png`,
 });
 
 const npcs = [
   new NPC({
     spriteImages: {
-      left: `${ASSETS_FOLDER}/npc-sprite.png`,
-      right: `${ASSETS_FOLDER}/npc-sprite.png`,
+      left: `${CONFIG.assetsFolder}/npc-sprite.png`,
+      right: `${CONFIG.assetsFolder}/npc-sprite.png`,
     },
     mapPositionCell: {
       cellX: 17,
@@ -42,8 +42,8 @@ const npcs = [
   }),
   new NPC({
     spriteImages: {
-      left: `${ASSETS_FOLDER}/npc-sprite.png`,
-      right: `${ASSETS_FOLDER}/npc-sprite.png`,
+      left: `${CONFIG.assetsFolder}/npc-sprite.png`,
+      right: `${CONFIG.assetsFolder}/npc-sprite.png`,
     },
     mapPositionCell: {
       cellX: 36,
@@ -60,16 +60,16 @@ const backgrounds = [background];
 const players = {};
 players[CONFIG.player.fabrissazzo] = new Player({
   spriteImages: {
-    left: `${ASSETS_FOLDER}/fabris-sprite-left.png`,
-    right: `${ASSETS_FOLDER}/fabris-sprite-right.png`,
+    left: `${CONFIG.assetsFolder}/fabris-sprite-left.png`,
+    right: `${CONFIG.assetsFolder}/fabris-sprite-right.png`,
   },
   name: "Fabris",
 });
 
 players[CONFIG.player.gianni] = new Player({
   spriteImages: {
-    left: `${ASSETS_FOLDER}/gianni-sprite-left.png`,
-    right: `${ASSETS_FOLDER}/gianni-sprite-right.png`,
+    left: `${CONFIG.assetsFolder}/gianni-sprite-left.png`,
+    right: `${CONFIG.assetsFolder}/gianni-sprite-right.png`,
   },
   name: "Gianni",
 });

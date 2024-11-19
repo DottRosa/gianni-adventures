@@ -11,9 +11,9 @@ const CANVAS_WIDTH = TILE_DIM * TILES_PER_X;
 const CANVAS_HEIGHT = TILE_DIM * TILES_PER_Y;
 const TILES_FROM_CENTER_X = Math.floor(TILES_PER_X / 2);
 const TILES_FROM_CENTER_Y = Math.floor(TILES_PER_Y / 2);
-const ASSETS_FOLDER = "./assets";
 
 const CONFIG = {
+  assetsFolder: "./assets",
   player: {
     movementFrames: 12,
     get frameVelocity() {
