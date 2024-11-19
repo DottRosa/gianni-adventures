@@ -25,8 +25,8 @@ class NPC extends Sprite {
     const shiftY = this.background.position.y - this.mapCoords.y;
 
     this.position = {
-      x: TILES_FROM_CENTER_X * TILE_DIM + shiftX,
-      y: TILES_FROM_CENTER_Y * TILE_DIM + shiftY,
+      x: CONFIG.tile.tilesFromCenterX * CONFIG.tile.tileDim + shiftX,
+      y: CONFIG.tile.tilesFromCenterY * CONFIG.tile.tileDim + shiftY,
     };
   }
 

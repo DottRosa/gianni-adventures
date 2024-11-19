@@ -39,9 +39,11 @@ class Sprite {
     const image = this.image[this.currentDirection];
 
     this.position.x =
-      CANVAS_WIDTH / 2 - this.image[this.currentDirection].width / 4 / 2;
+      CONFIG.tile.canvasWidth / 2 -
+      this.image[this.currentDirection].width / 4 / 2;
     this.position.y =
-      CANVAS_HEIGHT / 2 - this.image[this.currentDirection].height / 2;
+      CONFIG.tile.canvasHeight / 2 -
+      this.image[this.currentDirection].height / 2;
 
     let xPos = this.position.x + driftX;
     let yPos = this.position.y + driftY;

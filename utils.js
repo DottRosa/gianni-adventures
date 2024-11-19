@@ -6,27 +6,31 @@
  */
 function getCoordsByCell(cellX, cellY) {
   return {
-    x: -TILE_DIM * (cellX - TILES_FROM_CENTER_X),
-    y: -TILE_DIM * (cellY - TILES_FROM_CENTER_Y),
+    x: -CONFIG.tile.tileDim * (cellX - CONFIG.tile.tilesFromCenterX),
+    y: -CONFIG.tile.tileDim * (cellY - CONFIG.tile.tilesFromCenterY),
   };
 }
 
 function getCellByCoords(x, y) {
-  const realXCenter = TILES_FROM_CENTER_X * TILE_DIM;
-  const realYCenter = TILES_FROM_CENTER_Y * TILE_DIM;
+  const realXCenter = CONFIG.tile.tilesFromCenterX * CONFIG.tile.tileDim;
+  const realYCenter = CONFIG.tile.tilesFromCenterY * CONFIG.tile.tileDim;
 
   let cellX = 0;
   if (x >= 0) {
-    cellX = Math.round(Math.abs(realXCenter - x) / TILE_DIM);
+    cellX = Math.round(Math.abs(realXCenter - x) / CONFIG.tile.tileDim);
   } else {
-    cellX = Math.round(Math.abs(x) / TILE_DIM + TILES_FROM_CENTER_X);
+    cellX = Math.round(
+      Math.abs(x) / CONFIG.tile.tileDim + CONFIG.tile.tilesFromCenterX
+    );
   }
 
   let cellY = 0;
   if (y >= 0) {
-    cellY = Math.round(Math.abs(realYCenter - y) / TILE_DIM);
+    cellY = Math.round(Math.abs(realYCenter - y) / CONFIG.tile.tileDim);
   } else {
-    cellY = Math.round(Math.abs(y) / TILE_DIM + TILES_FROM_CENTER_Y);
+    cellY = Math.round(
+      Math.abs(y) / CONFIG.tile.tileDim + CONFIG.tile.tilesFromCenterY
+    );
   }
 
   return {

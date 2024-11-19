@@ -8,8 +8,8 @@ let npcDialogueInvolved = null;
 let interactionCooldown = 0;
 let lastKeyPressedId = null;
 
-canvas.width = CANVAS_WIDTH;
-canvas.height = CANVAS_HEIGHT;
+canvas.width = CONFIG.tile.canvasWidth;
+canvas.height = CONFIG.tile.canvasHeight;
 
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);

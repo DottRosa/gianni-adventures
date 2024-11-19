@@ -1,23 +1,26 @@
-// --- CONFIGS ---
-// Zoom percentage
-const ZOOM = 500;
-const REAL_TILE_DIM = 12; // Dimension of a single tile
-const TILES_PER_X = 17; // Number of tiles to display in the canvas in the x axis
-const TILES_PER_Y = 11; // Number of tiles to display in the canvas in the y axis
-
-// --- CALCULATED ---
-const TILE_DIM = (REAL_TILE_DIM * ZOOM) / 100; // The dim of the zoomed tile
-const CANVAS_WIDTH = TILE_DIM * TILES_PER_X;
-const CANVAS_HEIGHT = TILE_DIM * TILES_PER_Y;
-const TILES_FROM_CENTER_X = Math.floor(TILES_PER_X / 2);
-const TILES_FROM_CENTER_Y = Math.floor(TILES_PER_Y / 2);
-
 const CONFIG = {
+  zoom: 500,
+  tile: {
+    realDim: 12,
+    tilesPerX: 17,
+    tilesPerY: 11,
+    tilesFromCenterX: null,
+    tilesFromCenterY: null,
+    get tileDim() {
+      return (this.realDim * CONFIG.zoom) / 100;
+    },
+    get canvasWidth() {
+      return this.tileDim * this.tilesPerX;
+    },
+    get canvasHeight() {
+      return this.tileDim * this.tilesPerY;
+    },
+  },
   assetsFolder: "./assets",
   player: {
     movementFrames: 12,
     get frameVelocity() {
-      return TILE_DIM / this.movementFrames;
+      return CONFIG.tile.tileDim / this.movementFrames;
     },
     velocity: null,
     interactionArea: null,
@@ -50,11 +53,14 @@ const CONFIG = {
   },
 };
 
+CONFIG.tile.tilesFromCenterX = Math.floor(CONFIG.tile.tilesPerX / 2);
+CONFIG.tile.tilesFromCenterY = Math.floor(CONFIG.tile.tilesPerY / 2);
+
 CONFIG.dialogue.fontNormal = `${CONFIG.dialogue.fontSize}px ${CONFIG.dialogue.fontFamily}`;
 CONFIG.dialogue.fontBold = `bold ${CONFIG.dialogue.fontSize}px ${CONFIG.dialogue.fontFamily}`;
 
 CONFIG.player.velocity = CONFIG.player.frameVelocity;
-CONFIG.player.interactionArea = TILE_DIM;
+CONFIG.player.interactionArea = CONFIG.tile.tileDim;
 CONFIG.player.main = CONFIG.player.gianni;
 CONFIG.player.partner = CONFIG.player.fabrissazzo;
 
