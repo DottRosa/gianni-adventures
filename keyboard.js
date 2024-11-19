@@ -31,10 +31,10 @@ class Keyboard {
     const key = keyboardEvent.key.toLowerCase();
 
     switch (key) {
-      case KEYBOARD_SWITCH_KEY: {
+      case CONFIG.keyboard.switchKey: {
         return this.keysPressed.Switch;
       }
-      case KEYBOARD_INTERACT_KEY: {
+      case CONFIG.keyboard.interactKey: {
         return this.keysPressed.Interact;
       }
     }
@@ -46,11 +46,11 @@ class Keyboard {
     const key = keyboardEvent.key.toLowerCase();
 
     switch (key) {
-      case KEYBOARD_SWITCH_KEY: {
+      case CONFIG.keyboard.switchKey: {
         this.keysPressed.Switch = pressed;
         return;
       }
-      case KEYBOARD_INTERACT_KEY: {
+      case CONFIG.keyboard.interactKey: {
         this.keysPressed.Interact = pressed;
         return;
       }

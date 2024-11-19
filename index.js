@@ -221,7 +221,7 @@ function handleInteractions() {
     lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
   ) {
     lastKeyPressedId = keyboard.keyId;
-    interactionCooldown = now + INTERACTION_CHOICES_COOLDOWN_TIME;
+    interactionCooldown = now + CONFIG.keyboard.choicesCooldown;
 
     switch (true) {
       case keyboard.isDown: {
@@ -247,7 +247,7 @@ function handleInteractions() {
     lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
   ) {
     lastKeyPressedId = keyboard.keyId;
-    interactionCooldown = now + INTERACTION_COOLDOWN_TIME;
+    interactionCooldown = now + CONFIG.keyboard.interactionCooldown;
 
     if (dialogueInProgress && npcDialogueInvolved) {
       const canContinue = npcDialogueInvolved.dialogueManager.next();

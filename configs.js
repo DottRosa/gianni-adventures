@@ -25,13 +25,13 @@ const PLAYER_GIANNI = "gianni";
 let mainPlayer = PLAYER_GIANNI;
 let partnerPlayer = PLAYER_FABRISSAZZO;
 
-// --- KEYBOARD ---
-const INTERACTION_COOLDOWN_TIME = 300;
-const INTERACTION_CHOICES_COOLDOWN_TIME = 100;
-const KEYBOARD_SWITCH_KEY = "s";
-const KEYBOARD_INTERACT_KEY = "a";
-
 const CONFIG = {
+  keyboard: {
+    interactionCooldown: 300,
+    choicesCooldown: 100,
+    switchKey: "s",
+    interactKey: "a",
+  },
   dialogue: {
     fontSize: 13,
     fontFamily: "Comic Sans MS",
