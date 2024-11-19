@@ -213,11 +213,36 @@ function drawDialogues() {
 function handleInteractions() {
   const now = Date.now();
 
+  if (
+    dialogueInProgress &&
+    npcDialogueInvolved.dialogueManager.choiceInProgress &&
+    now > interactionCooldown
+  ) {
+    interactionCooldown = now + INTERACTION_CHOICES_COOLDOWN_TIME;
+
+    switch (true) {
+      case keyboard.isDown: {
+        npcDialogueInvolved.changeChoice(true);
+        break;
+      }
+      case keyboard.isUp: {
+        npcDialogueInvolved.changeChoice(false);
+        break;
+      }
+      case keyboard.isInteract: {
+        npcDialogueInvolved.dialogueManager.selectChoice();
+        break;
+      }
+    }
+
+    return; // next interaction handling will be skipped
+  }
+
   if (keyboard.isInteract && now > interactionCooldown) {
     interactionCooldown = now + INTERACTION_COOLDOWN_TIME;
 
     if (dialogueInProgress && npcDialogueInvolved) {
-      const canContinue = npcDialogueInvolved.continueDialogue();
+      const canContinue = npcDialogueInvolved.dialogueManager.next();
 
       if (!canContinue) {
         dialogueInProgress = false;
@@ -247,7 +272,7 @@ function handleInteractions() {
     if (npc) {
       dialogueInProgress = true;
       npcDialogueInvolved = npc;
-      npcDialogueInvolved.startDialogue();
+      npcDialogueInvolved.dialogueManager.start();
     }
   }
 }

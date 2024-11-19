@@ -16,7 +16,20 @@ const dialogues = {
   gianni_answer: {
     id: "gianni_answer",
     speaker: PLAYER_GIANNI,
-    text: "Ma che ooooooh!",
+    choices: [
+      {
+        text: "Ma che ooooooh!",
+        next: "goodbye",
+      },
+      {
+        text: "Allora ooooh!",
+        next: "goodbye",
+      },
+      {
+        text: "Ti metto 2",
+        next: "goodbye",
+      },
+    ],
     next: "goodbye",
   },
   fabris_answer: {
@@ -51,6 +64,10 @@ const dialogues = {
 };
 
 class DialogueManager {
+  choiceInProgress = false;
+  currentChoices = null;
+  currentChoice = -1;
+
   constructor(dialogues) {
     this.dialogues = dialogues;
     this.currentDialogue = null;
@@ -109,6 +126,33 @@ class DialogueManager {
     return this.currentDialogue.text;
   }
 
+  nextChoice() {
+    this.currentChoice++;
+    if (this.currentChoice >= this.currentChoices.length) {
+      this.currentChoice = 0;
+    }
+  }
+
+  previousChoice() {
+    this.currentChoice--;
+    if (this.currentChoice < 0) {
+      this.currentChoice = this.currentChoices.length - 1;
+    }
+  }
+
+  selectChoice() {
+    let nextId = this.currentDialogue.choices[this.currentChoice].next;
+    this.currentChoice = -1;
+    this.choiceInProgress = false;
+
+    if (!nextId) {
+      return false;
+    }
+
+    this.start(nextId);
+    return true;
+  }
+
   draw({ position, name, players, partnerDrift }) {
     const boxHeight = 60;
 
@@ -146,12 +190,29 @@ class DialogueManager {
     ctx.font = NPC_DIALOGUE_FONT_NORMAL;
     ctx.fillStyle = NPC_DIALOGUE_TEXT_COLOR;
 
-    ctx.fillText(
-      this.currentDialogText,
-      boxX + 5,
-      boxY + 20,
-      boxY + boxHeight / 2
-    );
+    if (this.currentDialogue.choices) {
+      if (!this.choiceInProgress) {
+        this.choiceInProgress = true;
+        this.currentChoices = this.currentDialogue.choices;
+        this.currentChoice = 0;
+      }
+      this.currentDialogue.choices.forEach((choice, index) => {
+        const prefix = this.currentChoice === index ? "> " : "";
+        ctx.fillText(
+          `${prefix}${choice.text}`,
+          boxX + (prefix ? 5 : 15),
+          boxY + 20 + index * 15,
+          boxY + boxHeight / 2 + index * 15
+        );
+      });
+    } else {
+      ctx.fillText(
+        this.currentDialogText,
+        boxX + 5,
+        boxY + 20,
+        boxY + boxHeight / 2
+      );
+    }
   }
 }
 

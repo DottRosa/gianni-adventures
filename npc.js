@@ -51,16 +51,12 @@ class NPC extends Sprite {
     );
   }
 
-  startDialogue() {
-    this.dialogueManager.start();
-  }
-
-  continueDialogue() {
-    return this.dialogueManager.next();
-  }
-
-  get dialogIsEnded() {
-    return this.dialogueManager.ended;
+  changeChoice(goToNext = true) {
+    if (goToNext) {
+      this.dialogueManager.nextChoice();
+    } else {
+      this.dialogueManager.previousChoice();
+    }
   }
 
   drawDialogue({ players, partnerDrift }) {
