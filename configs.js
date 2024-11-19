@@ -63,6 +63,3 @@ CONFIG.player.velocity = CONFIG.player.frameVelocity;
 CONFIG.player.interactionArea = CONFIG.tile.tileDim;
 CONFIG.player.main = CONFIG.player.gianni;
 CONFIG.player.partner = CONFIG.player.fabrissazzo;
-
-let mainPlayer = CONFIG.player.main;
-let partnerPlayer = CONFIG.player.partner;

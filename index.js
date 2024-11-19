@@ -84,8 +84,8 @@ function handlePlayersMovement() {
   const moveY = keyboard.isDown ? -1 : keyboard.isUp ? 1 : 0;
 
   if (moveX !== 0) {
-    players[partnerPlayer].direction = moveX > 0 ? "left" : "right";
-    players[mainPlayer].direction = moveX > 0 ? "left" : "right";
+    players[CONFIG.player.partner].direction = moveX > 0 ? "left" : "right";
+    players[CONFIG.player.main].direction = moveX > 0 ? "left" : "right";
   }
 
   const nextValueX = background.position.x + moveX * CONFIG.player.velocity;
@@ -168,9 +168,9 @@ function handlePlayersMovement() {
 
 function handleSwitch() {
   if (keyboard.isSwitch) {
-    const temp = mainPlayer;
-    mainPlayer = partnerPlayer;
-    partnerPlayer = temp;
+    const temp = CONFIG.player.main;
+    CONFIG.player.main = CONFIG.player.partner;
+    CONFIG.player.partner = temp;
 
     keyboard.unsetSwitch();
   }
@@ -260,7 +260,7 @@ function handleInteractions() {
     }
     const npc = npcs.find((npc) => {
       const npcPosition = npc.position;
-      const playerPosition = players[mainPlayer].position;
+      const playerPosition = players[CONFIG.player.main].position;
 
       const deltaX = npcPosition.x - playerPosition.x;
       const deltaY = npcPosition.y - playerPosition.y;
@@ -270,7 +270,7 @@ function handleInteractions() {
         npcDirection = deltaX > 0 ? "right" : "left";
       }
 
-      if (players[mainPlayer].currentDirection !== npcDirection) {
+      if (players[CONFIG.player.main].currentDirection !== npcDirection) {
         return false;
       }
 
@@ -293,8 +293,8 @@ function animate() {
     n.draw();
   });
 
-  players[partnerPlayer].draw(partnerDrift.x, partnerDrift.y);
-  players[mainPlayer].draw();
+  players[CONFIG.player.partner].draw(partnerDrift.x, partnerDrift.y);
+  players[CONFIG.player.main].draw();
 
   if (!dialogueInProgress) {
     handlePlayersMovement();

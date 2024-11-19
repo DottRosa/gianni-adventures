@@ -2,11 +2,11 @@ const dialogues = {
   intro: {
     id: "intro",
     textVariants: {
-      gianni: {
+      [CONFIG.player.gianni]: {
         text: "Ciao Gianni!",
         next: "gianni_answer",
       },
-      fabrissazzo: {
+      [CONFIG.player.fabrissazzo]: {
         text: "Fabris...",
         next: "fabris_answer",
       },
@@ -89,7 +89,7 @@ class DialogueManager {
     }
 
     if (dialogue.textVariants) {
-      const variant = dialogue.textVariants[mainPlayer];
+      const variant = dialogue.textVariants[CONFIG.player.main];
       if (variant) {
         this.currentDialogue = dialogue;
       }
@@ -101,7 +101,7 @@ class DialogueManager {
   next() {
     let nextId = this.currentDialogue.next;
     if (this.currentDialogue.textVariants) {
-      const variant = this.currentDialogue.textVariants[mainPlayer];
+      const variant = this.currentDialogue.textVariants[CONFIG.player.main];
       nextId = variant.next;
     }
 
@@ -119,7 +119,7 @@ class DialogueManager {
 
   get currentDialogText() {
     if (this.currentDialogue.textVariants) {
-      const variant = this.currentDialogue.textVariants[mainPlayer];
+      const variant = this.currentDialogue.textVariants[CONFIG.player.main];
       return variant.text;
     }
 
@@ -163,7 +163,7 @@ class DialogueManager {
     if (this.currentDialogue.speaker) {
       const player = players[this.currentDialogue.speaker];
 
-      if (this.currentDialogue.speaker === mainPlayer) {
+      if (this.currentDialogue.speaker === CONFIG.player.main) {
         boxX = player.position.x + 20;
         boxY = player.position.y - CONFIG.dialogue.balloon.height;
       } else {
