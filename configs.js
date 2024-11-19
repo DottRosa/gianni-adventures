@@ -13,19 +13,20 @@ const TILES_FROM_CENTER_X = Math.floor(TILES_PER_X / 2);
 const TILES_FROM_CENTER_Y = Math.floor(TILES_PER_Y / 2);
 const ASSETS_FOLDER = "./assets";
 
-// --- PLAYERS ---
-const MOVEMENT_FRAMES = 12;
-const FRAME_VELOCITY = TILE_DIM / MOVEMENT_FRAMES;
-const PLAYER_VELOCITY = FRAME_VELOCITY;
-const PLAYER_INTERACTION_AREA = TILE_DIM;
-const DISTANCE_BETWEEN_PARTNERS = 50;
-const PLAYER_FABRISSAZZO = "fabrissazzo";
-const PLAYER_GIANNI = "gianni";
-
-let mainPlayer = PLAYER_GIANNI;
-let partnerPlayer = PLAYER_FABRISSAZZO;
-
 const CONFIG = {
+  player: {
+    movementFrames: 12,
+    get frameVelocity() {
+      return TILE_DIM / this.movementFrames;
+    },
+    velocity: null,
+    interactionArea: null,
+    distanceBetweenPartners: 50,
+    fabrissazzo: "fabrissazzo",
+    gianni: "gianni",
+    main: null,
+    partner: null,
+  },
   keyboard: {
     interactionCooldown: 300,
     choicesCooldown: 100,
@@ -51,3 +52,11 @@ const CONFIG = {
 
 CONFIG.dialogue.fontNormal = `${CONFIG.dialogue.fontSize}px ${CONFIG.dialogue.fontFamily}`;
 CONFIG.dialogue.fontBold = `bold ${CONFIG.dialogue.fontSize}px ${CONFIG.dialogue.fontFamily}`;
+
+CONFIG.player.velocity = CONFIG.player.frameVelocity;
+CONFIG.player.interactionArea = TILE_DIM;
+CONFIG.player.main = CONFIG.player.gianni;
+CONFIG.player.partner = CONFIG.player.fabrissazzo;
+
+let mainPlayer = CONFIG.player.main;
+let partnerPlayer = CONFIG.player.partner;

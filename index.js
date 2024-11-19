@@ -58,7 +58,7 @@ const npcs = [
 const backgrounds = [background];
 
 const players = {};
-players[PLAYER_FABRISSAZZO] = new Player({
+players[CONFIG.player.fabrissazzo] = new Player({
   spriteImages: {
     left: `${ASSETS_FOLDER}/fabris-sprite-left.png`,
     right: `${ASSETS_FOLDER}/fabris-sprite-right.png`,
@@ -66,7 +66,7 @@ players[PLAYER_FABRISSAZZO] = new Player({
   name: "Fabris",
 });
 
-players[PLAYER_GIANNI] = new Player({
+players[CONFIG.player.gianni] = new Player({
   spriteImages: {
     left: `${ASSETS_FOLDER}/gianni-sprite-left.png`,
     right: `${ASSETS_FOLDER}/gianni-sprite-right.png`,
@@ -88,8 +88,8 @@ function handlePlayersMovement() {
     players[mainPlayer].direction = moveX > 0 ? "left" : "right";
   }
 
-  const nextValueX = background.position.x + moveX * PLAYER_VELOCITY;
-  const nextValueY = background.position.y + moveY * PLAYER_VELOCITY;
+  const nextValueX = background.position.x + moveX * CONFIG.player.velocity;
+  const nextValueY = background.position.y + moveY * CONFIG.player.velocity;
 
   let canMoveX = !collision.isColliding(nextValueX, background.position.y);
   let canMoveY = !collision.isColliding(background.position.x, nextValueY);
@@ -110,10 +110,10 @@ function handlePlayersMovement() {
   }
 
   if (canMoveX) {
-    backgroundPosition.x += moveX * PLAYER_VELOCITY;
+    backgroundPosition.x += moveX * CONFIG.player.velocity;
   }
   if (canMoveY) {
-    backgroundPosition.y += moveY * PLAYER_VELOCITY;
+    backgroundPosition.y += moveY * CONFIG.player.velocity;
   }
 
   backgrounds.forEach((b) => {
@@ -125,42 +125,42 @@ function handlePlayersMovement() {
 
   // The partner follows the path of the main player
   if (keyboard.isRight) {
-    if (partnerDrift.x > -1 * DISTANCE_BETWEEN_PARTNERS) {
-      partnerDrift.x -= PLAYER_VELOCITY;
+    if (partnerDrift.x > -1 * CONFIG.player.distanceBetweenPartners) {
+      partnerDrift.x -= CONFIG.player.velocity;
     }
   }
 
   if (keyboard.isLeft) {
-    if (partnerDrift.x < DISTANCE_BETWEEN_PARTNERS) {
-      partnerDrift.x += PLAYER_VELOCITY;
+    if (partnerDrift.x < CONFIG.player.distanceBetweenPartners) {
+      partnerDrift.x += CONFIG.player.velocity;
     }
   }
 
   if (keyboard.isUp) {
-    if (partnerDrift.y < DISTANCE_BETWEEN_PARTNERS) {
-      partnerDrift.y += PLAYER_VELOCITY;
+    if (partnerDrift.y < CONFIG.player.distanceBetweenPartners) {
+      partnerDrift.y += CONFIG.player.velocity;
     }
   }
 
   if (keyboard.isDown) {
-    if (partnerDrift.y > -1 * DISTANCE_BETWEEN_PARTNERS) {
-      partnerDrift.y -= PLAYER_VELOCITY;
+    if (partnerDrift.y > -1 * CONFIG.player.distanceBetweenPartners) {
+      partnerDrift.y -= CONFIG.player.velocity;
     }
   }
 
   // Align the partner when the direction of the main player is only 1
   if (moveX === 0 && moveY !== 0) {
     const mult = partnerDrift.x < 0 ? 1 : partnerDrift.x > 0 ? -1 : 0;
-    partnerDrift.x += (mult * PLAYER_VELOCITY) / 2;
-    if (Math.abs(partnerDrift.x) < PLAYER_VELOCITY / 2) {
+    partnerDrift.x += (mult * CONFIG.player.velocity) / 2;
+    if (Math.abs(partnerDrift.x) < CONFIG.player.velocity / 2) {
       partnerDrift.x = 0;
     }
   }
 
   if (moveX !== 0 && moveY === 0) {
     const mult = partnerDrift.y < 0 ? 1 : partnerDrift.y > 0 ? -1 : 0;
-    partnerDrift.y += (mult * PLAYER_VELOCITY) / 2;
-    if (Math.abs(partnerDrift.y) < PLAYER_VELOCITY / 2) {
+    partnerDrift.y += (mult * CONFIG.player.velocity) / 2;
+    if (Math.abs(partnerDrift.y) < CONFIG.player.velocity / 2) {
       partnerDrift.y = 0;
     }
   }
@@ -275,7 +275,7 @@ function handleInteractions() {
       }
 
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      return distance <= PLAYER_INTERACTION_AREA;
+      return distance <= CONFIG.player.interactionArea;
     });
     if (npc) {
       dialogueInProgress = true;

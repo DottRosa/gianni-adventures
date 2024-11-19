@@ -15,7 +15,7 @@ const dialogues = {
   },
   gianni_answer: {
     id: "gianni_answer",
-    speaker: PLAYER_GIANNI,
+    speaker: CONFIG.player.gianni,
     choices: [
       {
         text: "Ma che ooooooh!",
@@ -35,7 +35,7 @@ const dialogues = {
   fabris_answer: {
     id: "fabris_answer",
     text: "mmm...",
-    speaker: PLAYER_FABRISSAZZO,
+    speaker: CONFIG.player.fabrissazzo,
     conditions: [],
     events: [],
     next: "fabris_2",
@@ -50,7 +50,7 @@ const dialogues = {
   gianni_finish: {
     id: "gianni_finish",
     text: "Ha ragione Fabris!",
-    speaker: PLAYER_GIANNI,
+    speaker: CONFIG.player.gianni,
     conditions: [],
     events: [],
     next: null,
