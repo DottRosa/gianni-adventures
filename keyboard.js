@@ -9,12 +9,37 @@ class Keyboard {
     Interact: false,
   };
 
+  // This is a unique ID that identifies a key press. It is based on the timestamp,
+  // so pressing the same key multiple times in a row will generate different codes.
+  // This ID is useful for blocking player actions if they hold down a key.
+  // If the ID remains the same, it means the key is being held down.
+  keyId = null;
+
   registerKeyPressed(keyboardEvent) {
+    if (this.keyIsAlreadyPressed(keyboardEvent)) {
+      return;
+    }
     this.toggleKeyPressed(keyboardEvent, true);
+    this.keyId = Date.now().toString(36);
   }
 
   unsetKeyPressed(keyboardEvent) {
     this.toggleKeyPressed(keyboardEvent, false);
+  }
+
+  keyIsAlreadyPressed(keyboardEvent) {
+    const key = keyboardEvent.key.toLowerCase();
+
+    switch (key) {
+      case KEYBOARD_SWITCH_KEY: {
+        return this.keysPressed.Switch;
+      }
+      case KEYBOARD_INTERACT_KEY: {
+        return this.keysPressed.Interact;
+      }
+    }
+
+    return this.keysPressed[keyboardEvent.key];
   }
 
   toggleKeyPressed(keyboardEvent, pressed) {

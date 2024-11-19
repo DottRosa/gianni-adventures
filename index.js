@@ -6,6 +6,7 @@ const keyboard = new Keyboard();
 let dialogueInProgress = false;
 let npcDialogueInvolved = null;
 let interactionCooldown = 0;
+let lastKeyPressedId = null;
 
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
@@ -216,8 +217,10 @@ function handleInteractions() {
   if (
     dialogueInProgress &&
     npcDialogueInvolved.dialogueManager.choiceInProgress &&
-    now > interactionCooldown
+    now > interactionCooldown &&
+    lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
   ) {
+    lastKeyPressedId = keyboard.keyId;
     interactionCooldown = now + INTERACTION_CHOICES_COOLDOWN_TIME;
 
     switch (true) {
@@ -238,7 +241,12 @@ function handleInteractions() {
     return; // next interaction handling will be skipped
   }
 
-  if (keyboard.isInteract && now > interactionCooldown) {
+  if (
+    keyboard.isInteract &&
+    now > interactionCooldown &&
+    lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
+  ) {
+    lastKeyPressedId = keyboard.keyId;
     interactionCooldown = now + INTERACTION_COOLDOWN_TIME;
 
     if (dialogueInProgress && npcDialogueInvolved) {
