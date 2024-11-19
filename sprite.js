@@ -1,12 +1,12 @@
 class Sprite {
   currentFrame = 0;
-  currentDirection = "right";
+  currentDirection = CONFIG.directions.right;
   position = {
     x: 0,
     y: 0,
   };
 
-  constructor({ spriteImages, startDirection = "right" }) {
+  constructor({ spriteImages, startDirection = CONFIG.directions.right }) {
     this.currentDirection = startDirection;
 
     this.image = {

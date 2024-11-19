@@ -84,8 +84,10 @@ function handlePlayersMovement() {
   const moveY = keyboard.isDown ? -1 : keyboard.isUp ? 1 : 0;
 
   if (moveX !== 0) {
-    players[CONFIG.player.partner].direction = moveX > 0 ? "left" : "right";
-    players[CONFIG.player.main].direction = moveX > 0 ? "left" : "right";
+    players[CONFIG.player.partner].direction =
+      moveX > 0 ? CONFIG.directions.left : CONFIG.directions.right;
+    players[CONFIG.player.main].direction =
+      moveX > 0 ? CONFIG.directions.left : CONFIG.directions.right;
   }
 
   const nextValueX = background.position.x + moveX * CONFIG.player.velocity;
@@ -192,7 +194,7 @@ function debug() {
   // Specifiche del testo
   ctx.font = "10px Arial"; // Font e dimensione del testo
   ctx.fillStyle = "black"; // Colore del testo
-  ctx.textAlign = "left"; // Allinea il testo a sinistra
+  ctx.textAlign = CONFIG.directions.left; // Allinea il testo a sinistra
   ctx.textBaseline = "top"; // Posiziona il testo dall'alto
 
   // Scrivi il testo all'interno del box
@@ -267,7 +269,8 @@ function handleInteractions() {
 
       let npcDirection;
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        npcDirection = deltaX > 0 ? "right" : "left";
+        npcDirection =
+          deltaX > 0 ? CONFIG.directions.right : CONFIG.directions.left;
       }
 
       if (players[CONFIG.player.main].currentDirection !== npcDirection) {

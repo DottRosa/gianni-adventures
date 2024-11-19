@@ -30,6 +30,10 @@ const CONFIG = {
     main: null,
     partner: null,
   },
+  directions: {
+    right: "right",
+    left: "left",
+  },
   keyboard: {
     interactionCooldown: 300,
     choicesCooldown: 100,
@@ -40,8 +44,8 @@ const CONFIG = {
     fontSize: 13,
     fontFamily: "Comic Sans MS",
     textAlign: "left",
-    fontNormal: null, // calcolato dopo
-    fontBold: null, // calcolato dopo
+    fontNormal: null,
+    fontBold: null,
     nameColor: "red",
     textColor: "black",
     balloon: {

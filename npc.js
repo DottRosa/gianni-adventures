@@ -1,7 +1,7 @@
 class NPC extends Sprite {
   constructor({
     spriteImages,
-    startDirection = "right",
+    startDirection = CONFIG.directions.right,
     mapPositionCell = { cellX: 0, cellY: 0 },
     background,
     dialogueManager = null,
