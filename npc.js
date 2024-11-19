@@ -63,7 +63,12 @@ class NPC extends Sprite {
     return this.dialogueManager.ended;
   }
 
-  drawDialogue() {
-    this.dialogueManager.draw(this.position, this.name);
+  drawDialogue({ players, partnerDrift }) {
+    this.dialogueManager.draw({
+      position: this.position,
+      name: this.name,
+      players,
+      partnerDrift,
+    });
   }
 }

@@ -62,7 +62,7 @@ players[PLAYER_FABRISSAZZO] = new Player({
     left: `${ASSETS_FOLDER}/fabris-sprite-left.png`,
     right: `${ASSETS_FOLDER}/fabris-sprite-right.png`,
   },
-  name: PLAYER_FABRISSAZZO,
+  name: "Fabris",
 });
 
 players[PLAYER_GIANNI] = new Player({
@@ -70,7 +70,7 @@ players[PLAYER_GIANNI] = new Player({
     left: `${ASSETS_FOLDER}/gianni-sprite-left.png`,
     right: `${ASSETS_FOLDER}/gianni-sprite-right.png`,
   },
-  name: PLAYER_GIANNI,
+  name: "Gianni",
 });
 
 const collision = new Collision(COLLISIONS_FIRST_MAP, 70, npcs);
@@ -207,7 +207,7 @@ function debug() {
 }
 
 function drawDialogues() {
-  npcDialogueInvolved.drawDialogue();
+  npcDialogueInvolved.drawDialogue({ players, partnerDrift });
 }
 
 function handleInteractions() {
