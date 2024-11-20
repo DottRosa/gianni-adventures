@@ -276,10 +276,13 @@ function handleInteractions() {
 // Funzione di animazione
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
-  currentMap.draw();
+  currentMap.drawBackgrounds();
+  currentMap.drawNpcs();
 
   players[CONFIG.player.partner].draw(partnerDrift.x, partnerDrift.y);
   players[CONFIG.player.main].draw();
+
+  currentMap.drawForegrounds();
 
   if (!dialogueInProgress) {
     handlePlayersMovement();

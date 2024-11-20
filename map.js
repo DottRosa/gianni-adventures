@@ -41,15 +41,21 @@ class Map {
     this.currentPosition = startPosition;
   }
 
-  draw() {
-    this.backgrounds[0].draw();
-
-    for (let i = 0; i < this.npcs.length; i++) {
-      this.npcs[i].draw();
+  drawBackgrounds() {
+    for (let i = 0; i < this.backgrounds.length; i++) {
+      this.backgrounds[i].draw();
     }
+  }
 
+  drawForegrounds() {
     for (let i = 0; i < this.foregrounds.length; i++) {
       this.foregrounds[i].draw();
+    }
+  }
+
+  drawNpcs() {
+    for (let i = 0; i < this.npcs.length; i++) {
+      this.npcs[i].draw();
     }
   }
 
