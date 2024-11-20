@@ -1,19 +1,18 @@
 class NPC extends Sprite {
   constructor({
-    spriteImages,
+    details,
     startDirection = CONFIG.directions.right,
     mapPositionCell = { cellX: 0, cellY: 0 },
     dialogueManager = null,
-    name = "Unknown",
   }) {
-    super({ spriteImages, startDirection });
+    super({ spriteImages: details.spriteImages, startDirection });
+    this.details = details;
     this.mapPositionCell = mapPositionCell;
     this.mapCoords = getCoordsByCell(
       mapPositionCell.cellX,
       mapPositionCell.cellY
     );
     this.dialogueManager = dialogueManager;
-    this.name = name;
   }
 
   updatePosition(position) {
@@ -56,7 +55,7 @@ class NPC extends Sprite {
   drawDialogue({ players, partnerDrift }) {
     this.dialogueManager.draw({
       position: this.position,
-      name: this.name,
+      name: this.details.nickname[CONFIG.player.main],
       players,
       partnerDrift,
     });

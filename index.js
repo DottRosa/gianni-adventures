@@ -34,49 +34,6 @@ canvas.height = CONFIG.tile.canvasHeight;
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const START_COORDS = { cellX: 16, cellY: 21 };
-
-const background = new Background({
-  position: getCoordsByCell(START_COORDS.cellX, START_COORDS.cellY),
-  imageSrc: `${CONFIG.assetsFolder}/first-map.png`,
-});
-
-const collisionsGround = new Background({
-  position: getCoordsByCell(16, 21),
-  imageSrc: `${CONFIG.assetsFolder}/collisions.png`,
-});
-
-const npcs = [
-  new NPC({
-    spriteImages: {
-      left: `${CONFIG.assetsFolder}/npc-sprite.png`,
-      right: `${CONFIG.assetsFolder}/npc-sprite.png`,
-    },
-    mapPositionCell: {
-      cellX: 17,
-      cellY: 22,
-    },
-    background,
-    dialogueManager,
-    name: "Furlanetto",
-  }),
-  new NPC({
-    spriteImages: {
-      left: `${CONFIG.assetsFolder}/npc-sprite.png`,
-      right: `${CONFIG.assetsFolder}/npc-sprite.png`,
-    },
-    mapPositionCell: {
-      cellX: 36,
-      cellY: 17,
-    },
-    background,
-    // dialogue: dialogue,
-    name: "Giulio",
-  }),
-];
-
-const backgrounds = [background];
-
 const players = {};
 players[CONFIG.player.fabrissazzo] = new Player({
   spriteImages: {
@@ -94,8 +51,6 @@ players[CONFIG.player.gianni] = new Player({
   name: "Gianni",
 });
 
-const collision = new Collision(COLLISIONS_FIRST_MAP, 70, npcs);
-
 let backgroundPosition = { x: 0, y: 0 };
 let partnerDrift = { x: 0, y: 0 };
 
@@ -110,15 +65,17 @@ function handlePlayersMovement() {
       moveX > 0 ? CONFIG.directions.left : CONFIG.directions.right;
   }
 
-  const nextValueX = background.position.x + moveX * CONFIG.player.velocity;
-  const nextValueY = background.position.y + moveY * CONFIG.player.velocity;
+  const currentPosition = currentMap.currentPosition;
+
+  const nextValueX = currentPosition.x + moveX * CONFIG.player.velocity;
+  const nextValueY = currentPosition.y + moveY * CONFIG.player.velocity;
 
   let canMoveX = !currentMap.collisionsDetector.isColliding(
     nextValueX,
-    background.position.y
+    currentPosition.y
   );
   let canMoveY = !currentMap.collisionsDetector.isColliding(
-    background.position.x,
+    currentPosition.x,
     nextValueY
   );
 
@@ -144,16 +101,9 @@ function handlePlayersMovement() {
     backgroundPosition.y += moveY * CONFIG.player.velocity;
   }
 
-  backgrounds.forEach((b) => {
-    b.position.x += backgroundPosition.x;
-    b.position.y += backgroundPosition.y;
-  });
+  currentMap.updateLayerPosition(backgroundPosition.x, backgroundPosition.y);
 
-  const cell = getCellByCoords(
-    backgrounds[0].position.x,
-    backgrounds[0].position.y
-  );
-
+  const cell = currentMap.currentCell;
   const index = cell.cellY * 70 + cell.cellX;
 
   if (DOORS[index] !== 0) {
@@ -236,12 +186,12 @@ function debug() {
 
   // Scrivi il testo all'interno del box
   ctx.fillText(
-    `x: ${background.position.x}, y: ${background.position.y}`,
+    `x: ${currentMap.currentPosition.x}, y: ${currentMap.currentPosition.y}`,
     boxX + 10,
     boxY + 10
   );
 
-  const cell = getCellByCoords(background.position.x, background.position.y);
+  const cell = currentMap.currentCell;
 
   ctx.fillText(`cellX: ${cell.cellX}, y: ${cell.cellY}`, boxX + 10, boxY + 20);
 }
@@ -297,7 +247,7 @@ function handleInteractions() {
       }
       return;
     }
-    const npc = npcs.find((npc) => {
+    const npc = currentMap.npcs.find((npc) => {
       const npcPosition = npc.position;
       const playerPosition = players[CONFIG.player.main].position;
 
@@ -328,10 +278,7 @@ function handleInteractions() {
 // Funzione di animazione
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
-  backgrounds.forEach((b) => b.draw());
-  npcs.forEach((n) => {
-    n.draw();
-  });
+  currentMap.draw();
 
   players[CONFIG.player.partner].draw(partnerDrift.x, partnerDrift.y);
   players[CONFIG.player.main].draw();

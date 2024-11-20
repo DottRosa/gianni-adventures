@@ -1,68 +1,3 @@
-const dialogues = {
-  intro: {
-    id: "intro",
-    textVariants: {
-      [CONFIG.player.gianni]: {
-        text: "Ciao Gianni!",
-        next: "gianni_answer",
-      },
-      [CONFIG.player.fabrissazzo]: {
-        text: "Fabris...",
-        next: "fabris_answer",
-      },
-    },
-    conditions: [],
-  },
-  gianni_answer: {
-    id: "gianni_answer",
-    speaker: CONFIG.player.gianni,
-    choices: [
-      {
-        text: "Ma che ooooooh!",
-        next: "goodbye",
-      },
-      {
-        text: "Allora ooooh!",
-        next: "goodbye",
-      },
-      {
-        text: "Ti metto 2",
-        next: "goodbye",
-      },
-    ],
-    next: "goodbye",
-  },
-  fabris_answer: {
-    id: "fabris_answer",
-    text: "mmm...",
-    speaker: CONFIG.player.fabrissazzo,
-    conditions: [],
-    events: [],
-    next: "fabris_2",
-  },
-  fabris_2: {
-    id: "fabris_2",
-    text: "Fai ridere...",
-    conditions: [],
-    events: [],
-    next: "gianni_finish",
-  },
-  gianni_finish: {
-    id: "gianni_finish",
-    text: "Ha ragione Fabris!",
-    speaker: CONFIG.player.gianni,
-    conditions: [],
-    events: [],
-    next: null,
-  },
-  goodbye: {
-    id: "goodbye",
-    text: "Okok non serve incazzarsi!",
-    conditions: [],
-    next: null,
-  },
-};
-
 class DialogueManager {
   choiceInProgress = false;
   currentChoices = null;
@@ -75,9 +10,9 @@ class DialogueManager {
   }
 
   start(dialogueId) {
-    let dialogue = this.dialogues.intro;
+    let dialogue = this.dialogues.start;
     if (!dialogue) {
-      console.error('"intro" dialogue missing');
+      console.error('"start" dialogue missing');
     }
 
     if (dialogueId) {
@@ -229,5 +164,3 @@ class DialogueManager {
     }
   }
 }
-
-const dialogueManager = new DialogueManager(dialogues);

@@ -5,34 +5,26 @@ const MAPS = {
     collisions: COLLISIONS_FIRST_MAP,
     doors: DOORS,
     backgroundImages: [`${CONFIG.assetsFolder}/first-map.png`],
-    foregroundImages: [`${CONFIG.assetsFolder}/collisions.png`],
+    foregroundImages: [`${CONFIG.assetsFolder}/foreground.png`],
     startPosition: getCoordsByCell(16, 21),
     npcs: [
       new NPC({
-        spriteImages: {
-          left: `${CONFIG.assetsFolder}/npc-sprite.png`,
-          right: `${CONFIG.assetsFolder}/npc-sprite.png`,
-        },
+        details: NPCS[NPCS_KEYS.furlanetto],
         mapPositionCell: {
           cellX: 17,
           cellY: 22,
         },
-        // background,
-        // dialogueManager,
-        name: "Furlanetto",
+        dialogueManager: new DialogueManager(
+          DIALOGUES.intro[NPCS_KEYS.furlanetto]
+        ),
       }),
       new NPC({
-        spriteImages: {
-          left: `${CONFIG.assetsFolder}/npc-sprite.png`,
-          right: `${CONFIG.assetsFolder}/npc-sprite.png`,
-        },
+        details: NPCS[NPCS_KEYS.cozza],
         mapPositionCell: {
           cellX: 36,
           cellY: 17,
         },
-        // background,
-        // dialogue: dialogue,
-        name: "Giulio",
+        dialogueManager: new DialogueManager(DIALOGUES.intro[NPCS_KEYS.cozza]),
       }),
     ],
   }),
