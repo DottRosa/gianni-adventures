@@ -3,6 +3,8 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const keyboard = new Keyboard();
 
+const currentMap = MAPS.intro;
+
 function handleFootstepsSound() {
   const moveX = keyboard.isRight || keyboard.isLeft;
   const moveY = keyboard.isUp || keyboard.isDown;
@@ -111,8 +113,14 @@ function handlePlayersMovement() {
   const nextValueX = background.position.x + moveX * CONFIG.player.velocity;
   const nextValueY = background.position.y + moveY * CONFIG.player.velocity;
 
-  let canMoveX = !collision.isColliding(nextValueX, background.position.y);
-  let canMoveY = !collision.isColliding(background.position.x, nextValueY);
+  let canMoveX = !currentMap.collisionsDetector.isColliding(
+    nextValueX,
+    background.position.y
+  );
+  let canMoveY = !currentMap.collisionsDetector.isColliding(
+    background.position.x,
+    nextValueY
+  );
 
   // Diagonal check
   if (moveX !== 0 && moveY !== 0) {

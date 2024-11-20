@@ -3,7 +3,6 @@ class NPC extends Sprite {
     spriteImages,
     startDirection = CONFIG.directions.right,
     mapPositionCell = { cellX: 0, cellY: 0 },
-    background,
     dialogueManager = null,
     name = "Unknown",
   }) {
@@ -13,16 +12,13 @@ class NPC extends Sprite {
       mapPositionCell.cellX,
       mapPositionCell.cellY
     );
-    this.background = background;
     this.dialogueManager = dialogueManager;
     this.name = name;
-
-    this.updatePosition();
   }
 
-  updatePosition() {
-    const shiftX = this.background.position.x - this.mapCoords.x;
-    const shiftY = this.background.position.y - this.mapCoords.y;
+  updatePosition(position) {
+    const shiftX = position.x - this.mapCoords.x;
+    const shiftY = position.y - this.mapCoords.y;
 
     this.position = {
       x: CONFIG.tile.tilesFromCenterX * CONFIG.tile.tileDim + shiftX,
@@ -32,8 +28,6 @@ class NPC extends Sprite {
 
   draw() {
     const image = this.image[this.currentDirection];
-
-    this.updatePosition();
 
     let xPos = this.position.x;
     let yPos = this.position.y;
