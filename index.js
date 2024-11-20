@@ -3,6 +3,24 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const keyboard = new Keyboard();
 
+function handleFootstepsSound() {
+  const moveX = keyboard.isRight || keyboard.isLeft;
+  const moveY = keyboard.isUp || keyboard.isDown;
+
+  const currentlyMoving = moveX || moveY;
+
+  if (currentlyMoving) {
+    ASSETS.soundEffects.footsteps.loop = true;
+    ASSETS.soundEffects.footsteps
+      .play()
+      .catch((err) => console.error("Audio play error:", err));
+  } else if (!currentlyMoving) {
+    // Il giocatore si è fermato
+    ASSETS.soundEffects.footsteps.pause();
+    ASSETS.soundEffects.footsteps.currentTime = 0;
+  }
+}
+
 let dialogueInProgress = false;
 let npcDialogueInvolved = null;
 let interactionCooldown = 0;
@@ -122,6 +140,17 @@ function handlePlayersMovement() {
     b.position.x += backgroundPosition.x;
     b.position.y += backgroundPosition.y;
   });
+
+  const cell = getCellByCoords(
+    backgrounds[0].position.x,
+    backgrounds[0].position.y
+  );
+
+  const index = cell.cellY * 70 + cell.cellX;
+
+  if (DOORS[index] !== 0) {
+    console.log("entra nella porta");
+  }
 
   backgroundPosition = { x: 0, y: 0 };
 
@@ -302,6 +331,7 @@ function animate() {
   if (!dialogueInProgress) {
     handlePlayersMovement();
     handleSwitch();
+    handleFootstepsSound();
   } else {
     drawDialogues();
   }

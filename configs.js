@@ -67,3 +67,9 @@ CONFIG.player.velocity = CONFIG.player.frameVelocity;
 CONFIG.player.interactionArea = CONFIG.tile.tileDim;
 CONFIG.player.main = CONFIG.player.gianni;
 CONFIG.player.partner = CONFIG.player.fabrissazzo;
+
+const ASSETS = {
+  soundEffects: {
+    footsteps: new Audio("assets/sound-effects/footsteps.mp3"),
+  },
+};
