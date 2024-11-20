@@ -3,7 +3,7 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const keyboard = new Keyboard();
 
-const currentMap = MAPS.intro;
+let currentMap = MAPS[MAP_IDS.intro];
 
 function handleFootstepsSound() {
   const moveX = keyboard.isRight || keyboard.isLeft;
@@ -103,11 +103,9 @@ function handlePlayersMovement() {
 
   currentMap.updateLayerPosition(backgroundPosition.x, backgroundPosition.y);
 
-  const cell = currentMap.currentCell;
-  const index = cell.cellY * 70 + cell.cellX;
-
-  if (DOORS[index] !== 0) {
-    console.log("entra nella porta");
+  const nextMapId = currentMap.doorFound;
+  if (nextMapId) {
+    currentMap = MAPS[nextMapId];
   }
 
   backgroundPosition = { x: 0, y: 0 };

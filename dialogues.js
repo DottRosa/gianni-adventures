@@ -1,6 +1,6 @@
 const DIALOGUES = {
   intro: {
-    [NPCS_KEYS.cozza]: {
+    [NPC_IDS.cozza]: {
       start: {
         id: "start",
         textVariants: {
@@ -61,7 +61,7 @@ const DIALOGUES = {
         next: null,
       },
     },
-    [NPCS_KEYS.furlanetto]: {
+    [NPC_IDS.furlanetto]: {
       start: {
         id: "start",
         textVariants: {
@@ -86,10 +86,6 @@ const DIALOGUES = {
           },
           {
             text: "Allora ooooh!",
-            next: "goodbye",
-          },
-          {
-            text: "Ti metto 2",
             next: "goodbye",
           },
         ],

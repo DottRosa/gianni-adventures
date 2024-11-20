@@ -4,7 +4,7 @@ class Map {
     totalTilesY,
     collisions,
     npcs = [],
-    doors,
+    doors = [],
     backgroundImages = [],
     foregroundImages = [],
     ambientMusic,
@@ -64,5 +64,16 @@ class Map {
 
   get currentCell() {
     return getCellByCoords(this.currentPosition.x, this.currentPosition.y);
+  }
+
+  get doorFound() {
+    const door = this.doors.find((door) => {
+      return door.match(this.currentCell);
+    });
+
+    if (door) {
+      return door.nextMapId;
+    }
+    return null;
   }
 }

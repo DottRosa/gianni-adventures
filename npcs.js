@@ -1,10 +1,10 @@
-const NPCS_KEYS = {
+const NPC_IDS = {
   furlanetto: "furlanetto",
   cozza: "cozza",
 };
 
 const NPCS = {
-  [NPCS_KEYS.furlanetto]: {
+  [NPC_IDS.furlanetto]: {
     firstName: "Carlo",
     lastName: "Furlanetto",
     spriteImages: {
@@ -20,7 +20,7 @@ const NPCS = {
       [CONFIG.player.gianni]: "Carlo",
     },
   },
-  [NPCS_KEYS.cozza]: {
+  [NPC_IDS.cozza]: {
     firstName: "Marco",
     lastName: "Cozzarini",
     spriteImages: {
