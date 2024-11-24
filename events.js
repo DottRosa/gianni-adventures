@@ -1,7 +1,7 @@
 const EVENTS = {
   battle: {
     entity: null,
-    isProgress: false,
+    inProgress: false,
   },
   dialogue: {
     entity: null,

@@ -4,7 +4,6 @@ const ctx = canvas.getContext("2d");
 const keyboard = new Keyboard();
 
 let currentMap = MAPS[MAP_IDS.intro];
-let currentBattle = null;
 
 function handleFootstepsSound() {
   const moveX = keyboard.isRight || keyboard.isLeft;
@@ -245,8 +244,8 @@ function handleInteractions() {
           break;
         }
         case CONFIG.dialogue.status.battle: {
-          currentBattle = EVENTS.dialogue.entity.dialogueManager.battle;
           EVENTS.battle.inProgress = true;
+          EVENTS.battle.entity = EVENTS.dialogue.entity.dialogueManager.battle;
           break;
         }
       }
@@ -268,6 +267,7 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
 
   if (EVENTS.battle.inProgress) {
+    EVENTS.battle.entity.draw();
   } else {
     currentMap.drawBackgrounds();
     currentMap.drawNpcs();
