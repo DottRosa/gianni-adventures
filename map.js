@@ -1,4 +1,6 @@
 class Map {
+  currentInteractionEntity = null;
+
   constructor({
     totalTilesX,
     totalTilesY,
@@ -93,8 +95,8 @@ class Map {
    * Finds the nearest entity the player can interact with
    * @returns an NPC or a MapObject
    */
-  findNearestInteractionEntity() {
-    return [...this.npcs, ...this.mapObjects].find((entity) => {
+  setNearestInteractionEntity() {
+    const entity = [...this.npcs, ...this.mapObjects].find((entity) => {
       const entityPosition = entity.position;
       const playerPosition = players[CONFIG.player.main].position;
 
@@ -114,5 +116,7 @@ class Map {
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       return distance <= CONFIG.player.interactionArea;
     });
+
+    this.currentInteractionEntity = entity;
   }
 }

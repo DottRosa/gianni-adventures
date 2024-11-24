@@ -41,11 +41,15 @@ class DialogueManager {
     }
 
     if (!nextId) {
-      return false;
+      if (this.currentDialogue.battle) {
+        return CONFIG.dialogue.status.battle;
+      }
+
+      return CONFIG.dialogue.status.stop;
     }
 
     this.start(nextId);
-    return true;
+    return CONFIG.dialogue.status.continue;
   }
 
   get ended() {

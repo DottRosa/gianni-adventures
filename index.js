@@ -24,7 +24,7 @@ function handleFootstepsSound() {
 }
 
 let dialogueInProgress = false;
-let entityDialogueInvolved = null;
+let battleInProgress = false;
 let interactionCooldown = 0;
 let lastKeyPressedId = null;
 
@@ -195,7 +195,7 @@ function debug() {
 }
 
 function drawDialogues() {
-  entityDialogueInvolved.drawDialogue({ players, partnerDrift });
+  currentMap.currentInteractionEntity.drawDialogue({ players, partnerDrift });
 }
 
 function handleInteractions() {
@@ -203,7 +203,7 @@ function handleInteractions() {
 
   if (
     dialogueInProgress &&
-    entityDialogueInvolved.dialogueManager.choiceInProgress &&
+    currentMap.currentInteractionEntity.dialogueManager.choiceInProgress &&
     now > interactionCooldown &&
     lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
   ) {
@@ -212,15 +212,15 @@ function handleInteractions() {
 
     switch (true) {
       case keyboard.isDown: {
-        entityDialogueInvolved.changeChoice(true);
+        currentMap.currentInteractionEntity.changeChoice(true);
         break;
       }
       case keyboard.isUp: {
-        entityDialogueInvolved.changeChoice(false);
+        currentMap.currentInteractionEntity.changeChoice(false);
         break;
       }
       case keyboard.isInteract: {
-        entityDialogueInvolved.dialogueManager.selectChoice();
+        currentMap.currentInteractionEntity.dialogueManager.selectChoice();
         break;
       }
     }
@@ -236,22 +236,29 @@ function handleInteractions() {
     lastKeyPressedId = keyboard.keyId;
     interactionCooldown = now + CONFIG.keyboard.interactionCooldown;
 
-    if (dialogueInProgress && entityDialogueInvolved) {
-      const canContinue = entityDialogueInvolved.dialogueManager.next();
+    if (dialogueInProgress && currentMap.currentInteractionEntity) {
+      const dialogueStatus =
+        currentMap.currentInteractionEntity.dialogueManager.next();
 
-      if (!canContinue) {
-        dialogueInProgress = false;
-        entityDialogueInvolved = null;
+      switch (dialogueStatus) {
+        case CONFIG.dialogue.status.stop: {
+          dialogueInProgress = false;
+          currentMap.currentInteractionEntity = null;
+          break;
+        }
+        case CONFIG.dialogue.status.battle: {
+          battleInProgress = true;
+          break;
+        }
       }
       return;
     }
 
-    const entity = currentMap.findNearestInteractionEntity();
+    currentMap.setNearestInteractionEntity();
 
-    if (entity) {
+    if (currentMap.currentInteractionEntity) {
       dialogueInProgress = true;
-      entityDialogueInvolved = entity;
-      entityDialogueInvolved.dialogueManager.start();
+      currentMap.currentInteractionEntity.dialogueManager.start();
     }
   }
 }
@@ -266,6 +273,10 @@ function animate() {
   players[CONFIG.player.main].draw();
 
   currentMap.drawForegrounds();
+
+  if (battleInProgress) {
+    console.log("si parte");
+  }
 
   if (!dialogueInProgress) {
     handlePlayersMovement();

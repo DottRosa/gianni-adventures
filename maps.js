@@ -1,8 +1,3 @@
-const MAP_IDS = {
-  intro: "intro",
-  next: "next",
-};
-
 const MAPS = {
   [MAP_IDS.intro]: new Map({
     totalTilesX: 40,

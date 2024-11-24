@@ -64,61 +64,18 @@ const NPC_DIALOGUES = {
     [NPC_IDS.furlanetto]: {
       start: {
         id: "start",
-        textVariants: {
-          [CONFIG.player.gianni]: {
-            text: "Ciao Gianni!",
-            next: "gianni_answer",
-          },
-          [CONFIG.player.fabrissazzo]: {
-            text: "Fabris...",
-            next: "fabris_answer",
-          },
-        },
-        conditions: [],
-      },
-      gianni_answer: {
-        id: "gianni_answer",
-        speaker: CONFIG.player.gianni,
-        choices: [
-          {
-            text: "Ma che ooooooh!",
-            next: "goodbye",
-          },
-          {
-            text: "Allora ooooh!",
-            next: "goodbye",
-          },
-        ],
-        next: "goodbye",
-      },
-      fabris_answer: {
-        id: "fabris_answer",
-        text: "mmm...",
-        speaker: CONFIG.player.fabrissazzo,
-        conditions: [],
-        events: [],
-        next: "fabris_2",
-      },
-      fabris_2: {
-        id: "fabris_2",
-        text: "Fai ridere...",
-        conditions: [],
-        events: [],
-        next: "gianni_finish",
-      },
-      gianni_finish: {
-        id: "gianni_finish",
-        text: "Ha ragione Fabris!",
+        text: "Ma che ooooooooh",
         speaker: CONFIG.player.gianni,
         conditions: [],
         events: [],
-        next: null,
+        next: "battle",
       },
-      goodbye: {
-        id: "goodbye",
-        text: "Okok non serve incazzarsi!",
+      battle: {
+        id: "battle",
+        text: "Combattiamo!",
         conditions: [],
         next: null,
+        battle: BATTLES[MAP_IDS.intro][NPC_IDS.furlanetto],
       },
     },
   },

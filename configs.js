@@ -54,6 +54,11 @@ const CONFIG = {
       height: 75,
       width: 150,
     },
+    status: {
+      continue: "continue",
+      stop: "stop",
+      battle: "battle",
+    },
   },
 };
 
@@ -72,4 +77,9 @@ const ASSETS = {
   soundEffects: {
     footsteps: new Audio("assets/sound-effects/footsteps.mp3"),
   },
+};
+
+const MAP_IDS = {
+  intro: "intro",
+  next: "next",
 };
