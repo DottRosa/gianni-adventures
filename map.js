@@ -37,13 +37,6 @@ class Map {
         })
       );
     });
-    this.battleBackground = new Layer({
-      imageSrc: `${CONFIG.assetsFolder}/battle.jpg`,
-      position: {
-        x: 0,
-        y: 0,
-      },
-    });
     this.ambientMusic = ambientMusic;
     // This is shared between backgrounds and foregrounds, so any update to this
     // variable will be reflected to both fore/back grounds.
