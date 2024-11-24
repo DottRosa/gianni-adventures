@@ -52,6 +52,10 @@ class DialogueManager {
     return CONFIG.dialogue.status.continue;
   }
 
+  get battle() {
+    return this.currentDialogue.battle;
+  }
+
   get ended() {
     return !this.currentDialogue.next;
   }

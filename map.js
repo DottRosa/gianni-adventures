@@ -1,6 +1,4 @@
 class Map {
-  currentInteractionEntity = null;
-
   constructor({
     totalTilesX,
     totalTilesY,
@@ -38,6 +36,13 @@ class Map {
           imageSrc: fg,
         })
       );
+    });
+    this.battleBackground = new Layer({
+      imageSrc: `${CONFIG.assetsFolder}/battle.jpg`,
+      position: {
+        x: 0,
+        y: 0,
+      },
     });
     this.ambientMusic = ambientMusic;
     // This is shared between backgrounds and foregrounds, so any update to this
@@ -95,8 +100,8 @@ class Map {
    * Finds the nearest entity the player can interact with
    * @returns an NPC or a MapObject
    */
-  setNearestInteractionEntity() {
-    const entity = [...this.npcs, ...this.mapObjects].find((entity) => {
+  getNearestInteractionEntity() {
+    return [...this.npcs, ...this.mapObjects].find((entity) => {
       const entityPosition = entity.position;
       const playerPosition = players[CONFIG.player.main].position;
 
@@ -116,7 +121,5 @@ class Map {
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       return distance <= CONFIG.player.interactionArea;
     });
-
-    this.currentInteractionEntity = entity;
   }
 }

@@ -4,6 +4,7 @@ const ctx = canvas.getContext("2d");
 const keyboard = new Keyboard();
 
 let currentMap = MAPS[MAP_IDS.intro];
+let currentBattle = null;
 
 function handleFootstepsSound() {
   const moveX = keyboard.isRight || keyboard.isLeft;
@@ -23,8 +24,6 @@ function handleFootstepsSound() {
   }
 }
 
-let dialogueInProgress = false;
-let battleInProgress = false;
 let interactionCooldown = 0;
 let lastKeyPressedId = null;
 
@@ -195,15 +194,15 @@ function debug() {
 }
 
 function drawDialogues() {
-  currentMap.currentInteractionEntity.drawDialogue({ players, partnerDrift });
+  EVENTS.dialogue.entity.drawDialogue({ players, partnerDrift });
 }
 
 function handleInteractions() {
   const now = Date.now();
 
   if (
-    dialogueInProgress &&
-    currentMap.currentInteractionEntity.dialogueManager.choiceInProgress &&
+    EVENTS.dialogue.inProgress &&
+    EVENTS.dialogue.entity.dialogueManager.choiceInProgress &&
     now > interactionCooldown &&
     lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
   ) {
@@ -212,15 +211,15 @@ function handleInteractions() {
 
     switch (true) {
       case keyboard.isDown: {
-        currentMap.currentInteractionEntity.changeChoice(true);
+        EVENTS.dialogue.entity.changeChoice(true);
         break;
       }
       case keyboard.isUp: {
-        currentMap.currentInteractionEntity.changeChoice(false);
+        EVENTS.dialogue.entity.changeChoice(false);
         break;
       }
       case keyboard.isInteract: {
-        currentMap.currentInteractionEntity.dialogueManager.selectChoice();
+        EVENTS.dialogue.entity.dialogueManager.selectChoice();
         break;
       }
     }
@@ -236,29 +235,30 @@ function handleInteractions() {
     lastKeyPressedId = keyboard.keyId;
     interactionCooldown = now + CONFIG.keyboard.interactionCooldown;
 
-    if (dialogueInProgress && currentMap.currentInteractionEntity) {
-      const dialogueStatus =
-        currentMap.currentInteractionEntity.dialogueManager.next();
+    if (EVENTS.dialogue.inProgress && EVENTS.dialogue.entity) {
+      const dialogueStatus = EVENTS.dialogue.entity.dialogueManager.next();
 
       switch (dialogueStatus) {
         case CONFIG.dialogue.status.stop: {
-          dialogueInProgress = false;
-          currentMap.currentInteractionEntity = null;
+          EVENTS.dialogue.inProgress = false;
+          EVENTS.dialogue.entity = null;
           break;
         }
         case CONFIG.dialogue.status.battle: {
-          battleInProgress = true;
+          currentBattle = EVENTS.dialogue.entity.dialogueManager.battle;
+          EVENTS.battle.inProgress = true;
           break;
         }
       }
       return;
     }
 
-    currentMap.setNearestInteractionEntity();
+    const entity = currentMap.getNearestInteractionEntity();
 
-    if (currentMap.currentInteractionEntity) {
-      dialogueInProgress = true;
-      currentMap.currentInteractionEntity.dialogueManager.start();
+    if (entity) {
+      EVENTS.dialogue.entity = entity;
+      EVENTS.dialogue.inProgress = true;
+      EVENTS.dialogue.entity.dialogueManager.start();
     }
   }
 }
@@ -266,28 +266,26 @@ function handleInteractions() {
 // Funzione di animazione
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
-  currentMap.drawBackgrounds();
-  currentMap.drawNpcs();
 
-  players[CONFIG.player.partner].draw(partnerDrift.x, partnerDrift.y);
-  players[CONFIG.player.main].draw();
-
-  currentMap.drawForegrounds();
-
-  if (battleInProgress) {
-    console.log("si parte");
-  }
-
-  if (!dialogueInProgress) {
-    handlePlayersMovement();
-    handleSwitch();
-    handleFootstepsSound();
+  if (EVENTS.battle.inProgress) {
   } else {
-    drawDialogues();
-  }
-  handleInteractions();
+    currentMap.drawBackgrounds();
+    currentMap.drawNpcs();
 
-  debug();
+    players[CONFIG.player.partner].draw(partnerDrift.x, partnerDrift.y);
+    players[CONFIG.player.main].draw();
+
+    currentMap.drawForegrounds();
+
+    if (!EVENTS.dialogue.inProgress) {
+      handlePlayersMovement();
+      handleSwitch();
+      handleFootstepsSound();
+    } else {
+      drawDialogues();
+    }
+    handleInteractions();
+  }
 
   window.requestAnimationFrame(animate);
 }
