@@ -1,4 +1,4 @@
-const DIALOGUES = {
+const NPC_DIALOGUES = {
   intro: {
     [NPC_IDS.cozza]: {
       start: {
@@ -118,6 +118,45 @@ const DIALOGUES = {
         id: "goodbye",
         text: "Okok non serve incazzarsi!",
         conditions: [],
+        next: null,
+      },
+    },
+  },
+};
+
+const MAP_OBJECT_DIALOGUES = {
+  intro: {
+    [MAP_OBJECT_IDS.fiorellino]: {
+      start: {
+        id: "start",
+        text: "Guarda Gianni, un fiorazzo",
+        speaker: CONFIG.player.fabrissazzo,
+        conditions: [],
+        events: [],
+        next: "gianni",
+      },
+      gianni: {
+        id: "gianni",
+        text: "Fabris... quanti petali ha quel fiore? Il tuo voto dipende da questo",
+        speaker: CONFIG.player.gianni,
+        conditions: [],
+        events: [],
+        next: "fabris",
+      },
+      fabris: {
+        id: "fabris",
+        text: "8 prof, hehehe",
+        speaker: CONFIG.player.fabrissazzo,
+        conditions: [],
+        events: [],
+        next: "fine",
+      },
+      fine: {
+        id: "fine",
+        text: "BENE! Quindi 10-8 fa 2!",
+        speaker: CONFIG.player.gianni,
+        conditions: [],
+        events: [],
         next: null,
       },
     },

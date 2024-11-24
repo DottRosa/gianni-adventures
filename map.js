@@ -5,6 +5,7 @@ class Map {
     collisions,
     npcs = [],
     doors = [],
+    mapObjects = [],
     backgroundImages = [],
     foregroundImages = [],
     ambientMusic,
@@ -15,6 +16,7 @@ class Map {
     this.collisionsDetector = new Collision(collisions, this.totalTilesY, npcs);
     this.npcs = npcs;
     this.doors = doors;
+    this.mapObjects = mapObjects;
     this.backgroundImages = backgroundImages;
     this.foregroundImages = foregroundImages;
     this.backgrounds = [];
@@ -66,6 +68,10 @@ class Map {
     for (let i = 0; i < this.npcs.length; i++) {
       this.npcs[i].updatePosition(this.currentPosition);
     }
+
+    for (let i = 0; i < this.mapObjects.length; i++) {
+      this.mapObjects[i].updatePosition(this.currentPosition);
+    }
   }
 
   get currentCell() {
@@ -81,5 +87,32 @@ class Map {
       return door.nextMapId;
     }
     return null;
+  }
+
+  /**
+   * Finds the nearest entity the player can interact with
+   * @returns an NPC or a MapObject
+   */
+  findNearestInteractionEntity() {
+    return [...this.npcs, ...this.mapObjects].find((entity) => {
+      const entityPosition = entity.position;
+      const playerPosition = players[CONFIG.player.main].position;
+
+      const deltaX = entityPosition.x - playerPosition.x;
+      const deltaY = entityPosition.y - playerPosition.y;
+
+      let entityDirection;
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        entityDirection =
+          deltaX > 0 ? CONFIG.directions.right : CONFIG.directions.left;
+      }
+
+      if (players[CONFIG.player.main].currentDirection !== entityDirection) {
+        return false;
+      }
+
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      return distance <= CONFIG.player.interactionArea;
+    });
   }
 }

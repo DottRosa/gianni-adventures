@@ -24,7 +24,7 @@ function handleFootstepsSound() {
 }
 
 let dialogueInProgress = false;
-let npcDialogueInvolved = null;
+let entityDialogueInvolved = null;
 let interactionCooldown = 0;
 let lastKeyPressedId = null;
 
@@ -195,7 +195,7 @@ function debug() {
 }
 
 function drawDialogues() {
-  npcDialogueInvolved.drawDialogue({ players, partnerDrift });
+  entityDialogueInvolved.drawDialogue({ players, partnerDrift });
 }
 
 function handleInteractions() {
@@ -203,7 +203,7 @@ function handleInteractions() {
 
   if (
     dialogueInProgress &&
-    npcDialogueInvolved.dialogueManager.choiceInProgress &&
+    entityDialogueInvolved.dialogueManager.choiceInProgress &&
     now > interactionCooldown &&
     lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
   ) {
@@ -212,15 +212,15 @@ function handleInteractions() {
 
     switch (true) {
       case keyboard.isDown: {
-        npcDialogueInvolved.changeChoice(true);
+        entityDialogueInvolved.changeChoice(true);
         break;
       }
       case keyboard.isUp: {
-        npcDialogueInvolved.changeChoice(false);
+        entityDialogueInvolved.changeChoice(false);
         break;
       }
       case keyboard.isInteract: {
-        npcDialogueInvolved.dialogueManager.selectChoice();
+        entityDialogueInvolved.dialogueManager.selectChoice();
         break;
       }
     }
@@ -236,39 +236,22 @@ function handleInteractions() {
     lastKeyPressedId = keyboard.keyId;
     interactionCooldown = now + CONFIG.keyboard.interactionCooldown;
 
-    if (dialogueInProgress && npcDialogueInvolved) {
-      const canContinue = npcDialogueInvolved.dialogueManager.next();
+    if (dialogueInProgress && entityDialogueInvolved) {
+      const canContinue = entityDialogueInvolved.dialogueManager.next();
 
       if (!canContinue) {
         dialogueInProgress = false;
-        npcDialogueInvolved = null;
+        entityDialogueInvolved = null;
       }
       return;
     }
-    const npc = currentMap.npcs.find((npc) => {
-      const npcPosition = npc.position;
-      const playerPosition = players[CONFIG.player.main].position;
 
-      const deltaX = npcPosition.x - playerPosition.x;
-      const deltaY = npcPosition.y - playerPosition.y;
+    const entity = currentMap.findNearestInteractionEntity();
 
-      let npcDirection;
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        npcDirection =
-          deltaX > 0 ? CONFIG.directions.right : CONFIG.directions.left;
-      }
-
-      if (players[CONFIG.player.main].currentDirection !== npcDirection) {
-        return false;
-      }
-
-      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      return distance <= CONFIG.player.interactionArea;
-    });
-    if (npc) {
+    if (entity) {
       dialogueInProgress = true;
-      npcDialogueInvolved = npc;
-      npcDialogueInvolved.dialogueManager.start();
+      entityDialogueInvolved = entity;
+      entityDialogueInvolved.dialogueManager.start();
     }
   }
 }

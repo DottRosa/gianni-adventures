@@ -15,6 +15,18 @@ const MAPS = {
         nextMapId: MAP_IDS.next,
       }),
     ],
+    mapObjects: [
+      new MapObject({
+        name: "Fiorellino",
+        mapPositionCell: {
+          cellX: 25,
+          cellY: 18,
+        },
+        dialogueManager: new DialogueManager(
+          MAP_OBJECT_DIALOGUES.intro[MAP_OBJECT_IDS.fiorellino]
+        ),
+      }),
+    ],
     backgroundImages: [`${CONFIG.assetsFolder}/first-map.png`],
     foregroundImages: [`${CONFIG.assetsFolder}/foreground.png`],
     startPosition: getCoordsByCell(16, 21),
@@ -26,7 +38,7 @@ const MAPS = {
           cellY: 22,
         },
         dialogueManager: new DialogueManager(
-          DIALOGUES.intro[NPC_IDS.furlanetto]
+          NPC_DIALOGUES.intro[NPC_IDS.furlanetto]
         ),
       }),
       new NPC({
@@ -35,7 +47,9 @@ const MAPS = {
           cellX: 36,
           cellY: 17,
         },
-        dialogueManager: new DialogueManager(DIALOGUES.intro[NPC_IDS.cozza]),
+        dialogueManager: new DialogueManager(
+          NPC_DIALOGUES.intro[NPC_IDS.cozza]
+        ),
       }),
     ],
   }),

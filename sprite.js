@@ -15,7 +15,9 @@ class Sprite {
     };
 
     Object.keys(spriteImages).forEach((direction) => {
-      this.image[direction].src = spriteImages[direction];
+      if (spriteImages[direction]) {
+        this.image[direction].src = spriteImages[direction];
+      }
     });
   }
 
