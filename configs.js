@@ -68,8 +68,11 @@ const CONFIG = {
     get gapBetweenCharacters() {
       return CONFIG.tile.tileDim;
     },
-    get arenaPadding() {
+    get arenaPaddingX() {
       return CONFIG.tile.tileDim * 2;
+    },
+    get arenaPaddingY() {
+      return CONFIG.tile.tileDim;
     },
     characterStats: {
       health: {

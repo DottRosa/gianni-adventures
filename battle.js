@@ -1,3 +1,5 @@
+// PASSARE LA BATTLE AD UN BATTLE MANAGER CHE SI PREOCCUPA DI GESTIRE IL TUTTO
+
 class Battle {
   pointerPosition = 0;
   interactionCooldown = 0;
@@ -23,18 +25,18 @@ class Battle {
     // Calculate turns
     const turns = [
       {
-        index: 0,
+        isPlayer: true,
         entity: players[CONFIG.player.gianni],
       },
       {
-        index: 1,
+        isPlayer: true,
         entity: players[CONFIG.player.fabrissazzo],
       },
     ];
 
     this.enemies.forEach((enemy, index) => {
-      characters.push({
-        index: index + Object.values(players).length,
+      turns.push({
+        isPlayer: false,
         entity: enemy,
       });
     });
@@ -46,7 +48,6 @@ class Battle {
         : 1;
     });
 
-    console.log(turns);
     this.turns = turns;
     this.currentTurn = 0;
   }
@@ -61,11 +62,11 @@ class Battle {
       CONFIG.directions.right;
 
     players[CONFIG.player.gianni].drawAtPosition(
-      CONFIG.battle.arenaPadding,
+      CONFIG.battle.arenaPaddingX,
       CONFIG.tile.canvasHeight / 2
     );
     players[CONFIG.player.fabrissazzo].drawAtPosition(
-      CONFIG.battle.arenaPadding + CONFIG.battle.gapBetweenCharacters,
+      CONFIG.battle.arenaPaddingX + CONFIG.battle.gapBetweenCharacters,
       CONFIG.tile.canvasHeight / 2
     );
   }
@@ -74,7 +75,7 @@ class Battle {
     for (var i = 0; i < this.enemies.length; i++) {
       const posX =
         CONFIG.tile.canvasWidth - // the full width of the canvas
-        CONFIG.battle.arenaPadding - // the padding of the arena
+        CONFIG.battle.arenaPaddingX - // the padding of the arena
         this.enemies[i].displayedWidth - // the width of the character, because it start to draw images from top-left corner
         CONFIG.battle.gapBetweenCharacters * i; // space between characters
 
@@ -89,9 +90,9 @@ class Battle {
     const width = CONFIG.battle.healthBar.width;
     const height = CONFIG.battle.healthBar.height;
 
-    let x = CONFIG.battle.arenaPadding;
+    let x = CONFIG.battle.arenaPaddingX;
     if (isEnemy) {
-      x = CONFIG.tile.canvasWidth - CONFIG.battle.arenaPadding - width;
+      x = CONFIG.tile.canvasWidth - CONFIG.battle.arenaPaddingX - width;
     }
 
     characters.forEach((character) => {
@@ -150,7 +151,7 @@ class Battle {
     const height = CONFIG.battle.pointer.height;
 
     let posX = // pos X for players
-      CONFIG.battle.arenaPadding +
+      CONFIG.battle.arenaPaddingX +
       players[CONFIG.player.gianni].displayedWidth / 4 +
       CONFIG.battle.gapBetweenCharacters * this.pointerPosition +
       width / 4;
@@ -158,7 +159,7 @@ class Battle {
     if (this.pointerPosition > Object.values(players).length - 1) {
       posX = // pos X for enemies
         CONFIG.tile.canvasWidth -
-        CONFIG.battle.arenaPadding -
+        CONFIG.battle.arenaPaddingX -
         this.enemies[0].displayedWidth / 2 -
         CONFIG.battle.gapBetweenCharacters +
         (this.pointerPosition - this.enemies.length) *
@@ -194,6 +195,32 @@ class Battle {
     ctx.fillText(characterName, textX, textY);
   }
 
+  drawDialogueBox() {
+    const posX = CONFIG.battle.arenaPaddingX;
+    const posY = CONFIG.tile.canvasHeight / 2 + CONFIG.tile.tileDim * 2;
+    const width = CONFIG.tile.canvasWidth - posX * 2;
+    const height =
+      CONFIG.tile.canvasHeight - posY - CONFIG.battle.arenaPaddingY;
+    ctx.fillStyle = CONFIG.dialogue.balloon.backgroundColor;
+    ctx.fillRect(posX, posY, width, height);
+
+    ctx.strokeStyle = CONFIG.dialogue.balloon.borderColor;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(posX, posY, width, height);
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = CONFIG.dialogue.textColor;
+    ctx.font = `20px ${CONFIG.typography.fontFamily}`;
+
+    ctx.fillText(
+      `È il turno di ${
+        this.turns[this.currentTurn].entity.name
+      }. Seleziona la tua mossa`,
+      posX,
+      posY + 25
+    );
+  }
+
   draw() {
     this.background.draw();
     this.drawPlayers();
@@ -201,6 +228,7 @@ class Battle {
     this.drawPlayersHealthBar();
     this.drawEnemiesHealthBar();
     this.drawPointer();
+    this.drawDialogueBox();
   }
 
   movePointerRight() {
