@@ -83,3 +83,12 @@ const MAP_IDS = {
   intro: "intro",
   next: "next",
 };
+
+const MAP_OBJECT_IDS = {
+  fiorellino: "fiorellino",
+};
+
+const NPC_IDS = {
+  furlanetto: "furlanetto",
+  cozza: "cozza",
+};

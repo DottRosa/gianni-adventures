@@ -1,8 +1,3 @@
-const NPC_IDS = {
-  furlanetto: "furlanetto",
-  cozza: "cozza",
-};
-
 const NPCS = {
   [NPC_IDS.furlanetto]: {
     firstName: "Carlo",
