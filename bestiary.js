@@ -7,7 +7,7 @@ const BESTIARY = {
       right: `${CONFIG.assetsFolder}/npc-sprite.png`,
     },
     description: "",
-    fullName: () => {
+    get fullName() {
       return `${this.firstName} ${this.lastName}`;
     },
     nickname: {
@@ -23,7 +23,7 @@ const BESTIARY = {
       right: `${CONFIG.assetsFolder}/npc-sprite.png`,
     },
     description: "",
-    fullName: () => {
+    get fullName() {
       return `${this.firstName} ${this.lastName}`;
     },
     nickname: {

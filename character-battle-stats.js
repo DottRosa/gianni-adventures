@@ -7,8 +7,11 @@ class CharacterBattleStats {
     specialAttacks = [],
   }) {
     this.health = health;
+    this.currentHealth = new Number(health);
     this.stamina = stamina;
+    this.currentStamina = new Number(stamina);
     this.velocity = velocity;
+    this.currentVelocity = new Number(velocity);
 
     ["health", "stamina", "velocity"].forEach((param) => {
       if (

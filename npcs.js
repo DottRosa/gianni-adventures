@@ -22,6 +22,11 @@ const NPCS = {
         cellY: 17,
       },
       dialogueManager: new DialogueManager(NPC_DIALOGUES.intro[NPC_IDS.cozza]),
+      characterBattleStats: new CharacterBattleStats({
+        health: 120,
+        stamina: 100,
+        velocity: 3,
+      }),
     }),
   },
 };

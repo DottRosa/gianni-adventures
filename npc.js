@@ -46,7 +46,7 @@ class NPC extends Sprite {
     );
   }
 
-  drawFixed(posX, posY) {
+  drawAtPosition(posX, posY) {
     const image = this.image[this.currentDirection];
 
     ctx.drawImage(
@@ -77,5 +77,9 @@ class NPC extends Sprite {
       players,
       partnerDrift,
     });
+  }
+
+  get name() {
+    return this.details.fullName;
   }
 }

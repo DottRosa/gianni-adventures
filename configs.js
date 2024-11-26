@@ -1,5 +1,9 @@
 const CONFIG = {
   zoom: 500,
+  typography: {
+    fontFamily: "Comic Sans MS",
+    textColor: "black",
+  },
   tile: {
     realDim: 12,
     tilesPerX: 17,
@@ -61,6 +65,12 @@ const CONFIG = {
     },
   },
   battle: {
+    get gapBetweenCharacters() {
+      return CONFIG.tile.tileDim;
+    },
+    get arenaPadding() {
+      return CONFIG.tile.tileDim;
+    },
     characterStats: {
       health: {
         min: 20,
@@ -73,6 +83,33 @@ const CONFIG = {
       velocity: {
         min: 1,
         max: 5,
+      },
+    },
+    healthBar: {
+      get verticalGap() {
+        return CONFIG.tile.tileDim;
+      },
+      width: 200,
+      height: 10,
+      ranges: {
+        high: {
+          threshold: 0.5,
+          color: "green",
+        },
+        medium: {
+          threshold: 0.2,
+          color: "orange",
+        },
+        low: {
+          threshold: 0,
+          color: "red",
+        },
+      },
+      fontSize: 14,
+      textAlign: "left",
+      border: {
+        color: "black",
+        width: 2,
       },
     },
   },

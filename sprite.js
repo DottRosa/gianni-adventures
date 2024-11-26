@@ -54,30 +54,34 @@ class Sprite {
 
     ctx.drawImage(
       image,
-      this.currentFrame * (image.width / 4),
+      this.currentFrame * this.displayedWidth,
       0,
-      image.width / 4,
+      this.displayedWidth,
       image.height,
       xPos,
       yPos,
-      image.width / 4,
+      this.displayedWidth,
       image.height
     );
   }
 
-  drawFixed(posX, posY) {
+  drawAtPosition(posX, posY) {
     const image = this.image[this.currentDirection];
 
     ctx.drawImage(
       image,
-      this.currentFrame * (image.width / 4),
+      this.currentFrame * this.displayedWidth,
       0,
-      image.width / 4,
+      this.displayedWidth,
       image.height,
       posX,
       posY,
-      image.width / 4,
+      this.displayedWidth,
       image.height
     );
+  }
+
+  get displayedWidth() {
+    return this.image[this.currentDirection].width / 4;
   }
 }
