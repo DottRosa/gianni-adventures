@@ -31,7 +31,7 @@ class Battle {
       CONFIG.tile.canvasHeight / 2
     );
     players[CONFIG.player.fabrissazzo].drawAtPosition(
-      CONFIG.battle.gapBetweenCharacters * 2,
+      CONFIG.battle.arenaPadding + CONFIG.battle.gapBetweenCharacters,
       CONFIG.tile.canvasHeight / 2
     );
   }
@@ -142,6 +142,22 @@ class Battle {
     ctx.strokeStyle = CONFIG.battle.pointer.border.color;
     ctx.lineWidth = CONFIG.battle.pointer.border.width;
     ctx.stroke();
+
+    // Draw the character name
+    let characterName = "";
+    if (this.pointerPosition === 0) {
+      characterName = players[CONFIG.player.gianni].name;
+    } else if (this.pointerPosition === 1) {
+      characterName = players[CONFIG.player.fabrissazzo].name;
+    } else {
+      characterName =
+        this.enemies[this.pointerPosition - Object.values(players).length].name;
+    }
+
+    const textX = posX + width / 2;
+    const textY = startY - 10;
+    ctx.textAlign = "center";
+    ctx.fillText(characterName, textX, textY);
   }
 
   draw() {

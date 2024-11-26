@@ -69,7 +69,7 @@ const CONFIG = {
       return CONFIG.tile.tileDim;
     },
     get arenaPadding() {
-      return CONFIG.tile.tileDim;
+      return CONFIG.tile.tileDim * 2;
     },
     characterStats: {
       health: {
