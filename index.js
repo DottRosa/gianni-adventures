@@ -257,6 +257,7 @@ function handleInteractions() {
           EVENTS.battle.inProgress = true;
           const battleId = EVENTS.dialogue.entity.dialogueManager.battleId;
           EVENTS.battle.entity = BATTLES[currentMap.id][battleId];
+          EVENTS.battle.entity.init();
           break;
         }
       }

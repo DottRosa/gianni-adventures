@@ -1,6 +1,8 @@
 class Battle {
   pointerPosition = 0;
   interactionCooldown = 0;
+  currentTurn;
+  turns = [];
   lastKeyPressedId;
 
   constructor({
@@ -15,6 +17,38 @@ class Battle {
       imageSrc: background,
     });
     this.enemies = enemies;
+  }
+
+  init() {
+    // Calculate turns
+    const turns = [
+      {
+        index: 0,
+        entity: players[CONFIG.player.gianni],
+      },
+      {
+        index: 1,
+        entity: players[CONFIG.player.fabrissazzo],
+      },
+    ];
+
+    this.enemies.forEach((enemy, index) => {
+      characters.push({
+        index: index + Object.values(players).length,
+        entity: enemy,
+      });
+    });
+
+    turns.sort((a, b) => {
+      return a.entity.characterBattleStats.currentVelocity >
+        b.entity.characterBattleStats.currentVelocity
+        ? -1
+        : 1;
+    });
+
+    console.log(turns);
+    this.turns = turns;
+    this.currentTurn = 0;
   }
 
   get charactersQuantity() {

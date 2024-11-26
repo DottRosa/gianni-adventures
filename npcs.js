@@ -25,7 +25,7 @@ const NPCS = {
       characterBattleStats: new CharacterBattleStats({
         health: 120,
         stamina: 100,
-        velocity: 3,
+        velocity: 2,
       }),
     }),
   },
