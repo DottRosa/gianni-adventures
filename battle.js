@@ -1,4 +1,8 @@
 class Battle {
+  pointerPosition = 0;
+  interactionCooldown = 0;
+  lastKeyPressedId;
+
   constructor({
     background = `${CONFIG.assetsFolder}/battle.jpg`,
     enemies = [],
@@ -11,6 +15,10 @@ class Battle {
       imageSrc: background,
     });
     this.enemies = enemies;
+  }
+
+  get charactersQuantity() {
+    return Object.values(players).length + this.enemies.length;
   }
 
   drawPlayers() {
@@ -103,7 +111,38 @@ class Battle {
     this.drawHealth(this.enemies, true);
   }
 
-  drawPointer() {}
+  drawPointer() {
+    const width = CONFIG.battle.pointer.width;
+    const height = CONFIG.battle.pointer.height;
+
+    let posX = // pos X for players
+      CONFIG.battle.arenaPadding +
+      players[CONFIG.player.gianni].displayedWidth / 4 +
+      CONFIG.battle.gapBetweenCharacters * this.pointerPosition +
+      width / 4;
+
+    if (this.pointerPosition > Object.values(players).length - 1) {
+      posX = // pos X for enemies
+        CONFIG.tile.canvasWidth -
+        CONFIG.battle.arenaPadding -
+        this.enemies[0].displayedWidth / 2 -
+        CONFIG.battle.gapBetweenCharacters +
+        (this.pointerPosition - this.enemies.length) *
+          CONFIG.battle.gapBetweenCharacters -
+        width / 4;
+    }
+
+    const startY = CONFIG.tile.canvasHeight / 2 - height * 2;
+
+    // Disegna la parentesi angolare verso il basso
+    ctx.beginPath();
+    ctx.moveTo(posX, startY);
+    ctx.lineTo(posX + width / 2, startY + height); // Vertex
+    ctx.lineTo(posX + width, startY);
+    ctx.strokeStyle = CONFIG.battle.pointer.border.color;
+    ctx.lineWidth = CONFIG.battle.pointer.border.width;
+    ctx.stroke();
+  }
 
   draw() {
     this.background.draw();
@@ -112,5 +151,52 @@ class Battle {
     this.drawPlayersHealthBar();
     this.drawEnemiesHealthBar();
     this.drawPointer();
+  }
+
+  movePointerRight() {
+    this.pointerPosition++;
+    if (this.pointerPosition >= this.charactersQuantity) {
+      this.pointerPosition = 0;
+    }
+  }
+
+  movePointerLeft() {
+    this.pointerPosition--;
+    if (this.pointerPosition < 0) {
+      this.pointerPosition = this.charactersQuantity - 1;
+    }
+  }
+
+  handlePointer(keyboard) {
+    const now = Date.now();
+
+    if (
+      now > this.interactionCooldown &&
+      this.lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
+    ) {
+      this.lastKeyPressedId = keyboard.keyId;
+      this.interactionCooldown = now + CONFIG.keyboard.choicesCooldown;
+
+      switch (true) {
+        case keyboard.isLeft: {
+          this.movePointerLeft();
+          break;
+        }
+        case keyboard.isRight: {
+          this.movePointerRight();
+          break;
+        }
+        case keyboard.isInteract: {
+          // EVENTS.dialogue.entity.dialogueManager.selectChoice();
+          break;
+        }
+      }
+
+      return; // next interaction handling will be skipped
+    }
+  }
+
+  handle(keyboard) {
+    this.handlePointer(keyboard);
   }
 }

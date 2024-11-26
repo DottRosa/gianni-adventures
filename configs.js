@@ -85,6 +85,14 @@ const CONFIG = {
         max: 5,
       },
     },
+    pointer: {
+      width: 20,
+      height: 20,
+      border: {
+        color: "black",
+        width: 6,
+      },
+    },
     healthBar: {
       get verticalGap() {
         return CONFIG.tile.tileDim;

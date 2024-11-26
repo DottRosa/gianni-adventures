@@ -279,6 +279,7 @@ function animate() {
 
   if (EVENTS.battle.inProgress) {
     EVENTS.battle.entity.draw();
+    EVENTS.battle.entity.handle(keyboard);
   } else {
     currentMap.drawBackgrounds();
     currentMap.drawNpcs();
