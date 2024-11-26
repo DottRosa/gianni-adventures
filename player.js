@@ -3,8 +3,10 @@ class Player extends Sprite {
     spriteImages,
     startDirection = CONFIG.directions.right,
     name,
+    characterBattleStats,
   }) {
     super({ spriteImages, startDirection });
     this.name = name;
+    this.characterBattleStats = characterBattleStats;
   }
 }

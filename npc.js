@@ -4,6 +4,7 @@ class NPC extends Sprite {
     startDirection = CONFIG.directions.right,
     mapPositionCell = { cellX: 0, cellY: 0 },
     dialogueManager = null,
+    characterBattleStats,
   }) {
     super({ spriteImages: details.spriteImages, startDirection });
     this.details = details;
@@ -13,6 +14,7 @@ class NPC extends Sprite {
       mapPositionCell.cellY
     );
     this.dialogueManager = dialogueManager;
+    this.characterBattleStats = characterBattleStats;
   }
 
   updatePosition(position) {
@@ -39,6 +41,22 @@ class NPC extends Sprite {
       image.height,
       xPos,
       yPos,
+      image.width / 4,
+      image.height
+    );
+  }
+
+  drawFixed(posX, posY) {
+    const image = this.image[this.currentDirection];
+
+    ctx.drawImage(
+      image,
+      this.currentFrame * (image.width / 4),
+      0,
+      image.width / 4,
+      image.height,
+      posX,
+      posY,
       image.width / 4,
       image.height
     );

@@ -1,5 +1,6 @@
 class Map {
   constructor({
+    id,
     totalTilesX,
     totalTilesY,
     collisions,
@@ -11,10 +12,15 @@ class Map {
     ambientMusic,
     startPosition,
   }) {
+    this.id = id;
     this.totalTilesX = totalTilesX;
     this.totalTilesY = totalTilesY;
-    this.collisionsDetector = new Collision(collisions, this.totalTilesY, npcs);
-    this.npcs = npcs;
+    this.npcs = Object.values(npcs);
+    this.collisionsDetector = new Collision(
+      collisions,
+      this.totalTilesY,
+      this.npcs
+    );
     this.doors = doors;
     this.mapObjects = mapObjects;
     this.backgroundImages = backgroundImages;

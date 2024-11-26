@@ -1,5 +1,7 @@
 const BATTLES = {
   [MAP_IDS.intro]: {
-    [NPC_IDS.furlanetto]: new Battle({}),
+    firstBattle: new Battle({
+      enemies: [NPCS[MAP_IDS.intro].furlanetto, NPCS[MAP_IDS.intro].cozza],
+    }),
   },
 };

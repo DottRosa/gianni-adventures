@@ -41,7 +41,7 @@ class DialogueManager {
     }
 
     if (!nextId) {
-      if (this.currentDialogue.battle) {
+      if (this.currentDialogue.battleId) {
         return CONFIG.dialogue.status.battle;
       }
 
@@ -52,8 +52,8 @@ class DialogueManager {
     return CONFIG.dialogue.status.continue;
   }
 
-  get battle() {
-    return this.currentDialogue.battle;
+  get battleId() {
+    return this.currentDialogue.battleId;
   }
 
   get ended() {

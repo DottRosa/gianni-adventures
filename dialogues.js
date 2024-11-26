@@ -1,5 +1,5 @@
 const NPC_DIALOGUES = {
-  intro: {
+  [MAP_IDS.intro]: {
     [NPC_IDS.cozza]: {
       start: {
         id: "start",
@@ -75,7 +75,7 @@ const NPC_DIALOGUES = {
         text: "Combattiamo!",
         conditions: [],
         next: null,
-        battle: BATTLES[MAP_IDS.intro][NPC_IDS.furlanetto],
+        battleId: "firstBattle",
       },
     },
   },

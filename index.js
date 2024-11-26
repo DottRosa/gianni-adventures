@@ -39,6 +39,11 @@ players[CONFIG.player.fabrissazzo] = new Player({
     right: `${CONFIG.assetsFolder}/fabris-sprite-right.png`,
   },
   name: "Fabris",
+  characterBattleStats: new CharacterBattleStats({
+    health: 100,
+    stamina: 100,
+    velocity: 3,
+  }),
 });
 
 players[CONFIG.player.gianni] = new Player({
@@ -47,6 +52,11 @@ players[CONFIG.player.gianni] = new Player({
     right: `${CONFIG.assetsFolder}/gianni-sprite-right.png`,
   },
   name: "Gianni",
+  characterBattleStats: new CharacterBattleStats({
+    health: 130,
+    stamina: 80,
+    velocity: 1,
+  }),
 });
 
 let backgroundPosition = { x: 0, y: 0 };
@@ -245,7 +255,8 @@ function handleInteractions() {
         }
         case CONFIG.dialogue.status.battle: {
           EVENTS.battle.inProgress = true;
-          EVENTS.battle.entity = EVENTS.dialogue.entity.dialogueManager.battle;
+          const battleId = EVENTS.dialogue.entity.dialogueManager.battleId;
+          EVENTS.battle.entity = BATTLES[currentMap.id][battleId];
           break;
         }
       }

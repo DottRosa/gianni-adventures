@@ -60,6 +60,22 @@ const CONFIG = {
       battle: "battle",
     },
   },
+  battle: {
+    characterStats: {
+      health: {
+        min: 20,
+        max: 500,
+      },
+      stamina: {
+        min: 50,
+        max: 200,
+      },
+      velocity: {
+        min: 1,
+        max: 5,
+      },
+    },
+  },
 };
 
 CONFIG.tile.tilesFromCenterX = Math.floor(CONFIG.tile.tilesPerX / 2);
