@@ -72,7 +72,7 @@ const CONFIG = {
       return CONFIG.tile.tileDim * 2;
     },
     get arenaPaddingY() {
-      return CONFIG.tile.tileDim;
+      return CONFIG.tile.tileDim / 2;
     },
     characterStats: {
       health: {
@@ -80,8 +80,8 @@ const CONFIG = {
         max: 500,
       },
       stamina: {
-        min: 50,
-        max: 200,
+        min: 1,
+        max: 10,
       },
       velocity: {
         min: 1,
@@ -122,6 +122,10 @@ const CONFIG = {
         color: "black",
         width: 2,
       },
+    },
+    dialogues: {
+      isEnemyTurn: "È il turno di {name}.",
+      isPlayerTurn: "È il turno di {name}. Fai la tua mossa:",
     },
   },
 };

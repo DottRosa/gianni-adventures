@@ -11,7 +11,7 @@ const NPCS = {
       ),
       characterBattleStats: new CharacterBattleStats({
         health: 120,
-        stamina: 100,
+        stamina: 6,
         velocity: 3,
       }),
     }),
@@ -24,7 +24,7 @@ const NPCS = {
       dialogueManager: new DialogueManager(NPC_DIALOGUES.intro[NPC_IDS.cozza]),
       characterBattleStats: new CharacterBattleStats({
         health: 120,
-        stamina: 100,
+        stamina: 4,
         velocity: 2,
       }),
     }),
