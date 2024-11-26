@@ -40,6 +40,8 @@ class Sprite {
   draw(driftX = 0, driftY = 0) {
     const image = this.image[this.currentDirection];
 
+    let xPos, yPos;
+
     this.position.x =
       CONFIG.tile.canvasWidth / 2 -
       this.image[this.currentDirection].width / 4 / 2;
@@ -47,8 +49,8 @@ class Sprite {
       CONFIG.tile.canvasHeight / 2 -
       this.image[this.currentDirection].height / 2;
 
-    let xPos = this.position.x + driftX;
-    let yPos = this.position.y + driftY;
+    xPos = this.position.x + driftX;
+    yPos = this.position.y + driftY;
 
     ctx.drawImage(
       image,
@@ -58,6 +60,22 @@ class Sprite {
       image.height,
       xPos,
       yPos,
+      image.width / 4,
+      image.height
+    );
+  }
+
+  drawFixed(posX, posY) {
+    const image = this.image[this.currentDirection];
+
+    ctx.drawImage(
+      image,
+      this.currentFrame * (image.width / 4),
+      0,
+      image.width / 4,
+      image.height,
+      posX,
+      posY,
       image.width / 4,
       image.height
     );
