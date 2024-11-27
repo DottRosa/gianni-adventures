@@ -26,6 +26,7 @@ class BattleManager {
   currentPhase = CONFIG.battle.phases.selection;
   turns = [];
   lastKeyPressedId;
+  maxItemsToDisplay = 0;
 
   constructor(battle) {
     this.battle = battle;
@@ -89,6 +90,8 @@ class BattleManager {
         y: posY,
       };
     }
+
+    this.maxItemsToDisplay = CONFIG.battle.actionBox.maxItemsToDisplay;
 
     // Avoid clicking on interaction when entering the battle
     this.interactionCooldown = Infinity;
@@ -255,12 +258,21 @@ class BattleManager {
     ctx.strokeStyle = CONFIG.battle.actionBox.border.color;
     ctx.lineWidth = CONFIG.battle.actionBox.border.width;
 
-    ctx.strokeRect(
-      x + padding / 2,
-      firstChoiceY - 22.5 + choices.gap * this.actionPointer,
-      width - padding,
-      30
-    );
+    if (this.actionPointer >= this.maxItemsToDisplay) {
+      ctx.strokeRect(
+        x + padding / 2,
+        firstChoiceY - 22.5 + choices.gap * 3,
+        width - padding,
+        30
+      );
+    } else {
+      ctx.strokeRect(
+        x + padding / 2,
+        firstChoiceY - 22.5 + choices.gap * this.actionPointer,
+        width - padding,
+        30
+      );
+    }
   }
 
   drawPointer() {
@@ -325,15 +337,36 @@ class BattleManager {
           break;
         }
         case CONFIG.battle.phases.attacksOptions: {
-          this.turns[this.currentTurn].entity.attacks.forEach(
-            (attack, index) => {
+          const attacks = this.turns[this.currentTurn].entity.attacks;
+
+          for (var i = 0; i < attacks.length; i++) {
+            if (
+              this.actionPointer < this.maxItemsToDisplay &&
+              i >= 0 &&
+              i < this.maxItemsToDisplay
+            ) {
               ctx.fillText(
-                attack.name,
+                `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
                 x + padding,
-                y + padding * 2 + index * CONFIG.battle.actionBox.choices.gap
+                y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
               );
             }
-          );
+
+            if (
+              this.actionPointer >= this.maxItemsToDisplay &&
+              i >= this.actionPointer - (this.maxItemsToDisplay - 1) &&
+              i < this.actionPointer + 1
+            ) {
+              ctx.fillText(
+                `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
+                x + padding,
+                y +
+                  padding * 2 +
+                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
+                    CONFIG.battle.actionBox.choices.gap
+              );
+            }
+          }
         }
       }
     } else {

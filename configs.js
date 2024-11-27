@@ -145,6 +145,10 @@ const CONFIG = {
         offsetX: 10,
         offsetY: 10,
       },
+      get maxItemsToDisplay() {
+        const availableSpace = this.height - this.padding * 2;
+        return Math.floor(availableSpace / (this.fontSize * 2));
+      },
     },
     phases: {
       selection: "selection", // the characher decides which kind of action wants to execute
