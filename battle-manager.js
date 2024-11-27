@@ -40,6 +40,8 @@ class BattleManager {
 
     this.turns = turns;
     this.currentTurn = 0;
+
+    // ASSETS.music.battle.play();
   }
 
   drawPlayers() {

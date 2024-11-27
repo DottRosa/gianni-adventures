@@ -42,7 +42,8 @@ const CONFIG = {
     interactionCooldown: 300,
     choicesCooldown: 100,
     switchKey: "s",
-    interactKey: "a",
+    interactKey: "z",
+    cancelKey: "x",
   },
   dialogue: {
     fontSize: 13,
@@ -174,6 +175,9 @@ const ASSETS = {
     selection: new Audio(
       "assets/sound-effects/minimal-pop-click-ui-4-198304.mp3"
     ),
+  },
+  music: {
+    battle: new Audio("assets/music/battle.mp4"),
   },
 };
 
