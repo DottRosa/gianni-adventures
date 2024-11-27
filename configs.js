@@ -123,9 +123,35 @@ const CONFIG = {
         width: 2,
       },
     },
-    dialogues: {
-      isEnemyTurn: "È il turno di {name}.",
-      isPlayerTurn: "È il turno di {name}. Fai la tua mossa:",
+    actionBox: {
+      get x() {
+        return CONFIG.battle.arenaPaddingX;
+      },
+      get y() {
+        return CONFIG.tile.canvasHeight / 2 + CONFIG.tile.tileDim * 2;
+      },
+      get width() {
+        return CONFIG.tile.canvasWidth - this.x * 2;
+      },
+      get height() {
+        return CONFIG.tile.canvasHeight - this.y - CONFIG.battle.arenaPaddingY;
+      },
+      backgroundColor: "white",
+      border: {
+        color: "black",
+        width: 1,
+      },
+      fontSize: 20,
+      padding: 15,
+      choices: {
+        marginTop: 80,
+        gap: 30,
+      },
+    },
+    phases: {
+      selection: "selection", // the characher decides which kind of action wants to execute
+      option: "option", // the character has to chose an item from the selected action items list
+      target: "target", // the characher selectes the target of the selected action
     },
   },
 };
@@ -144,6 +170,10 @@ CONFIG.player.partner = CONFIG.player.fabrissazzo;
 const ASSETS = {
   soundEffects: {
     footsteps: new Audio("assets/sound-effects/footsteps.mp3"),
+    choices: new Audio("assets/sound-effects/bloop.mp3"),
+    selection: new Audio(
+      "assets/sound-effects/minimal-pop-click-ui-4-198304.mp3"
+    ),
   },
 };
 

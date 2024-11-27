@@ -1,7 +1,9 @@
 class BattleManager {
-  pointerPosition = 0;
+  targetSelectionPointer = 0;
+  actionPointer = 0;
   interactionCooldown = 0;
   currentTurn;
+  currentPhase = CONFIG.battle.phases.selection;
   turns = [];
   lastKeyPressedId;
 
@@ -151,23 +153,23 @@ class BattleManager {
     this.drawHealth(this.battle.enemies, true);
   }
 
-  drawPointer() {
+  drawTargetSelectionPointer() {
     const width = CONFIG.battle.pointer.width;
     const height = CONFIG.battle.pointer.height;
 
     let posX = // pos X for players
       CONFIG.battle.arenaPaddingX +
       players[CONFIG.player.gianni].displayedWidth / 4 +
-      CONFIG.battle.gapBetweenCharacters * this.pointerPosition +
+      CONFIG.battle.gapBetweenCharacters * this.targetSelectionPointer +
       width / 4;
 
-    if (this.pointerPosition > Object.values(players).length - 1) {
+    if (this.targetSelectionPointer > Object.values(players).length - 1) {
       posX = // pos X for enemies
         CONFIG.tile.canvasWidth -
         CONFIG.battle.arenaPaddingX -
         this.battle.enemies[0].displayedWidth / 2 -
         CONFIG.battle.gapBetweenCharacters +
-        (this.pointerPosition - this.battle.enemies.length) *
+        (this.targetSelectionPointer - this.battle.enemies.length) *
           CONFIG.battle.gapBetweenCharacters -
         width / 4;
     }
@@ -185,14 +187,14 @@ class BattleManager {
 
     // Draw the character name
     let characterName = "";
-    if (this.pointerPosition === 0) {
+    if (this.targetSelectionPointer === 0) {
       characterName = players[CONFIG.player.gianni].name;
-    } else if (this.pointerPosition === 1) {
+    } else if (this.targetSelectionPointer === 1) {
       characterName = players[CONFIG.player.fabrissazzo].name;
     } else {
       characterName =
         this.battle.enemies[
-          this.pointerPosition - Object.values(players).length
+          this.targetSelectionPointer - Object.values(players).length
         ].name;
     }
 
@@ -202,30 +204,76 @@ class BattleManager {
     ctx.fillText(characterName, textX, textY);
   }
 
-  drawDialogueBox() {
-    const posX = CONFIG.battle.arenaPaddingX;
-    const posY = CONFIG.tile.canvasHeight / 2 + CONFIG.tile.tileDim * 2;
-    const width = CONFIG.tile.canvasWidth - posX * 2;
-    const height =
-      CONFIG.tile.canvasHeight - posY - CONFIG.battle.arenaPaddingY;
-    ctx.fillStyle = CONFIG.dialogue.balloon.backgroundColor;
-    ctx.fillRect(posX, posY, width, height);
+  drawActionSelectionPointer() {
+    const { x, y, padding, choices } = CONFIG.battle.actionBox;
+    const firstChoiceY = y + CONFIG.battle.actionBox.choices.marginTop;
+    ctx.strokeStyle = CONFIG.battle.actionBox.border.color;
+    ctx.lineWidth = CONFIG.battle.actionBox.border.width;
 
-    ctx.strokeStyle = CONFIG.dialogue.balloon.borderColor;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(posX, posY, width, height);
+    ctx.strokeRect(
+      x + padding,
+      firstChoiceY - 22.5 + choices.gap * this.actionPointer,
+      200,
+      30
+    );
+  }
+
+  drawPointer() {
+    if (this.currentPhase === CONFIG.battle.phases.selection) {
+      this.drawActionSelectionPointer();
+    } else if (this.currentPhase === CONFIG.battle.phases.option) {
+    } else if (this.currentPhase === CONFIG.battle.phases.target) {
+      this.drawTargetSelectionPointer();
+    }
+  }
+
+  drawDialogueBox() {
+    const { x, y, width, height, padding, fontSize, backgroundColor } =
+      CONFIG.battle.actionBox;
+
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(x, y, width, height);
+
+    ctx.strokeStyle = CONFIG.battle.actionBox.border.color;
+    ctx.lineWidth = CONFIG.battle.actionBox.border.width;
+    ctx.strokeRect(x, y, width, height);
 
     ctx.textAlign = "left";
-    ctx.fillStyle = CONFIG.dialogue.textColor;
-    ctx.font = `20px ${CONFIG.typography.fontFamily}`;
+    ctx.fillStyle = CONFIG.typography.textColor;
+    ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
 
-    ctx.fillText(
-      `È il turno di ${
-        this.turns[this.currentTurn].entity.name
-      }. Seleziona la tua mossa`,
-      posX,
-      posY + 25
-    );
+    if (this.turns[this.currentTurn].isPlayer) {
+      switch (this.currentPhase) {
+        case CONFIG.battle.phases.selection: {
+          ctx.fillText(
+            `È il turno di ${this.turns[this.currentTurn].entity.name}:`,
+            x + padding,
+            y + padding * 2
+          );
+          ctx.fillText(
+            `Attacco`,
+            x + 25,
+            y + CONFIG.battle.actionBox.choices.marginTop
+          );
+          ctx.fillText(
+            `Attacco Speciale`,
+            x + 25,
+            y +
+              CONFIG.battle.actionBox.choices.marginTop +
+              CONFIG.battle.actionBox.choices.gap
+          );
+          ctx.fillText(
+            `Zaino`,
+            x + 25,
+            y +
+              CONFIG.battle.actionBox.choices.marginTop +
+              CONFIG.battle.actionBox.choices.gap * 2
+          );
+          break;
+        }
+      }
+    } else {
+    }
   }
 
   draw() {
@@ -234,21 +282,35 @@ class BattleManager {
     this.drawEnemies();
     this.drawPlayersHealthBar();
     this.drawEnemiesHealthBar();
-    this.drawPointer();
     this.drawDialogueBox();
+    this.drawPointer();
   }
 
-  movePointerRight() {
-    this.pointerPosition++;
-    if (this.pointerPosition >= this.battle.charactersQuantity) {
-      this.pointerPosition = 0;
+  moveTargetSelectionPointerRight() {
+    this.targetSelectionPointer++;
+    if (this.targetSelectionPointer >= this.battle.charactersQuantity) {
+      this.targetSelectionPointer = 0;
     }
   }
 
-  movePointerLeft() {
-    this.pointerPosition--;
-    if (this.pointerPosition < 0) {
-      this.pointerPosition = this.battle.charactersQuantity - 1;
+  moveTargetSelectionPointerLeft() {
+    this.targetSelectionPointer--;
+    if (this.targetSelectionPointer < 0) {
+      this.targetSelectionPointer = this.battle.charactersQuantity - 1;
+    }
+  }
+
+  moveActionPointerUp() {
+    this.actionPointer--;
+    if (this.actionPointer < 0) {
+      this.actionPointer = 3 - 1;
+    }
+  }
+
+  moveDialoguePointerDown() {
+    this.actionPointer++;
+    if (this.actionPointer >= 3) {
+      this.actionPointer = 0;
     }
   }
 
@@ -262,18 +324,44 @@ class BattleManager {
       this.lastKeyPressedId = keyboard.keyId;
       this.interactionCooldown = now + CONFIG.keyboard.choicesCooldown;
 
-      switch (true) {
-        case keyboard.isLeft: {
-          this.movePointerLeft();
-          break;
+      ASSETS.soundEffects.choices.pause();
+      ASSETS.soundEffects.choices.currentTime = 0;
+      ASSETS.soundEffects.selection.pause();
+      ASSETS.soundEffects.selection.currentTime = 0;
+
+      if (this.currentPhase === CONFIG.battle.phases.selection) {
+        switch (true) {
+          case keyboard.isUp: {
+            this.moveActionPointerUp();
+            ASSETS.soundEffects.choices.play();
+            break;
+          }
+          case keyboard.isDown: {
+            this.moveDialoguePointerDown();
+            ASSETS.soundEffects.choices.play();
+            break;
+          }
+          case keyboard.isInteract: {
+            // EVENTS.dialogue.entity.dialogueManager.selectChoice();
+            ASSETS.soundEffects.selection.play();
+            break;
+          }
         }
-        case keyboard.isRight: {
-          this.movePointerRight();
-          break;
-        }
-        case keyboard.isInteract: {
-          // EVENTS.dialogue.entity.dialogueManager.selectChoice();
-          break;
+      } else if (this.currentPhase === CONFIG.battle.phases.option) {
+      } else if (this.currentPhase === CONFIG.battle.phases.target) {
+        switch (true) {
+          case keyboard.isLeft: {
+            this.moveTargetSelectionPointerLeft();
+            break;
+          }
+          case keyboard.isRight: {
+            this.moveTargetSelectionPointerRight();
+            break;
+          }
+          case keyboard.isInteract: {
+            // EVENTS.dialogue.entity.dialogueManager.selectChoice();
+            break;
+          }
         }
       }
 

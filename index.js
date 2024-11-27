@@ -3,6 +3,8 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 const keyboard = new Keyboard();
 
+ctx.textBaseline = "top";
+
 let currentMap = MAPS[MAP_IDS.intro];
 
 function handleFootstepsSound() {
@@ -17,7 +19,6 @@ function handleFootstepsSound() {
       .play()
       .catch((err) => console.error("Audio play error:", err));
   } else if (!currentlyMoving) {
-    // Il giocatore si è fermato
     ASSETS.soundEffects.footsteps.pause();
     ASSETS.soundEffects.footsteps.currentTime = 0;
   }
@@ -260,6 +261,8 @@ function handleInteractions() {
             BATTLES[currentMap.id][battleId]
           );
           EVENTS.battle.entity.init();
+          ASSETS.soundEffects.footsteps.pause();
+          ASSETS.soundEffects.footsteps.currentTime = 0;
           break;
         }
       }
