@@ -81,6 +81,22 @@ class Sprite {
     );
   }
 
+  draw2() {
+    const image = this.image[this.currentDirection];
+
+    ctx.drawImage(
+      image,
+      this.currentFrame * this.displayedWidth,
+      0,
+      this.displayedWidth,
+      image.height,
+      this.position.x,
+      this.position.y,
+      this.displayedWidth,
+      image.height
+    );
+  }
+
   get displayedWidth() {
     return this.image[this.currentDirection].width / 4;
   }

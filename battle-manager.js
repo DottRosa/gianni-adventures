@@ -1,7 +1,27 @@
+const ACTION_CHOICES = [
+  {
+    name: "Attacco",
+    triggerPhase: CONFIG.battle.phases.attacksOptions,
+  },
+  {
+    name: "Attacco speciale",
+    triggerPhase: CONFIG.battle.phases.specialAttacksOptions,
+  },
+  {
+    name: "Zaino",
+    triggerPhase: CONFIG.battle.phases.bagOptions,
+  },
+  {
+    name: "Passa il turno",
+    triggerPhase: CONFIG.battle.phases.skipTurn,
+  },
+];
+
 class BattleManager {
   targetSelectionPointer = 0;
   actionPointer = 0;
-  interactionCooldown = 0;
+  specialAttackPointer = 0;
+  interactionCooldown;
   currentTurn;
   currentPhase = CONFIG.battle.phases.selection;
   turns = [];
@@ -41,25 +61,20 @@ class BattleManager {
     this.turns = turns;
     this.currentTurn = 0;
 
-    // ASSETS.music.battle.play();
-  }
-
-  drawPlayers() {
     players[CONFIG.player.gianni].currentDirection = CONFIG.directions.right;
     players[CONFIG.player.fabrissazzo].currentDirection =
       CONFIG.directions.right;
 
-    players[CONFIG.player.gianni].drawAtPosition(
-      CONFIG.battle.arenaPaddingX,
-      CONFIG.tile.canvasHeight / 2
-    );
-    players[CONFIG.player.fabrissazzo].drawAtPosition(
-      CONFIG.battle.arenaPaddingX + CONFIG.battle.gapBetweenCharacters,
-      CONFIG.tile.canvasHeight / 2
-    );
-  }
+    players[CONFIG.player.gianni].position = {
+      x: CONFIG.battle.arenaPaddingX,
+      y: CONFIG.tile.canvasHeight / 2,
+    };
 
-  drawEnemies() {
+    players[CONFIG.player.fabrissazzo].position = {
+      x: CONFIG.battle.arenaPaddingX + CONFIG.battle.gapBetweenCharacters,
+      y: CONFIG.tile.canvasHeight / 2,
+    };
+
     for (var i = 0; i < this.battle.enemies.length; i++) {
       const posX =
         CONFIG.tile.canvasWidth - // the full width of the canvas
@@ -69,8 +84,28 @@ class BattleManager {
 
       const posY = CONFIG.tile.canvasHeight / 2;
 
-      this.battle.enemies[i].drawAtPosition(posX, posY);
+      this.battle.enemies[i].position = {
+        x: posX,
+        y: posY,
+      };
     }
+
+    // Avoid clicking on interaction when entering the battle
+    this.interactionCooldown = Infinity;
+    setTimeout(() => {
+      this.interactionCooldown = 0;
+    }, CONFIG.keyboard.interactionCooldown);
+
+    // ASSETS.music.battle.play();
+  }
+
+  drawPlayers() {
+    players[CONFIG.player.gianni].draw2();
+    players[CONFIG.player.fabrissazzo].draw2();
+  }
+
+  drawEnemies() {
+    this.battle.enemies.forEach((e) => e.draw2());
   }
 
   drawHealth(characters, isEnemy = false) {
@@ -207,71 +242,98 @@ class BattleManager {
   }
 
   drawActionSelectionPointer() {
-    const { x, y, padding, choices } = CONFIG.battle.actionBox;
-    const firstChoiceY = y + CONFIG.battle.actionBox.choices.marginTop;
+    const { entity: activeCharacter } = this.turns[this.currentTurn];
+    const { padding, marginBottom, choices, width } = CONFIG.battle.actionBox;
+
+    const x = activeCharacter.position.x;
+    const y =
+      activeCharacter.position.y -
+      CONFIG.battle.actionBox.height -
+      marginBottom;
+
+    const firstChoiceY = y + padding * 2;
     ctx.strokeStyle = CONFIG.battle.actionBox.border.color;
     ctx.lineWidth = CONFIG.battle.actionBox.border.width;
 
     ctx.strokeRect(
-      x + padding,
+      x + padding / 2,
       firstChoiceY - 22.5 + choices.gap * this.actionPointer,
-      200,
+      width - padding,
       30
     );
   }
 
   drawPointer() {
-    if (this.currentPhase === CONFIG.battle.phases.selection) {
+    if (
+      this.currentPhase === CONFIG.battle.phases.selection ||
+      this.currentPhase === CONFIG.battle.phases.attacksOptions
+    ) {
       this.drawActionSelectionPointer();
-    } else if (this.currentPhase === CONFIG.battle.phases.option) {
     } else if (this.currentPhase === CONFIG.battle.phases.target) {
       this.drawTargetSelectionPointer();
     }
   }
 
-  drawDialogueBox() {
-    const { x, y, width, height, padding, fontSize, backgroundColor } =
+  drawActionBox() {
+    const { entity: activeCharacter, isPlayer } = this.turns[this.currentTurn];
+    const { padding, fontSize, marginBottom, shadow, backgroundColor } =
       CONFIG.battle.actionBox;
 
+    const x = activeCharacter.position.x;
+    const y =
+      activeCharacter.position.y -
+      CONFIG.battle.actionBox.height -
+      marginBottom;
+
+    applyShadow({
+      ...shadow,
+    });
+
     ctx.fillStyle = backgroundColor;
-    ctx.fillRect(x, y, width, height);
+    ctx.fillRect(
+      x,
+      y,
+      CONFIG.battle.actionBox.width,
+      CONFIG.battle.actionBox.height
+    );
 
-    ctx.strokeStyle = CONFIG.battle.actionBox.border.color;
-    ctx.lineWidth = CONFIG.battle.actionBox.border.width;
-    ctx.strokeRect(x, y, width, height);
+    // Aggiungi il triangolo in basso
+    ctx.beginPath(); // Inizia un nuovo percorso
+    ctx.moveTo(x + 20, y + CONFIG.battle.actionBox.height); // Punto sinistro del triangolo
+    ctx.lineTo(x + 40, y + CONFIG.battle.actionBox.height); // Punto destro del triangolo
+    ctx.lineTo(x + 30, y + CONFIG.battle.actionBox.height + 20); // Punta del triangolo
+    ctx.closePath(); // Chiude il triangolo
 
-    ctx.textAlign = "left";
+    ctx.fill(); // riempie il triangolo
+
+    resetShadow();
+
+    ctx.textAlign = CONFIG.typography.textAlign;
     ctx.fillStyle = CONFIG.typography.textColor;
     ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
 
     if (this.turns[this.currentTurn].isPlayer) {
       switch (this.currentPhase) {
         case CONFIG.battle.phases.selection: {
-          ctx.fillText(
-            `È il turno di ${this.turns[this.currentTurn].entity.name}:`,
-            x + padding,
-            y + padding * 2
-          );
-          ctx.fillText(
-            `Attacco`,
-            x + 25,
-            y + CONFIG.battle.actionBox.choices.marginTop
-          );
-          ctx.fillText(
-            `Attacco Speciale`,
-            x + 25,
-            y +
-              CONFIG.battle.actionBox.choices.marginTop +
-              CONFIG.battle.actionBox.choices.gap
-          );
-          ctx.fillText(
-            `Zaino`,
-            x + 25,
-            y +
-              CONFIG.battle.actionBox.choices.marginTop +
-              CONFIG.battle.actionBox.choices.gap * 2
-          );
+          ACTION_CHOICES.forEach((choice, index) => {
+            ctx.fillText(
+              choice.name,
+              x + padding,
+              y + padding * 2 + index * CONFIG.battle.actionBox.choices.gap
+            );
+          });
           break;
+        }
+        case CONFIG.battle.phases.attacksOptions: {
+          this.turns[this.currentTurn].entity.attacks.forEach(
+            (attack, index) => {
+              ctx.fillText(
+                attack.name,
+                x + padding,
+                y + padding * 2 + index * CONFIG.battle.actionBox.choices.gap
+              );
+            }
+          );
         }
       }
     } else {
@@ -284,7 +346,7 @@ class BattleManager {
     this.drawEnemies();
     this.drawPlayersHealthBar();
     this.drawEnemiesHealthBar();
-    this.drawDialogueBox();
+    this.drawActionBox();
     this.drawPointer();
   }
 
@@ -303,15 +365,29 @@ class BattleManager {
   }
 
   moveActionPointerUp() {
+    let max = 0;
+    if (this.currentPhase === CONFIG.battle.phases.selection) {
+      max = ACTION_CHOICES.length - 1;
+    }
+    if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
+      max = this.turns[this.currentTurn].entity.attacks.length - 1;
+    }
     this.actionPointer--;
     if (this.actionPointer < 0) {
-      this.actionPointer = 3 - 1;
+      this.actionPointer = max;
     }
   }
 
-  moveDialoguePointerDown() {
+  moveActionPointerDown() {
+    let max = 0;
+    if (this.currentPhase === CONFIG.battle.phases.selection) {
+      max = ACTION_CHOICES.length;
+    }
+    if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
+      max = this.turns[this.currentTurn].entity.attacks.length;
+    }
     this.actionPointer++;
-    if (this.actionPointer >= 3) {
+    if (this.actionPointer >= max) {
       this.actionPointer = 0;
     }
   }
@@ -331,7 +407,10 @@ class BattleManager {
       ASSETS.soundEffects.selection.pause();
       ASSETS.soundEffects.selection.currentTime = 0;
 
-      if (this.currentPhase === CONFIG.battle.phases.selection) {
+      if (
+        this.currentPhase === CONFIG.battle.phases.selection ||
+        this.currentPhase === CONFIG.battle.phases.attacksOptions
+      ) {
         switch (true) {
           case keyboard.isUp: {
             this.moveActionPointerUp();
@@ -339,17 +418,25 @@ class BattleManager {
             break;
           }
           case keyboard.isDown: {
-            this.moveDialoguePointerDown();
+            this.moveActionPointerDown();
             ASSETS.soundEffects.choices.play();
             break;
           }
           case keyboard.isInteract: {
-            // EVENTS.dialogue.entity.dialogueManager.selectChoice();
+            this.currentPhase = ACTION_CHOICES[this.actionPointer].triggerPhase;
+            this.actionPointer = 0; // resetto per usarlo per il submenu
             ASSETS.soundEffects.selection.play();
             break;
           }
+          case keyboard.isCancel: {
+            if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
+              this.currentPhase = CONFIG.battle.phases.selection;
+              this.actionPointer = 0; // resetto per usarlo per il submenu
+              ASSETS.soundEffects.cancel.play();
+            }
+            break;
+          }
         }
-      } else if (this.currentPhase === CONFIG.battle.phases.option) {
       } else if (this.currentPhase === CONFIG.battle.phases.target) {
         switch (true) {
           case keyboard.isLeft: {

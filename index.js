@@ -1,6 +1,5 @@
 // Definizione delle costanti e variabili necessarie
-const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
+
 const keyboard = new Keyboard();
 
 ctx.textBaseline = "top";
@@ -45,6 +44,7 @@ players[CONFIG.player.fabrissazzo] = new Player({
     stamina: 5,
     velocity: 3,
   }),
+  attacks: ATTACKS[CONFIG.player.fabrissazzo],
 });
 
 players[CONFIG.player.gianni] = new Player({

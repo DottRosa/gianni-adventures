@@ -38,3 +38,23 @@ function getCellByCoords(x, y) {
     cellY,
   };
 }
+
+/**
+ * Applica un'ombra in base ai parametri
+ */
+function applyShadow({ color, blur, offsetX, offsetY }) {
+  ctx.shadowColor = color;
+  ctx.shadowBlur = blur;
+  ctx.shadowOffsetX = offsetX;
+  ctx.shadowOffsetY = offsetY;
+}
+
+/**
+ * Resetta l'ombra e la rimuove dal contesto
+ */
+function resetShadow() {
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+}

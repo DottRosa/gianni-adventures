@@ -3,6 +3,7 @@ const CONFIG = {
   typography: {
     fontFamily: "Comic Sans MS",
     textColor: "black",
+    textAlign: "left",
   },
   tile: {
     realDim: 12,
@@ -125,33 +126,32 @@ const CONFIG = {
       },
     },
     actionBox: {
-      get x() {
-        return CONFIG.battle.arenaPaddingX;
-      },
-      get y() {
-        return CONFIG.tile.canvasHeight / 2 + CONFIG.tile.tileDim * 2;
-      },
-      get width() {
-        return CONFIG.tile.canvasWidth - this.x * 2;
-      },
-      get height() {
-        return CONFIG.tile.canvasHeight - this.y - CONFIG.battle.arenaPaddingY;
-      },
+      marginBottom: 20,
+      width: 150,
+      height: 150,
       backgroundColor: "white",
       border: {
         color: "black",
         width: 1,
       },
-      fontSize: 20,
+      fontSize: 14,
       padding: 15,
       choices: {
-        marginTop: 80,
         gap: 30,
+      },
+      shadow: {
+        color: "rgba(0, 0, 0, 0.2)",
+        blur: 10,
+        offsetX: 10,
+        offsetY: 10,
       },
     },
     phases: {
       selection: "selection", // the characher decides which kind of action wants to execute
-      option: "option", // the character has to chose an item from the selected action items list
+      attacksOptions: "attacksOptions", // the character has to chose an item from the selected action items list
+      specialAttacksOptions: "specialAttacksOptions", // the character has to chose an item from the selected action items list
+      bagOptions: "bagOptions", // the character has to chose an item from the selected action items list
+      skipTurn: "skipTurn", // il giocatore skippa il proprio turno senza eseguire azioni
       target: "target", // the characher selectes the target of the selected action
     },
   },
@@ -171,10 +171,9 @@ CONFIG.player.partner = CONFIG.player.fabrissazzo;
 const ASSETS = {
   soundEffects: {
     footsteps: new Audio("assets/sound-effects/footsteps.mp3"),
-    choices: new Audio("assets/sound-effects/bloop.mp3"),
-    selection: new Audio(
-      "assets/sound-effects/minimal-pop-click-ui-4-198304.mp3"
-    ),
+    choices: new Audio("assets/sound-effects/choices.mp3"),
+    selection: new Audio("assets/sound-effects/confirm.mp3"),
+    cancel: new Audio("assets/sound-effects/cancel.mp3"),
   },
   music: {
     battle: new Audio("assets/music/battle.mp4"),
@@ -194,3 +193,6 @@ const NPC_IDS = {
   furlanetto: "furlanetto",
   cozza: "cozza",
 };
+
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
