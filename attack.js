@@ -7,6 +7,7 @@ class Attack {
     isAoE = false, // indica che tutti i nemici verranno colpiti
     canTargetSelf = false, // indica che l'attacco può essere rivolto a se stessi
     canTargetAlly = false, // indica che l'attacco può essere rivolto all'alleato
+    gif,
   }) {
     this.name = name;
     this.description = description;
@@ -15,6 +16,19 @@ class Attack {
     this.isAoE = isAoE;
     this.canTargetSelf = canTargetSelf;
     this.canTargetAlly = canTargetAlly;
+    this.gif = gif;
+  }
+
+  resetAnimation() {
+    this.gif.reset();
+  }
+
+  animate(x, y) {
+    this.gif.animate(x, y);
+  }
+
+  animationIsFinished() {
+    return this.gif.finished;
   }
 }
 
@@ -24,6 +38,10 @@ const ATTACKS = {
       name: "Ceffone",
       description: "Un ceffone inferto con massima violenza",
       damage: 20,
+      gif: new GIF({
+        folderName: "explosion",
+        totalFrames: 10,
+      }),
     }),
     new Attack({
       name: "Pugnazzo ad area",

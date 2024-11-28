@@ -35,8 +35,8 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 const players = {};
 players[CONFIG.player.fabrissazzo] = new Player({
   spriteImages: {
-    left: `${CONFIG.assetsFolder}/fabris-sprite-left.png`,
-    right: `${CONFIG.assetsFolder}/fabris-sprite-right.png`,
+    left: `${CONFIG.assets.folder}/fabris-sprite-left.png`,
+    right: `${CONFIG.assets.folder}/fabris-sprite-right.png`,
   },
   name: "Fabris",
   characterBattleStats: new CharacterBattleStats({
@@ -49,8 +49,8 @@ players[CONFIG.player.fabrissazzo] = new Player({
 
 players[CONFIG.player.gianni] = new Player({
   spriteImages: {
-    left: `${CONFIG.assetsFolder}/gianni-sprite-left.png`,
-    right: `${CONFIG.assetsFolder}/gianni-sprite-right.png`,
+    left: `${CONFIG.assets.folder}/gianni-sprite-left.png`,
+    right: `${CONFIG.assets.folder}/gianni-sprite-right.png`,
   },
   name: "Gianni",
   characterBattleStats: new CharacterBattleStats({

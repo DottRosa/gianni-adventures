@@ -3,8 +3,8 @@ const BESTIARY = {
     firstName: "Carlo",
     lastName: "Furlanetto",
     spriteImages: {
-      left: `${CONFIG.assetsFolder}/npc-sprite.png`,
-      right: `${CONFIG.assetsFolder}/npc-sprite.png`,
+      left: `${CONFIG.assets.folder}/npc-sprite.png`,
+      right: `${CONFIG.assets.folder}/npc-sprite.png`,
     },
     description: "",
     get fullName() {
@@ -19,8 +19,8 @@ const BESTIARY = {
     firstName: "Marco",
     lastName: "Cozzarini",
     spriteImages: {
-      left: `${CONFIG.assetsFolder}/npc-sprite.png`,
-      right: `${CONFIG.assetsFolder}/npc-sprite.png`,
+      left: `${CONFIG.assets.folder}/npc-sprite.png`,
+      right: `${CONFIG.assets.folder}/npc-sprite.png`,
     },
     description: "",
     get fullName() {

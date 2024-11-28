@@ -21,7 +21,10 @@ const CONFIG = {
       return this.tileDim * this.tilesPerY;
     },
   },
-  assetsFolder: "./assets",
+  assets: {
+    folder: "./assets",
+    attacks: "./assets/attacks",
+  },
   player: {
     movementFrames: 12,
     get frameVelocity() {
@@ -42,6 +45,7 @@ const CONFIG = {
   keyboard: {
     interactionCooldown: 300,
     choicesCooldown: 100,
+    animationCooldown: 50,
     switchKey: "s",
     interactKey: "z",
     cancelKey: "x",

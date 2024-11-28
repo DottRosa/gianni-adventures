@@ -1,6 +1,6 @@
 class Battle {
   constructor({
-    background = `${CONFIG.assetsFolder}/battle.jpg`,
+    background = `${CONFIG.assets.folder}/battle.jpg`,
     enemies = [],
   }) {
     this.background = new Layer({

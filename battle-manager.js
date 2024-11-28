@@ -22,6 +22,7 @@ class BattleManager {
   actionPointer = 0;
   specialAttackPointer = 0;
   interactionCooldown;
+  attackAnimationCooldown = 0;
   currentTurn;
   currentPhase = CONFIG.battle.phases.selection;
   currentAttack;
@@ -438,9 +439,21 @@ class BattleManager {
   }
 
   drawAttack() {
-    const entity = this.battle.enemies[this.targetPointer];
+    if (this.currentPhase !== CONFIG.battle.phases.performAttack) {
+      return;
+    }
+    const entity = this.battle.enemies[Math.abs(this.targetPointer - 1)];
 
-    this.attackAnimationEnded = true;
+    const gifX = entity.position.x; // Posizione centrata
+    const gifY = entity.position.y; // Sopra il personaggio
+
+    this.currentAttack.animate(gifX, gifY);
+
+    if (this.currentAttack.animationIsFinished()) {
+      this.currentFrame = 0;
+      this.attackAnimationEnded = true;
+      this.currentAttack.resetAnimation();
+    }
   }
 
   draw() {
@@ -622,6 +635,7 @@ class BattleManager {
         entity.characterBattleStats.dealDamage(this.currentAttack.damage);
       }
       this.currentPhase = CONFIG.battle.phases.selection;
+      this.attackAnimationEnded = false;
     }
   }
 
