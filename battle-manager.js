@@ -18,12 +18,14 @@ const ACTION_CHOICES = [
 ];
 
 class BattleManager {
-  targetSelectionPointer = 0;
+  targetPointer = 0;
   actionPointer = 0;
   specialAttackPointer = 0;
   interactionCooldown;
   currentTurn;
   currentPhase = CONFIG.battle.phases.selection;
+  currentAttack;
+  targetAllowedValues = [];
   turns = [];
   lastKeyPressedId;
   maxItemsToDisplay = 0;
@@ -38,10 +40,12 @@ class BattleManager {
       {
         isPlayer: true,
         entity: players[CONFIG.player.gianni],
+        originalIndex: 0,
       },
       {
         isPlayer: true,
         entity: players[CONFIG.player.fabrissazzo],
+        originalIndex: 1,
       },
     ];
 
@@ -193,55 +197,104 @@ class BattleManager {
     this.drawHealth(this.battle.enemies, true);
   }
 
-  drawTargetSelectionPointer() {
+  drawTargetPointer() {
     const width = CONFIG.battle.pointer.width;
     const height = CONFIG.battle.pointer.height;
 
-    let posX = // pos X for players
+    let posX = // Posizione X per i giocatori
       CONFIG.battle.arenaPaddingX +
       players[CONFIG.player.gianni].displayedWidth / 4 +
-      CONFIG.battle.gapBetweenCharacters * this.targetSelectionPointer +
+      CONFIG.battle.gapBetweenCharacters *
+        this.targetAllowedValues[this.targetPointer] +
       width / 4;
 
-    if (this.targetSelectionPointer > Object.values(players).length - 1) {
-      posX = // pos X for enemies
+    if (
+      this.targetAllowedValues[this.targetPointer] >
+      Object.values(players).length - 1
+    ) {
+      posX = // Posizione X per i nemici
         CONFIG.tile.canvasWidth -
         CONFIG.battle.arenaPaddingX -
         this.battle.enemies[0].displayedWidth / 2 -
         CONFIG.battle.gapBetweenCharacters +
-        (this.targetSelectionPointer - this.battle.enemies.length) *
+        (this.targetAllowedValues[this.targetPointer] -
+          this.battle.enemies.length) *
           CONFIG.battle.gapBetweenCharacters -
         width / 4;
     }
 
-    const startY = CONFIG.tile.canvasHeight / 2 - height * 2;
+    const startY = CONFIG.tile.canvasHeight / 2 + height * 4;
 
-    // Disegna la parentesi angolare verso il basso
-    ctx.beginPath();
-    ctx.moveTo(posX, startY);
-    ctx.lineTo(posX + width / 2, startY + height); // Vertex
-    ctx.lineTo(posX + width, startY);
-    ctx.strokeStyle = CONFIG.battle.pointer.border.color;
-    ctx.lineWidth = CONFIG.battle.pointer.border.width;
-    ctx.stroke();
+    if (this.currentAttack.isAoE && this.currentAttack.canTargetEnemies) {
+      this.battle.enemies.forEach((enemy, index) => {
+        posX =
+          CONFIG.tile.canvasWidth -
+          CONFIG.battle.arenaPaddingX -
+          this.battle.enemies[0].displayedWidth / 2 -
+          CONFIG.battle.gapBetweenCharacters +
+          index * CONFIG.battle.gapBetweenCharacters -
+          width / 4;
 
-    // Draw the character name
-    let characterName = "";
-    if (this.targetSelectionPointer === 0) {
-      characterName = players[CONFIG.player.gianni].name;
-    } else if (this.targetSelectionPointer === 1) {
-      characterName = players[CONFIG.player.fabrissazzo].name;
+        ctx.beginPath();
+        ctx.moveTo(posX, startY + height); // Base sinistra
+        ctx.lineTo(posX + width / 2, startY); // Vertice superiore
+        ctx.lineTo(posX + width, startY + height); // Base destra
+        ctx.strokeStyle = CONFIG.battle.pointer.border.color;
+        ctx.lineWidth = CONFIG.battle.pointer.border.width;
+        ctx.stroke();
+      });
+    } else if (
+      this.currentAttack.isAoE &&
+      !this.currentAttack.canTargetEnemies
+    ) {
+      Object.values(players).forEach((player, index) => {
+        posX = // Posizione X per i giocatori
+          CONFIG.battle.arenaPaddingX +
+          players[CONFIG.player.gianni].displayedWidth / 4 +
+          CONFIG.battle.gapBetweenCharacters * index +
+          width / 4;
+
+        ctx.beginPath();
+        ctx.moveTo(posX, startY + height); // Base sinistra
+        ctx.lineTo(posX + width / 2, startY); // Vertice superiore
+        ctx.lineTo(posX + width, startY + height); // Base destra
+        ctx.strokeStyle = CONFIG.battle.pointer.border.color;
+        ctx.lineWidth = CONFIG.battle.pointer.border.width;
+        ctx.stroke();
+      });
     } else {
-      characterName =
-        this.battle.enemies[
-          this.targetSelectionPointer - Object.values(players).length
-        ].name;
-    }
+      // Disegna la freccia verso l'alto
+      ctx.beginPath();
+      ctx.moveTo(posX, startY + height); // Base sinistra
+      ctx.lineTo(posX + width / 2, startY); // Vertice superiore
+      ctx.lineTo(posX + width, startY + height); // Base destra
+      ctx.strokeStyle = CONFIG.battle.pointer.border.color;
+      ctx.lineWidth = CONFIG.battle.pointer.border.width;
+      ctx.stroke();
 
-    const textX = posX + width / 2;
-    const textY = startY - 10;
-    ctx.textAlign = "center";
-    ctx.fillText(characterName, textX, textY);
+      // Disegna il nome del personaggio sotto la freccia
+      let characterName = "";
+      if (
+        this.targetAllowedValues[this.targetPointer] <
+        Object.values(players).length
+      ) {
+        characterName =
+          this.targetAllowedValues[this.targetPointer] === 0
+            ? players[CONFIG.player.gianni].name
+            : players[CONFIG.player.fabrissazzo].name;
+      } else {
+        characterName =
+          this.battle.enemies[
+            this.targetAllowedValues[this.targetPointer] -
+              Object.values(players).length
+          ].name;
+      }
+
+      const textX = posX + width / 2;
+      const textY = startY + height + 20; // Posiziona il testo sotto la freccia
+      ctx.textAlign = "center";
+      ctx.fillText(characterName, textX, textY);
+    }
   }
 
   drawActionSelectionPointer() {
@@ -282,7 +335,7 @@ class BattleManager {
     ) {
       this.drawActionSelectionPointer();
     } else if (this.currentPhase === CONFIG.battle.phases.target) {
-      this.drawTargetSelectionPointer();
+      this.drawTargetPointer();
     }
   }
 
@@ -367,6 +420,16 @@ class BattleManager {
               );
             }
           }
+          break;
+        }
+        case CONFIG.battle.phases.target: {
+          ctx.fillText(this.currentAttack.name, x + padding, y + padding * 2);
+          ctx.fillText(
+            this.currentAttack.description,
+            x + padding,
+            y + padding * 3
+          );
+          break;
         }
       }
     } else {
@@ -383,17 +446,17 @@ class BattleManager {
     this.drawPointer();
   }
 
-  moveTargetSelectionPointerRight() {
-    this.targetSelectionPointer++;
-    if (this.targetSelectionPointer >= this.battle.charactersQuantity) {
-      this.targetSelectionPointer = 0;
+  moveTargetPointerRight() {
+    this.targetPointer++;
+    if (this.targetPointer >= this.targetAllowedValues.length) {
+      this.targetPointer = 0;
     }
   }
 
-  moveTargetSelectionPointerLeft() {
-    this.targetSelectionPointer--;
-    if (this.targetSelectionPointer < 0) {
-      this.targetSelectionPointer = this.battle.charactersQuantity - 1;
+  moveTargetPointerLeft() {
+    this.targetPointer--;
+    if (this.targetPointer < 0) {
+      this.targetPointer = this.targetAllowedValues.length - 1;
     }
   }
 
@@ -440,6 +503,63 @@ class BattleManager {
       ASSETS.soundEffects.selection.pause();
       ASSETS.soundEffects.selection.currentTime = 0;
 
+      if (this.currentPhase === CONFIG.battle.phases.selection) {
+        switch (true) {
+          case keyboard.isInteract: {
+            this.currentPhase = ACTION_CHOICES[this.actionPointer].triggerPhase;
+            this.actionPointer = 0; // resetto per usarlo per il submenu
+            ASSETS.soundEffects.selection.play();
+            return;
+          }
+        }
+      }
+
+      if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
+        switch (true) {
+          case keyboard.isInteract: {
+            this.currentPhase = CONFIG.battle.phases.target;
+            this.currentAttack =
+              this.turns[this.currentTurn].entity.attacks[this.actionPointer];
+
+            const targetAllowedValues = [];
+            if (this.turns[this.currentTurn].originalIndex === 0) {
+              if (this.currentAttack.canTargetSelf) {
+                targetAllowedValues.push(0);
+              }
+              if (this.currentAttack.canTargetAlly) {
+                targetAllowedValues.push(1);
+              }
+            }
+            if (this.turns[this.currentTurn].originalIndex === 1) {
+              if (this.currentAttack.canTargetAlly) {
+                targetAllowedValues.push(0);
+              }
+              if (this.currentAttack.canTargetSelf) {
+                targetAllowedValues.push(1);
+              }
+            }
+
+            if (this.currentAttack.canTargetEnemies) {
+              for (var i = 0; i < this.battle.enemies.length; i++) {
+                targetAllowedValues.push(i + 2);
+              }
+            }
+
+            this.targetAllowedValues = targetAllowedValues;
+
+            this.targetPointer = 0;
+            ASSETS.soundEffects.selection.play();
+            return;
+          }
+          case keyboard.isCancel: {
+            this.currentPhase = CONFIG.battle.phases.selection;
+            this.actionPointer = 0; // resetto per usarlo per il submenu
+            ASSETS.soundEffects.cancel.play();
+            return;
+          }
+        }
+      }
+
       if (
         this.currentPhase === CONFIG.battle.phases.selection ||
         this.currentPhase === CONFIG.battle.phases.attacksOptions
@@ -448,41 +568,33 @@ class BattleManager {
           case keyboard.isUp: {
             this.moveActionPointerUp();
             ASSETS.soundEffects.choices.play();
-            break;
+            return;
           }
           case keyboard.isDown: {
             this.moveActionPointerDown();
             ASSETS.soundEffects.choices.play();
-            break;
-          }
-          case keyboard.isInteract: {
-            this.currentPhase = ACTION_CHOICES[this.actionPointer].triggerPhase;
-            this.actionPointer = 0; // resetto per usarlo per il submenu
-            ASSETS.soundEffects.selection.play();
-            break;
-          }
-          case keyboard.isCancel: {
-            if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
-              this.currentPhase = CONFIG.battle.phases.selection;
-              this.actionPointer = 0; // resetto per usarlo per il submenu
-              ASSETS.soundEffects.cancel.play();
-            }
-            break;
+            return;
           }
         }
       } else if (this.currentPhase === CONFIG.battle.phases.target) {
         switch (true) {
           case keyboard.isLeft: {
-            this.moveTargetSelectionPointerLeft();
-            break;
+            this.moveTargetPointerLeft();
+            return;
           }
           case keyboard.isRight: {
-            this.moveTargetSelectionPointerRight();
-            break;
+            this.moveTargetPointerRight();
+            return;
           }
           case keyboard.isInteract: {
             // EVENTS.dialogue.entity.dialogueManager.selectChoice();
-            break;
+            return;
+          }
+          case keyboard.isCancel: {
+            this.currentPhase = CONFIG.battle.phases.attacksOptions;
+            this.targetPointer = 0;
+            ASSETS.soundEffects.cancel.play();
+            return;
           }
         }
       }
