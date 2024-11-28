@@ -8,6 +8,7 @@ class Attack {
     canTargetSelf = false, // indica che l'attacco può essere rivolto a se stessi
     canTargetAlly = false, // indica che l'attacco può essere rivolto all'alleato
     gif,
+    sound,
   }) {
     this.name = name;
     this.description = description;
@@ -17,6 +18,7 @@ class Attack {
     this.canTargetSelf = canTargetSelf;
     this.canTargetAlly = canTargetAlly;
     this.gif = gif;
+    this.sound = sound;
   }
 
   resetAnimation() {
@@ -24,6 +26,9 @@ class Attack {
   }
 
   animate(x, y) {
+    if (this.sound) {
+      this.sound.play();
+    }
     this.gif.animate(x, y);
   }
 
@@ -38,10 +43,8 @@ const ATTACKS = {
       name: "Ceffone",
       description: "Un ceffone inferto con massima violenza",
       damage: 20,
-      gif: new GIF({
-        folderName: "explosion",
-        totalFrames: 10,
-      }),
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
     }),
     new Attack({
       name: "Pugnazzo ad area",
@@ -56,6 +59,8 @@ const ATTACKS = {
       canTargetEnemies: false,
       canTargetSelf: true,
       canTargetAlly: true,
+      gif: GIFS[GIF_IDS.heal],
+      sound: ASSETS.soundEffects.heal,
     }),
     new Attack({
       name: "Cura Personale",
@@ -63,6 +68,8 @@ const ATTACKS = {
       damage: 1,
       canTargetEnemies: false,
       canTargetSelf: true,
+      gif: GIFS[GIF_IDS.heal],
+      sound: ASSETS.soundEffects.heal,
     }),
     new Attack({
       name: "Cura generosa",

@@ -55,6 +55,7 @@ class BattleManager {
       turns.push({
         isPlayer: false,
         entity: enemy,
+        originalIndex: index + 2,
       });
     });
 
@@ -442,10 +443,15 @@ class BattleManager {
     if (this.currentPhase !== CONFIG.battle.phases.performAttack) {
       return;
     }
-    const entity = this.battle.enemies[Math.abs(this.targetPointer - 1)];
 
-    const gifX = entity.position.x; // Posizione centrata
-    const gifY = entity.position.y; // Sopra il personaggio
+    const index = this.targetAllowedValues[this.targetPointer];
+
+    const entity = this.turns.find(
+      (turn) => turn.originalIndex === index
+    ).entity;
+
+    const gifX = entity.position.x;
+    const gifY = entity.position.y;
 
     this.currentAttack.animate(gifX, gifY);
 
@@ -630,11 +636,14 @@ class BattleManager {
       this.currentPhase === CONFIG.battle.phases.performAttack &&
       this.attackAnimationEnded
     ) {
+      ASSETS.soundEffects.damage.play();
       if (this.currentAttack.canTargetEnemies) {
         const entity = this.battle.enemies[this.targetPointer];
         entity.characterBattleStats.dealDamage(this.currentAttack.damage);
       }
       this.currentPhase = CONFIG.battle.phases.selection;
+      this.actionPointer = 0;
+      this.targetPointer = 0;
       this.attackAnimationEnded = false;
     }
   }
