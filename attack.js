@@ -23,7 +23,7 @@ const ATTACKS = {
     new Attack({
       name: "Ceffone",
       description: "Un ceffone inferto con massima violenza",
-      damage: 1,
+      damage: 20,
     }),
     new Attack({
       name: "Pugnazzo ad area",

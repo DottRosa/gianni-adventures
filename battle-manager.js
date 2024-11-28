@@ -25,6 +25,7 @@ class BattleManager {
   currentTurn;
   currentPhase = CONFIG.battle.phases.selection;
   currentAttack;
+  attackAnimationEnded = false;
   targetAllowedValues = [];
   turns = [];
   lastKeyPressedId;
@@ -436,6 +437,12 @@ class BattleManager {
     }
   }
 
+  drawAttack() {
+    const entity = this.battle.enemies[this.targetPointer];
+
+    this.attackAnimationEnded = true;
+  }
+
   draw() {
     this.battle.background.draw();
     this.drawPlayers();
@@ -444,6 +451,7 @@ class BattleManager {
     this.drawEnemiesHealthBar();
     this.drawActionBox();
     this.drawPointer();
+    this.drawAttack();
   }
 
   moveTargetPointerRight() {
@@ -587,7 +595,8 @@ class BattleManager {
             return;
           }
           case keyboard.isInteract: {
-            // EVENTS.dialogue.entity.dialogueManager.selectChoice();
+            this.currentPhase = CONFIG.battle.phases.performAttack;
+            ASSETS.soundEffects.selection.play();
             return;
           }
           case keyboard.isCancel: {
@@ -603,7 +612,21 @@ class BattleManager {
     }
   }
 
+  handleAttack() {
+    if (
+      this.currentPhase === CONFIG.battle.phases.performAttack &&
+      this.attackAnimationEnded
+    ) {
+      if (this.currentAttack.canTargetEnemies) {
+        const entity = this.battle.enemies[this.targetPointer];
+        entity.characterBattleStats.dealDamage(this.currentAttack.damage);
+      }
+      this.currentPhase = CONFIG.battle.phases.selection;
+    }
+  }
+
   handle(keyboard) {
     this.handlePointer(keyboard);
+    this.handleAttack();
   }
 }

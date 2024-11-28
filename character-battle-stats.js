@@ -25,4 +25,11 @@ class CharacterBattleStats {
     this.attacks = attacks;
     this.specialAttacks = specialAttacks;
   }
+
+  dealDamage(damage) {
+    this.currentHealth -= damage;
+    if (this.currentHealth < 0) {
+      this.currentHealth = 0;
+    }
+  }
 }
