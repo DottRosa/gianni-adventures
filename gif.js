@@ -29,8 +29,16 @@ class GIF {
     }
   }
 
-  animate(x, y) {
+  animate(
+    x,
+    y,
+    propagation = {
+      quantity: 0,
+      amount: 0,
+    }
+  ) {
     const now = Date.now();
+
     ctx.drawImage(
       this.frames[this.currentFrame],
       x - this.width / 2 + this.driftX,
@@ -38,6 +46,18 @@ class GIF {
       this.width,
       this.height
     );
+
+    if (propagation.quantity) {
+      for (var i = 0; i < propagation.quantity; i++) {
+        ctx.drawImage(
+          this.frames[this.currentFrame],
+          x - this.width / 2 + this.driftX + propagation.amount,
+          y - this.height / 2 + this.driftY,
+          this.width,
+          this.height
+        );
+      }
+    }
 
     // Avanza al frame successivo
     if (now > this.cooldown) {
@@ -88,7 +108,7 @@ const GIFS = {
     totalFrames: 6,
     width: 200,
     height: 200,
-    driftX: -30,
+    driftX: 30,
     driftY: 25,
   }),
 };

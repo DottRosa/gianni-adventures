@@ -46,22 +46,6 @@ class NPC extends Sprite {
     );
   }
 
-  drawAtPosition(posX, posY) {
-    const image = this.image[this.currentDirection];
-
-    ctx.drawImage(
-      image,
-      this.currentFrame * (image.width / 4),
-      0,
-      image.width / 4,
-      image.height,
-      posX,
-      posY,
-      image.width / 4,
-      image.height
-    );
-  }
-
   changeChoice(goToNext = true) {
     if (goToNext) {
       this.dialogueManager.nextChoice();

@@ -88,7 +88,8 @@ class BattleManager {
         CONFIG.tile.canvasWidth - // the full width of the canvas
         CONFIG.battle.arenaPaddingX - // the padding of the arena
         this.battle.enemies[i].displayedWidth - // the width of the character, because it start to draw images from top-left corner
-        CONFIG.battle.gapBetweenCharacters * i; // space between characters
+        CONFIG.battle.gapBetweenCharacters *
+          (this.battle.enemies.length - 1 - i); // si parte dalla posizione piu a sinistra possibile
 
       const posY = CONFIG.tile.canvasHeight / 2;
 
@@ -110,12 +111,12 @@ class BattleManager {
   }
 
   drawPlayers() {
-    players[CONFIG.player.gianni].draw2();
-    players[CONFIG.player.fabrissazzo].draw2();
+    players[CONFIG.player.gianni].drawFixed();
+    players[CONFIG.player.fabrissazzo].drawFixed();
   }
 
   drawEnemies() {
-    this.battle.enemies.forEach((e) => e.draw2());
+    this.battle.enemies.forEach((e) => e.drawFixed());
   }
 
   drawHealth(characters, isEnemy = false) {
@@ -445,15 +446,29 @@ class BattleManager {
     }
 
     const index = this.targetAllowedValues[this.targetPointer];
+    const turn = this.turns.find((turn) => turn.originalIndex === index);
 
-    const entity = this.turns.find(
-      (turn) => turn.originalIndex === index
-    ).entity;
+    let gifX = turn.entity.position.x;
+    let gifY = turn.entity.position.y;
 
-    const gifX = entity.position.x;
-    const gifY = entity.position.y;
-
-    this.currentAttack.animate(gifX, gifY);
+    if (this.currentAttack.isAoE) {
+      const propagation = {
+        quantity: 0,
+        amount: CONFIG.battle.gapBetweenCharacters,
+      };
+      if (turn.isPlayer) {
+        gifX = players[CONFIG.player.gianni].position.x;
+        gifY = players[CONFIG.player.gianni].position.y;
+        propagation.quantity = 1;
+      } else {
+        gifX = this.battle.enemies[0].position.x;
+        gifY = this.battle.enemies[0].position.y;
+        propagation.quantity = this.battle.enemies.length - 1;
+      }
+      this.currentAttack.animate(gifX, gifY, propagation);
+    } else {
+      this.currentAttack.animate(gifX, gifY);
+    }
 
     if (this.currentAttack.animationIsFinished()) {
       this.currentFrame = 0;

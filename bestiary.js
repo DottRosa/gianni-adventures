@@ -19,8 +19,8 @@ const BESTIARY = {
     firstName: "Marco",
     lastName: "Cozzarini",
     spriteImages: {
-      left: `${CONFIG.assets.folder}/npc-sprite.png`,
-      right: `${CONFIG.assets.folder}/npc-sprite.png`,
+      left: `${CONFIG.assets.folder}/cozza.png`,
+      right: `${CONFIG.assets.folder}/cozza.png`,
     },
     description: "",
     get fullName() {

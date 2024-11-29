@@ -65,23 +65,7 @@ class Sprite {
     );
   }
 
-  drawAtPosition(posX, posY) {
-    const image = this.image[this.currentDirection];
-
-    ctx.drawImage(
-      image,
-      this.currentFrame * this.displayedWidth,
-      0,
-      this.displayedWidth,
-      image.height,
-      posX,
-      posY,
-      this.displayedWidth,
-      image.height
-    );
-  }
-
-  draw2() {
+  drawFixed() {
     const image = this.image[this.currentDirection];
 
     ctx.drawImage(
