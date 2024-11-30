@@ -68,6 +68,10 @@ function textWidth(text) {
   return ctx.measureText(text).width;
 }
 
+/**
+ * Disegna un pallino pieno
+ * @param {*} params parametri necessari per disegnare il pallino
+ */
 function drawBullet({ x, y, radius, startAngle, endAngle, color }) {
   ctx.beginPath();
   ctx.arc(x, y, radius, startAngle, endAngle);
@@ -75,4 +79,26 @@ function drawBullet({ x, y, radius, startAngle, endAngle, color }) {
   ctx.fill();
   ctx.closePath();
   ctx.fillStyle = CONFIG.typography.textColor;
+}
+
+function wrapText(text, maxWidth) {
+  const words = text.split(" "); // Dividi la stringa in parole
+  let line = ""; // Riga temporanea
+  const lines = []; // Contiene tutte le righe finali
+
+  words.forEach((word) => {
+    const testLine = line + word + " ";
+    const testWidth = textWidth(testLine);
+
+    if (testWidth > maxWidth) {
+      // Se la riga supera la larghezza massima, aggiungila e inizia una nuova
+      lines.push(line);
+      line = word + " ";
+    } else {
+      line = testLine; // Altrimenti, aggiungi la parola alla riga corrente
+    }
+  });
+
+  lines.push(line.trim()); // Aggiungi l'ultima riga
+  return lines;
 }

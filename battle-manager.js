@@ -494,12 +494,17 @@ class BattleManager {
           break;
         }
         case CONFIG.battle.phases.target: {
-          ctx.fillText(this.currentAttack.name, x + padding, y + padding * 2);
-          ctx.fillText(
+          const wrappedDescription = wrapText(
             this.currentAttack.description,
-            x + padding,
-            y + padding * 3
+            width - padding * 2
           );
+
+          ctx.fillText(this.currentAttack.name, x + padding, y + padding * 2);
+
+          wrappedDescription.forEach((line, index) => {
+            ctx.fillText(line, x + padding, y + padding * 3 + index * 20);
+          });
+
           break;
         }
       }
