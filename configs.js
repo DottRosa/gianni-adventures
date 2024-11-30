@@ -136,7 +136,7 @@ const CONFIG = {
     },
     actionBox: {
       marginBottom: 20,
-      width: 250,
+      width: 300,
       height: 150,
       backgroundColor: "white",
       border: {

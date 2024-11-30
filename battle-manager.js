@@ -447,6 +447,8 @@ class BattleManager {
           const attacks = this.currentCharacter.costAttacks;
 
           for (var i = 0; i < attacks.length; i++) {
+            const details = `${attacks[i].damage}/${attacks[i].cost}`;
+
             if (
               this.actionPointer < this.maxItemsToDisplay &&
               i >= 0 &&
@@ -457,8 +459,6 @@ class BattleManager {
                 x + padding,
                 y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
               );
-
-              const details = `${attacks[i].damage}/${attacks[i].cost}`;
 
               ctx.fillText(
                 details,
@@ -489,6 +489,27 @@ class BattleManager {
                   (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
                     CONFIG.battle.actionBox.choices.gap
               );
+              ctx.fillText(
+                details,
+                x - padding + width - textWidth(details) - 7,
+                y +
+                  padding * 2 +
+                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
+                    CONFIG.battle.actionBox.choices.gap
+              );
+              ctx.beginPath();
+              drawBullet({
+                x: x - padding + width,
+                y:
+                  y +
+                  padding * 1.65 +
+                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
+                    CONFIG.battle.actionBox.choices.gap,
+                radius: CONFIG.battle.healthBar.stamina.radius,
+                startAngle: 0,
+                endAngle: Math.PI * 2,
+                color: CONFIG.battle.healthBar.stamina.color,
+              });
             }
           }
           break;
@@ -852,13 +873,9 @@ class BattleManager {
       ASSETS.soundEffects.damage.play();
       if (this.currentAttack.canTargetEnemies) {
         if (this.currentAttack.isAoE) {
-          this.battle.enemies.forEach((enemy) => {
-            enemy.characterBattleStats.dealDamage(this.currentAttack.damage);
-          });
           targets = this.battle.enemies;
         } else {
           const entity = this.battle.enemies[this.targetPointer];
-          entity.characterBattleStats.dealDamage(this.currentAttack.damage);
           targets = [entity];
         }
       } else {
@@ -867,8 +884,8 @@ class BattleManager {
         } else {
           const targetPlayer =
             this.targetAllowedValues[this.targetPointer] === 0
-              ? players[CONFIG.player.gianni].name
-              : players[CONFIG.player.fabrissazzo].name;
+              ? players[CONFIG.player.gianni]
+              : players[CONFIG.player.fabrissazzo];
 
           targets = [targetPlayer];
         }
@@ -880,7 +897,11 @@ class BattleManager {
         );
       }
 
-      this.currentAttack.effect({ performer: activeCharacter, targets });
+      this.currentAttack.effect({
+        performer: activeCharacter,
+        players,
+        targets,
+      });
 
       this.resetCurrentPhase();
       this.actionPointer = 0;

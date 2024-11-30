@@ -10,7 +10,7 @@ class Attack {
     gif,
     sound,
     cost = 0, // Indica il costo in stamina. Se è zero è un attacco normale, se maggiore è speciale
-    effect = ({ performer, targets }) => {},
+    effect,
   }) {
     this.name = name;
     this.description = description;
@@ -23,6 +23,13 @@ class Attack {
     this.sound = sound;
     this.cost = cost;
     this.effect = effect;
+    if (!this.effect) {
+      this.effect = ({ performer, targets, players }) => {
+        targets.forEach((target) => {
+          target.characterBattleStats.dealDamage(this.damage);
+        });
+      };
+    }
   }
 
   resetAnimation() {
@@ -78,6 +85,11 @@ const ATTACKS = {
       canTargetAlly: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
+      effect: ({ performer, targets }) => {
+        targets.forEach((target) => {
+          target.characterBattleStats.recoverHealth(20);
+        });
+      },
     }),
     new Attack({
       name: "Cura personale",
@@ -95,6 +107,9 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
       cost: 3,
+      effect: ({ performer, targets }) => {
+        performer.characterBattleStats.recoverHealth(20);
+      },
     }),
     new Attack({
       name: "Cura tutti",
@@ -105,6 +120,11 @@ const ATTACKS = {
       canTargetEnemies: false,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
+      effect: ({ performer, targets }) => {
+        targets.forEach((target) => {
+          target.characterBattleStats.recoverHealth(20);
+        });
+      },
     }),
     new Attack({
       name: "π/2",
@@ -116,7 +136,10 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
-      effect: ({ performer }) => {
+      effect: ({ performer, targets }) => {
+        targets.forEach((target) => {
+          target.characterBattleStats.dealDamage(50);
+        });
         performer.characterBattleStats.dealDamage(20);
       },
     }),
@@ -133,6 +156,24 @@ const ATTACKS = {
       effect: ({ targets }) => {
         targets[0].characterBattleStats.dealDamage(10);
         targets[1].characterBattleStats.dealDamage(20);
+      },
+    }),
+    new Attack({
+      name: "Ma che oooh!",
+      description: "Un urlo che percuote gli organi interni. Danneggia tutti.",
+      isAoE: true,
+      damage: 20,
+      canTargetEnemies: true,
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
+      cost: 4,
+      effect: ({ targets }) => {
+        targets.forEach((target) => {
+          target.characterBattleStats.dealDamage(20);
+        });
+        Object.values(players).forEach((player) => {
+          player.characterBattleStats.dealDamage(20);
+        });
       },
     }),
   ],

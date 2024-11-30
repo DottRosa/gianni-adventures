@@ -33,6 +33,13 @@ class CharacterBattleStats {
     }
   }
 
+  recoverHealth(amount) {
+    this.currentHealth += amount;
+    if (this.currentHealth > this.health) {
+      this.currentHealth = this.health;
+    }
+  }
+
   dealStaminaUsage(usage) {
     this.currentStamina -= usage;
   }
