@@ -58,3 +58,21 @@ function resetShadow() {
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 0;
 }
+
+/**
+ * Restituisce la lunghezza del testo in px
+ * @param {string} text il testo di cui calcolare la lunghezza
+ * @returns un valore in px che rappresenta la dimensione del testo in lunghezza
+ */
+function textWidth(text) {
+  return ctx.measureText(text).width;
+}
+
+function drawBullet({ x, y, radius, startAngle, endAngle, color }) {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, startAngle, endAngle);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.closePath();
+  ctx.fillStyle = CONFIG.typography.textColor;
+}

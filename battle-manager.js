@@ -166,24 +166,23 @@ class BattleManager {
         y - 5
       );
 
-      const staminaGap = 5; // Distanza tra i pallini
-      const staminaRadius = 3; // Raggio del pallino
-
       // Disegno dei pallini della stamina
       const staminaY = y + height + 10; // Posizione Y dei pallini
       let staminaX = x; // Posizione iniziale X dei pallini
       for (let i = 0; i < character.characterBattleStats.currentStamina; i++) {
-        ctx.beginPath();
-        ctx.arc(
-          staminaX + staminaRadius + (staminaRadius * 2 + staminaGap) * i,
-          staminaY,
-          staminaRadius,
-          0,
-          Math.PI * 2
-        );
-        ctx.fillStyle = "blue";
-        ctx.fill();
-        ctx.closePath();
+        drawBullet({
+          x:
+            staminaX +
+            CONFIG.battle.healthBar.stamina.radius +
+            (CONFIG.battle.healthBar.stamina.radius * 2 +
+              CONFIG.battle.healthBar.stamina.gap) *
+              i,
+          y: staminaY,
+          radius: CONFIG.battle.healthBar.stamina.radius,
+          startAngle: 0,
+          endAngle: Math.PI * 2,
+          color: CONFIG.battle.healthBar.stamina.color,
+        });
       }
 
       verticalGap += 50;
@@ -346,8 +345,15 @@ class BattleManager {
 
   drawActionBox() {
     const { entity: activeCharacter, isPlayer } = this.turns[this.currentTurn];
-    const { padding, fontSize, marginBottom, shadow, backgroundColor } =
-      CONFIG.battle.actionBox;
+    const {
+      padding,
+      fontSize,
+      marginBottom,
+      shadow,
+      backgroundColor,
+      width,
+      height,
+    } = CONFIG.battle.actionBox;
 
     const x = activeCharacter.position.x;
     const y =
@@ -360,12 +366,7 @@ class BattleManager {
     });
 
     ctx.fillStyle = backgroundColor;
-    ctx.fillRect(
-      x,
-      y,
-      CONFIG.battle.actionBox.width,
-      CONFIG.battle.actionBox.height
-    );
+    ctx.fillRect(x, y, width, height);
 
     // Aggiungi il triangolo in basso
     ctx.beginPath(); // Inizia un nuovo percorso
@@ -398,6 +399,8 @@ class BattleManager {
           const attacks = this.currentCharacter.freeAttacks;
 
           for (var i = 0; i < attacks.length; i++) {
+            const details = `${attacks[i].damage}`;
+
             if (
               this.actionPointer < this.maxItemsToDisplay &&
               i >= 0 &&
@@ -406,6 +409,11 @@ class BattleManager {
               ctx.fillText(
                 `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
                 x + padding,
+                y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
+              );
+              ctx.fillText(
+                details,
+                x - padding + width - textWidth(details) - 7,
                 y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
               );
             }
@@ -418,6 +426,14 @@ class BattleManager {
               ctx.fillText(
                 `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
                 x + padding,
+                y +
+                  padding * 2 +
+                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
+                    CONFIG.battle.actionBox.choices.gap
+              );
+              ctx.fillText(
+                details,
+                x - padding + width - textWidth(details) - 7,
                 y +
                   padding * 2 +
                   (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
@@ -441,6 +457,23 @@ class BattleManager {
                 x + padding,
                 y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
               );
+
+              const details = `${attacks[i].damage}/${attacks[i].cost}`;
+
+              ctx.fillText(
+                details,
+                x - padding + width - textWidth(details) - 7,
+                y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
+              );
+              ctx.beginPath();
+              drawBullet({
+                x: x - padding + width,
+                y: y + padding * 1.65 + i * CONFIG.battle.actionBox.choices.gap,
+                radius: CONFIG.battle.healthBar.stamina.radius,
+                startAngle: 0,
+                endAngle: Math.PI * 2,
+                color: CONFIG.battle.healthBar.stamina.color,
+              });
             }
 
             if (
@@ -474,6 +507,9 @@ class BattleManager {
     }
   }
 
+  /**
+   * Draw the animation of an attack
+   */
   drawAttack() {
     if (this.currentPhase !== CONFIG.battle.phases.performAttack) {
       return;
@@ -807,8 +843,14 @@ class BattleManager {
     ) {
       ASSETS.soundEffects.damage.play();
       if (this.currentAttack.canTargetEnemies) {
-        const entity = this.battle.enemies[this.targetPointer];
-        entity.characterBattleStats.dealDamage(this.currentAttack.damage);
+        if (this.currentAttack.isAoE) {
+          this.battle.enemies.forEach((enemy) => {
+            enemy.characterBattleStats.dealDamage(this.currentAttack.damage);
+          });
+        } else {
+          const entity = this.battle.enemies[this.targetPointer];
+          entity.characterBattleStats.dealDamage(this.currentAttack.damage);
+        }
       }
 
       if (this.currentAttack.hasCost) {

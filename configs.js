@@ -128,6 +128,11 @@ const CONFIG = {
         color: "black",
         width: 2,
       },
+      stamina: {
+        gap: 5,
+        radius: 3,
+        color: "blue",
+      },
     },
     actionBox: {
       marginBottom: 20,

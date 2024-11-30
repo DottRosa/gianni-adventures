@@ -35,6 +35,5 @@ class CharacterBattleStats {
 
   dealStaminaUsage(usage) {
     this.currentStamina -= usage;
-    console.log(this.currentStamina);
   }
 }

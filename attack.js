@@ -2,7 +2,7 @@ class Attack {
   constructor({
     name,
     description,
-    damage,
+    damage = 0,
     canTargetEnemies = true, // indica che l'attacco può essere rivolto verso i nemici
     isAoE = false, // indica che tutti i nemici verranno colpiti
     canTargetSelf = false, // indica che l'attacco può essere rivolto a se stessi
@@ -71,7 +71,6 @@ const ATTACKS = {
     new Attack({
       name: "Cura",
       description: "Un ceffone inferto con massima violenza",
-      damage: 1,
       canTargetEnemies: false,
       canTargetSelf: true,
       canTargetAlly: true,
@@ -79,9 +78,8 @@ const ATTACKS = {
       sound: ASSETS.soundEffects.heal,
     }),
     new Attack({
-      name: "Cura Personale",
+      name: "Cura personale",
       description: "Un ceffone inferto con massima violenza",
-      damage: 1,
       canTargetEnemies: false,
       canTargetSelf: true,
       gif: GIFS[GIF_IDS.heal],
@@ -90,11 +88,11 @@ const ATTACKS = {
     new Attack({
       name: "Cura generosa",
       description: "Un ceffone inferto con massima violenza",
-      damage: 1,
       canTargetEnemies: false,
       canTargetAlly: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
+      cost: 3,
     }),
     new Attack({
       name: "Cura tutti",
@@ -105,6 +103,17 @@ const ATTACKS = {
       canTargetEnemies: false,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
+    }),
+    new Attack({
+      name: "π/2",
+      description:
+        "Potentissimo attacco che sfrutta un angolo di 90°. L'esecutore subisce 20 danni",
+      isAoE: true,
+      damage: 50,
+      canTargetEnemies: true,
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
+      cost: 4,
     }),
   ],
 };
