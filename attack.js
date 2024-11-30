@@ -10,6 +10,7 @@ class Attack {
     gif,
     sound,
     cost = 0, // Indica il costo in stamina. Se è zero è un attacco normale, se maggiore è speciale
+    effect = ({ performer, targets }) => {},
   }) {
     this.name = name;
     this.description = description;
@@ -21,6 +22,7 @@ class Attack {
     this.gif = gif;
     this.sound = sound;
     this.cost = cost;
+    this.effect = effect;
   }
 
   resetAnimation() {
@@ -114,6 +116,24 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
+      effect: ({ performer }) => {
+        performer.characterBattleStats.dealDamage(20);
+      },
+    }),
+    new Attack({
+      name: "Fibonacci",
+      description:
+        "Pugni sferrati come la serie di Fibonacci. A partire dal nemico piu a sinistra, infligge danni pari a Fibonacci per 10, quindi 10, 10, 20, ...",
+      isAoE: true,
+      damage: 0,
+      canTargetEnemies: true,
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
+      cost: 4,
+      effect: ({ targets }) => {
+        targets[0].characterBattleStats.dealDamage(10);
+        targets[1].characterBattleStats.dealDamage(20);
+      },
     }),
   ],
 };

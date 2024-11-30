@@ -846,24 +846,42 @@ class BattleManager {
       this.currentPhase === CONFIG.battle.phases.performAttack &&
       this.attackAnimationEnded
     ) {
+      const { entity: activeCharacter } = this.turns[this.currentTurn];
+      let targets = [];
+
       ASSETS.soundEffects.damage.play();
       if (this.currentAttack.canTargetEnemies) {
         if (this.currentAttack.isAoE) {
           this.battle.enemies.forEach((enemy) => {
             enemy.characterBattleStats.dealDamage(this.currentAttack.damage);
           });
+          targets = this.battle.enemies;
         } else {
           const entity = this.battle.enemies[this.targetPointer];
           entity.characterBattleStats.dealDamage(this.currentAttack.damage);
+          targets = [entity];
+        }
+      } else {
+        if (this.currentAttack.isAoE) {
+          targets = Object.values(players);
+        } else {
+          const targetPlayer =
+            this.targetAllowedValues[this.targetPointer] === 0
+              ? players[CONFIG.player.gianni].name
+              : players[CONFIG.player.fabrissazzo].name;
+
+          targets = [targetPlayer];
         }
       }
 
       if (this.currentAttack.hasCost) {
-        const { entity: activeCharacter } = this.turns[this.currentTurn];
         activeCharacter.characterBattleStats.dealStaminaUsage(
           this.currentAttack.cost
         );
       }
+
+      this.currentAttack.effect({ performer: activeCharacter, targets });
+
       this.resetCurrentPhase();
       this.actionPointer = 0;
       this.targetPointer = 0;
