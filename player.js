@@ -11,4 +11,12 @@ class Player extends Sprite {
     this.characterBattleStats = characterBattleStats;
     this.attacks = attacks;
   }
+
+  get freeAttacks() {
+    return this.attacks.filter((a) => !a.hasCost);
+  }
+
+  get costAttacks() {
+    return this.attacks.filter((a) => a.hasCost);
+  }
 }

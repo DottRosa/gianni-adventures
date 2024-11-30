@@ -9,6 +9,7 @@ class Attack {
     canTargetAlly = false, // indica che l'attacco può essere rivolto all'alleato
     gif,
     sound,
+    cost = 0, // Indica il costo in stamina. Se è zero è un attacco normale, se maggiore è speciale
   }) {
     this.name = name;
     this.description = description;
@@ -19,6 +20,7 @@ class Attack {
     this.canTargetAlly = canTargetAlly;
     this.gif = gif;
     this.sound = sound;
+    this.cost = cost;
   }
 
   resetAnimation() {
@@ -42,6 +44,10 @@ class Attack {
   animationIsFinished() {
     return this.gif.finished;
   }
+
+  get hasCost() {
+    return !!this.cost;
+  }
 }
 
 const ATTACKS = {
@@ -60,6 +66,7 @@ const ATTACKS = {
       isAoE: true,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
+      cost: 1,
     }),
     new Attack({
       name: "Cura",

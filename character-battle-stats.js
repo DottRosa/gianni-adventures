@@ -32,4 +32,9 @@ class CharacterBattleStats {
       this.currentHealth = 0;
     }
   }
+
+  dealStaminaUsage(usage) {
+    this.currentStamina -= usage;
+    console.log(this.currentStamina);
+  }
 }

@@ -24,13 +24,13 @@ class BattleManager {
   interactionCooldown;
   attackAnimationCooldown = 0;
   currentTurn;
-  currentPhase = CONFIG.battle.phases.selection;
   currentAttack;
   attackAnimationEnded = false;
   targetAllowedValues = [];
   turns = [];
   lastKeyPressedId;
   maxItemsToDisplay = 0;
+  phasesHistory = [CONFIG.battle.phases.selection];
 
   constructor(battle) {
     this.battle = battle;
@@ -335,7 +335,8 @@ class BattleManager {
   drawPointer() {
     if (
       this.currentPhase === CONFIG.battle.phases.selection ||
-      this.currentPhase === CONFIG.battle.phases.attacksOptions
+      this.currentPhase === CONFIG.battle.phases.attacksOptions ||
+      this.currentPhase === CONFIG.battle.phases.specialAttacksOptions
     ) {
       this.drawActionSelectionPointer();
     } else if (this.currentPhase === CONFIG.battle.phases.target) {
@@ -394,7 +395,40 @@ class BattleManager {
           break;
         }
         case CONFIG.battle.phases.attacksOptions: {
-          const attacks = this.turns[this.currentTurn].entity.attacks;
+          const attacks = this.currentCharacter.freeAttacks;
+
+          for (var i = 0; i < attacks.length; i++) {
+            if (
+              this.actionPointer < this.maxItemsToDisplay &&
+              i >= 0 &&
+              i < this.maxItemsToDisplay
+            ) {
+              ctx.fillText(
+                `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
+                x + padding,
+                y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
+              );
+            }
+
+            if (
+              this.actionPointer >= this.maxItemsToDisplay &&
+              i >= this.actionPointer - (this.maxItemsToDisplay - 1) &&
+              i < this.actionPointer + 1
+            ) {
+              ctx.fillText(
+                `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
+                x + padding,
+                y +
+                  padding * 2 +
+                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
+                    CONFIG.battle.actionBox.choices.gap
+              );
+            }
+          }
+          break;
+        }
+        case CONFIG.battle.phases.specialAttacksOptions: {
+          const attacks = this.currentCharacter.costAttacks;
 
           for (var i = 0; i < attacks.length; i++) {
             if (
@@ -508,7 +542,10 @@ class BattleManager {
       max = ACTION_CHOICES.length - 1;
     }
     if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
-      max = this.turns[this.currentTurn].entity.attacks.length - 1;
+      max = this.currentCharacter.freeAttacks.length - 1;
+    }
+    if (this.currentPhase === CONFIG.battle.phases.specialAttacksOptions) {
+      max = this.currentCharacter.costAttacks.length - 1;
     }
     this.actionPointer--;
     if (this.actionPointer < 0) {
@@ -522,7 +559,10 @@ class BattleManager {
       max = ACTION_CHOICES.length;
     }
     if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
-      max = this.turns[this.currentTurn].entity.attacks.length;
+      max = this.currentCharacter.freeAttacks.length;
+    }
+    if (this.currentPhase === CONFIG.battle.phases.specialAttacksOptions) {
+      max = this.currentCharacter.costAttacks.length;
     }
     this.actionPointer++;
     if (this.actionPointer >= max) {
@@ -546,103 +586,217 @@ class BattleManager {
       ASSETS.soundEffects.selection.currentTime = 0;
 
       if (this.currentPhase === CONFIG.battle.phases.selection) {
-        switch (true) {
-          case keyboard.isInteract: {
-            this.currentPhase = ACTION_CHOICES[this.actionPointer].triggerPhase;
-            this.actionPointer = 0; // resetto per usarlo per il submenu
-            ASSETS.soundEffects.selection.play();
-            return;
-          }
-        }
+        this.handleSelectionPhase();
+        return;
       }
 
       if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
-        switch (true) {
-          case keyboard.isInteract: {
-            this.currentPhase = CONFIG.battle.phases.target;
-            this.currentAttack =
-              this.turns[this.currentTurn].entity.attacks[this.actionPointer];
-
-            const targetAllowedValues = [];
-            if (this.turns[this.currentTurn].originalIndex === 0) {
-              if (this.currentAttack.canTargetSelf) {
-                targetAllowedValues.push(0);
-              }
-              if (this.currentAttack.canTargetAlly) {
-                targetAllowedValues.push(1);
-              }
-            }
-            if (this.turns[this.currentTurn].originalIndex === 1) {
-              if (this.currentAttack.canTargetAlly) {
-                targetAllowedValues.push(0);
-              }
-              if (this.currentAttack.canTargetSelf) {
-                targetAllowedValues.push(1);
-              }
-            }
-
-            if (this.currentAttack.canTargetEnemies) {
-              for (var i = 0; i < this.battle.enemies.length; i++) {
-                targetAllowedValues.push(i + 2);
-              }
-            }
-
-            this.targetAllowedValues = targetAllowedValues;
-
-            this.targetPointer = 0;
-            ASSETS.soundEffects.selection.play();
-            return;
-          }
-          case keyboard.isCancel: {
-            this.currentPhase = CONFIG.battle.phases.selection;
-            this.actionPointer = 0; // resetto per usarlo per il submenu
-            ASSETS.soundEffects.cancel.play();
-            return;
-          }
-        }
+        this.handleAttacksOptionsPhase();
+        return;
       }
 
-      if (
-        this.currentPhase === CONFIG.battle.phases.selection ||
-        this.currentPhase === CONFIG.battle.phases.attacksOptions
-      ) {
-        switch (true) {
-          case keyboard.isUp: {
-            this.moveActionPointerUp();
-            ASSETS.soundEffects.choices.play();
-            return;
-          }
-          case keyboard.isDown: {
-            this.moveActionPointerDown();
-            ASSETS.soundEffects.choices.play();
-            return;
-          }
-        }
-      } else if (this.currentPhase === CONFIG.battle.phases.target) {
-        switch (true) {
-          case keyboard.isLeft: {
-            this.moveTargetPointerLeft();
-            return;
-          }
-          case keyboard.isRight: {
-            this.moveTargetPointerRight();
-            return;
-          }
-          case keyboard.isInteract: {
-            this.currentPhase = CONFIG.battle.phases.performAttack;
-            ASSETS.soundEffects.selection.play();
-            return;
-          }
-          case keyboard.isCancel: {
-            this.currentPhase = CONFIG.battle.phases.attacksOptions;
-            this.targetPointer = 0;
-            ASSETS.soundEffects.cancel.play();
-            return;
-          }
-        }
+      if (this.currentPhase === CONFIG.battle.phases.specialAttacksOptions) {
+        this.handleSpecialAttacksOptionsPhase();
+        return;
       }
 
-      return; // next interaction handling will be skipped
+      if (this.currentPhase === CONFIG.battle.phases.target) {
+        this.handleTargetPhase();
+        return;
+      }
+    }
+  }
+
+  handleSelectionPhase() {
+    switch (true) {
+      case keyboard.isInteract: {
+        this.nextPhase();
+        this.actionPointer = 0; // resetto per usarlo per il submenu
+        ASSETS.soundEffects.selection.play();
+        return;
+      }
+      case keyboard.isUp: {
+        this.moveActionPointerUp();
+        ASSETS.soundEffects.choices.play();
+        return;
+      }
+      case keyboard.isDown: {
+        this.moveActionPointerDown();
+        ASSETS.soundEffects.choices.play();
+        return;
+      }
+    }
+  }
+
+  handleAttacksOptionsPhase() {
+    switch (true) {
+      case keyboard.isInteract: {
+        this.nextPhase();
+        this.currentAttack =
+          this.currentCharacter.freeAttacks[this.actionPointer];
+
+        const targetAllowedValues = [];
+        if (this.turns[this.currentTurn].originalIndex === 0) {
+          if (this.currentAttack.canTargetSelf) {
+            targetAllowedValues.push(0);
+          }
+          if (this.currentAttack.canTargetAlly) {
+            targetAllowedValues.push(1);
+          }
+        }
+        if (this.turns[this.currentTurn].originalIndex === 1) {
+          if (this.currentAttack.canTargetAlly) {
+            targetAllowedValues.push(0);
+          }
+          if (this.currentAttack.canTargetSelf) {
+            targetAllowedValues.push(1);
+          }
+        }
+
+        if (this.currentAttack.canTargetEnemies) {
+          for (var i = 0; i < this.battle.enemies.length; i++) {
+            targetAllowedValues.push(i + 2);
+          }
+        }
+
+        this.targetAllowedValues = targetAllowedValues;
+
+        this.targetPointer = 0;
+        ASSETS.soundEffects.selection.play();
+        return;
+      }
+      case keyboard.isCancel: {
+        this.prevPhase();
+        this.actionPointer = 0; // resetto per usarlo per il submenu
+        ASSETS.soundEffects.cancel.play();
+        return;
+      }
+      case keyboard.isUp: {
+        this.moveActionPointerUp();
+        ASSETS.soundEffects.choices.play();
+        return;
+      }
+      case keyboard.isDown: {
+        this.moveActionPointerDown();
+        ASSETS.soundEffects.choices.play();
+        return;
+      }
+    }
+  }
+
+  handleSpecialAttacksOptionsPhase() {
+    switch (true) {
+      case keyboard.isInteract: {
+        this.nextPhase();
+        this.currentAttack =
+          this.currentCharacter.costAttacks[this.actionPointer];
+
+        const targetAllowedValues = [];
+        if (this.turns[this.currentTurn].originalIndex === 0) {
+          if (this.currentAttack.canTargetSelf) {
+            targetAllowedValues.push(0);
+          }
+          if (this.currentAttack.canTargetAlly) {
+            targetAllowedValues.push(1);
+          }
+        }
+        if (this.turns[this.currentTurn].originalIndex === 1) {
+          if (this.currentAttack.canTargetAlly) {
+            targetAllowedValues.push(0);
+          }
+          if (this.currentAttack.canTargetSelf) {
+            targetAllowedValues.push(1);
+          }
+        }
+
+        if (this.currentAttack.canTargetEnemies) {
+          for (var i = 0; i < this.battle.enemies.length; i++) {
+            targetAllowedValues.push(i + 2);
+          }
+        }
+
+        this.targetAllowedValues = targetAllowedValues;
+
+        this.targetPointer = 0;
+        ASSETS.soundEffects.selection.play();
+        return;
+      }
+      case keyboard.isCancel: {
+        this.prevPhase();
+        this.actionPointer = 0; // resetto per usarlo per il submenu
+        ASSETS.soundEffects.cancel.play();
+        return;
+      }
+      case keyboard.isUp: {
+        this.moveActionPointerUp();
+        ASSETS.soundEffects.choices.play();
+        return;
+      }
+      case keyboard.isDown: {
+        this.moveActionPointerDown();
+        ASSETS.soundEffects.choices.play();
+        return;
+      }
+    }
+  }
+
+  handleTargetPhase() {
+    switch (true) {
+      case keyboard.isLeft: {
+        this.moveTargetPointerLeft();
+        return;
+      }
+      case keyboard.isRight: {
+        this.moveTargetPointerRight();
+        return;
+      }
+      case keyboard.isInteract: {
+        this.nextPhase();
+        ASSETS.soundEffects.selection.play();
+        return;
+      }
+      case keyboard.isCancel: {
+        this.prevPhase();
+        this.targetPointer = 0;
+        ASSETS.soundEffects.cancel.play();
+        return;
+      }
+    }
+  }
+
+  get currentCharacter() {
+    return this.turns[this.currentTurn].entity;
+  }
+
+  get currentPhase() {
+    return this.phasesHistory[this.phasesHistory.length - 1];
+  }
+
+  resetCurrentPhase() {
+    this.phasesHistory = [CONFIG.battle.phases.selection];
+  }
+
+  prevPhase() {
+    this.phasesHistory = this.phasesHistory.slice(0, -1);
+  }
+
+  nextPhase() {
+    switch (this.currentPhase) {
+      case CONFIG.battle.phases.selection: {
+        this.phasesHistory.push(
+          ACTION_CHOICES[this.actionPointer].triggerPhase
+        );
+        return;
+      }
+      case CONFIG.battle.phases.attacksOptions:
+      case CONFIG.battle.phases.specialAttacksOptions: {
+        this.phasesHistory.push(CONFIG.battle.phases.target);
+        return;
+      }
+      case CONFIG.battle.phases.target: {
+        this.phasesHistory.push(CONFIG.battle.phases.performAttack);
+        return;
+      }
     }
   }
 
@@ -656,7 +810,14 @@ class BattleManager {
         const entity = this.battle.enemies[this.targetPointer];
         entity.characterBattleStats.dealDamage(this.currentAttack.damage);
       }
-      this.currentPhase = CONFIG.battle.phases.selection;
+
+      if (this.currentAttack.hasCost) {
+        const { entity: activeCharacter } = this.turns[this.currentTurn];
+        activeCharacter.characterBattleStats.dealStaminaUsage(
+          this.currentAttack.cost
+        );
+      }
+      this.resetCurrentPhase();
       this.actionPointer = 0;
       this.targetPointer = 0;
       this.attackAnimationEnded = false;
