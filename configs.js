@@ -168,6 +168,12 @@ const CONFIG = {
       target: "target", // the characher selectes the target of the selected action
       performAttack: "performAttack", // il personaggio attacca
     },
+    turns: {
+      radius: 30,
+      backgroundColor: "white",
+      currentTurnBackgroundColor: "yellow",
+      gap: 25,
+    },
   },
 };
 

@@ -189,7 +189,7 @@ function debug() {
   ctx.font = "10px Arial"; // Font e dimensione del testo
   ctx.fillStyle = "black"; // Colore del testo
   ctx.textAlign = CONFIG.directions.left; // Allinea il testo a sinistra
-  ctx.textBaseline = "top"; // Posiziona il testo dall'alto
+  // ctx.textBaseline = "top"; // Posiziona il testo dall'alto
 
   // Scrivi il testo all'interno del box
   ctx.fillText(
@@ -201,6 +201,22 @@ function debug() {
   const cell = currentMap.currentCell;
 
   ctx.fillText(`cellX: ${cell.cellX}, y: ${cell.cellY}`, boxX + 10, boxY + 20);
+
+  // Disegna la linea orizzontale
+  ctx.beginPath();
+  ctx.moveTo(0, CONFIG.tile.canvasHeight / 2); // Inizia a sinistra
+  ctx.lineTo(CONFIG.tile.canvasWidth, CONFIG.tile.canvasHeight / 2); // Termina a destra
+  ctx.strokeStyle = "blue"; // Colore della linea
+  ctx.lineWidth = 1; // Spessore della linea
+  ctx.stroke();
+
+  // Disegna la linea verticale
+  ctx.beginPath();
+  ctx.moveTo(CONFIG.tile.canvasWidth / 2, 0); // Inizia in alto
+  ctx.lineTo(CONFIG.tile.canvasWidth / 2, CONFIG.tile.canvasHeight); // Termina in basso
+  ctx.strokeStyle = "red"; // Colore della linea
+  ctx.lineWidth = 1; // Spessore della linea
+  ctx.stroke();
 }
 
 function drawDialogues() {
@@ -304,6 +320,8 @@ function animate() {
     }
     handleInteractions();
   }
+
+  // debug();
 
   window.requestAnimationFrame(animate);
 }

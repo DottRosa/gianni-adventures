@@ -20,7 +20,6 @@ const ACTION_CHOICES = [
 class BattleManager {
   targetPointer = 0;
   actionPointer = 0;
-  specialAttackPointer = 0;
   interactionCooldown;
   attackAnimationCooldown = 0;
   currentTurn;
@@ -130,7 +129,11 @@ class BattleManager {
     }
 
     characters.forEach((character) => {
-      let y = verticalGap;
+      let y =
+        CONFIG.tile.canvasHeight -
+        CONFIG.battle.arenaPaddingY -
+        height -
+        verticalGap;
       const healthPercent =
         character.characterBattleStats.currentHealth /
         character.characterBattleStats.health;
@@ -185,7 +188,7 @@ class BattleManager {
         });
       }
 
-      verticalGap += 50;
+      verticalGap -= 50;
     });
   }
 
@@ -573,12 +576,48 @@ class BattleManager {
     }
   }
 
+  drawTurns() {
+    const { radius, backgroundColor, currentTurnBackgroundColor, gap } =
+      CONFIG.battle.turns;
+
+    const boxWidth = (radius * 2 + gap) * this.turns.length - gap - gap / 3;
+
+    let x =
+      CONFIG.tile.canvasWidth - CONFIG.tile.canvasWidth / 2 - boxWidth / 2;
+    let y = CONFIG.battle.arenaPaddingY;
+    this.turns.forEach((turn, index) => {
+      ctx.beginPath();
+      ctx.arc(x + 25, y + 50, radius, 0, 2 * Math.PI); // Centra il cerchio
+      ctx.fillStyle =
+        this.currentTurn === index
+          ? currentTurnBackgroundColor
+          : backgroundColor; // Sfondo bianco
+      ctx.fill(); // Riempi il cerchio
+
+      ctx.lineWidth = 2;
+      ctx.stroke(); // Disegna il contorno
+
+      // Disegna l'icona
+      turn.entity.drawIcon(x, y);
+
+      x += radius * 2 + gap; // Sposta la posizione
+    });
+
+    const turnString = `È il turno di ${this.currentCharacter.name}`;
+    const textBoxWidth = textWidth(turnString);
+    x = CONFIG.tile.canvasWidth / 2 + textBoxWidth / 2;
+    y = CONFIG.battle.arenaPaddingY * 2.5 + radius * 2;
+    ctx.fillStyle = CONFIG.typography.textColor;
+    ctx.fillText(turnString, x, y);
+  }
+
   draw() {
     this.battle.background.draw();
     this.drawPlayers();
     this.drawEnemies();
     this.drawPlayersHealthBar();
     this.drawEnemiesHealthBar();
+    this.drawTurns();
     this.drawActionBox();
     this.drawPointer();
     this.drawAttack();
@@ -848,6 +887,9 @@ class BattleManager {
         this.phasesHistory.push(
           ACTION_CHOICES[this.actionPointer].triggerPhase
         );
+        if (this.currentPhase === CONFIG.battle.phases.skipTurn) {
+          this.startNextTurn();
+        }
         return;
       }
       case CONFIG.battle.phases.attacksOptions:
@@ -859,6 +901,16 @@ class BattleManager {
         this.phasesHistory.push(CONFIG.battle.phases.performAttack);
         return;
       }
+    }
+  }
+
+  startNextTurn() {
+    this.resetCurrentPhase();
+    this.targetPointer = 0;
+    this.actionPointer = 0;
+    this.currentTurn++;
+    if (this.currentTurn >= this.turns.length) {
+      this.currentTurn = 0;
     }
   }
 

@@ -84,4 +84,20 @@ class Sprite {
   get displayedWidth() {
     return this.image[this.currentDirection].width / 4;
   }
+
+  drawIcon(x, y) {
+    const image = this.image[this.currentDirection];
+
+    ctx.drawImage(
+      image,
+      this.currentFrame * this.displayedWidth,
+      (-1 * image.height + 10) / 2,
+      this.displayedWidth,
+      image.height,
+      x,
+      y,
+      this.displayedWidth,
+      image.height
+    );
+  }
 }
