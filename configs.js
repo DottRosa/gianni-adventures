@@ -163,7 +163,7 @@ const CONFIG = {
       selection: "selection", // the characher decides which kind of action wants to execute
       attacksOptions: "attacksOptions", // the character has to chose an item from the selected action items list
       specialAttacksOptions: "specialAttacksOptions", // the character has to chose an item from the selected action items list
-      bagOptions: "bagOptions", // the character has to chose an item from the selected action items list
+      backpackOptions: "backpackOptions", // the character has to chose an item from the selected action items list
       skipTurn: "skipTurn", // il giocatore skippa il proprio turno senza eseguire azioni
       target: "target", // the characher selectes the target of the selected action
       performAttack: "performAttack", // il personaggio attacca

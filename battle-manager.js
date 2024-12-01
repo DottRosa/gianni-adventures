@@ -9,7 +9,7 @@ const ACTION_CHOICES = [
   },
   {
     name: "Zaino",
-    triggerPhase: CONFIG.battle.phases.bagOptions,
+    triggerPhase: CONFIG.battle.phases.backpackOptions,
   },
   {
     name: "Passa il turno",
@@ -336,12 +336,13 @@ class BattleManager {
 
   drawPointer() {
     if (
-      this.currentPhase === CONFIG.battle.phases.selection ||
-      this.currentPhase === CONFIG.battle.phases.attacksOptions ||
-      this.currentPhase === CONFIG.battle.phases.specialAttacksOptions
+      this.phaseIsSelection ||
+      this.phaseIsAttacksOptions ||
+      this.phaseIsSpecialAttacksOptions ||
+      this.phaseIsBackpackOptions
     ) {
       this.drawActionSelectionPointer();
-    } else if (this.currentPhase === CONFIG.battle.phases.target) {
+    } else if (this.phaseIsTarget) {
       this.drawTargetPointer();
     }
   }
@@ -398,59 +399,35 @@ class BattleManager {
           });
           break;
         }
-        case CONFIG.battle.phases.attacksOptions: {
-          const attacks = this.currentCharacter.freeAttacks;
-
-          for (var i = 0; i < attacks.length; i++) {
-            const details = `${attacks[i].damage}`;
-
-            if (
-              this.actionPointer < this.maxItemsToDisplay &&
-              i >= 0 &&
-              i < this.maxItemsToDisplay
-            ) {
-              ctx.fillText(
-                `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
-                x + padding,
-                y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
-              );
-              ctx.fillText(
-                details,
-                x - padding + width - textWidth(details) - 7,
-                y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
-              );
-            }
-
-            if (
-              this.actionPointer >= this.maxItemsToDisplay &&
-              i >= this.actionPointer - (this.maxItemsToDisplay - 1) &&
-              i < this.actionPointer + 1
-            ) {
-              ctx.fillText(
-                `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
-                x + padding,
-                y +
-                  padding * 2 +
-                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
-                    CONFIG.battle.actionBox.choices.gap
-              );
-              ctx.fillText(
-                details,
-                x - padding + width - textWidth(details) - 7,
-                y +
-                  padding * 2 +
-                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
-                    CONFIG.battle.actionBox.choices.gap
-              );
-            }
+        case CONFIG.battle.phases.attacksOptions:
+        case CONFIG.battle.phases.specialAttacksOptions:
+        case CONFIG.battle.phases.backpackOptions: {
+          let options = [];
+          if (this.phaseIsAttacksOptions) {
+            options = this.currentCharacter.freeAttacks;
+          } else if (this.phaseIsSpecialAttacksOptions) {
+            options = this.currentCharacter.costAttacks;
+          } else if (this.phaseIsBackpackOptions) {
+            options = backpack.itemsList;
           }
-          break;
-        }
-        case CONFIG.battle.phases.specialAttacksOptions: {
-          const attacks = this.currentCharacter.costAttacks;
 
-          for (var i = 0; i < attacks.length; i++) {
-            const details = `${attacks[i].damage}/${attacks[i].cost}`;
+          if (options.length === 0) {
+            ctx.fillText(
+              `Nessun elemento da mostrare`, // Mostra l'indice reale (1-based)
+              x + padding,
+              y + padding * 2
+            );
+          }
+
+          for (var i = 0; i < options.length; i++) {
+            let details = ``;
+            if (this.phaseIsAttacksOptions) {
+              details = `${options[i].damage}`;
+            } else if (this.phaseIsSpecialAttacksOptions) {
+              details = `${options[i].damage}/${options[i].cost}`;
+            } else if (this.phaseIsBackpackOptions) {
+              details = `x${options[i].quantity}`;
+            }
 
             if (
               this.actionPointer < this.maxItemsToDisplay &&
@@ -458,25 +435,15 @@ class BattleManager {
               i < this.maxItemsToDisplay
             ) {
               ctx.fillText(
-                `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
+                `${i + 1}. ${options[i].name}`, // Mostra l'indice reale (1-based)
                 x + padding,
                 y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
               );
-
               ctx.fillText(
                 details,
                 x - padding + width - textWidth(details) - 7,
                 y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
               );
-              ctx.beginPath();
-              drawBullet({
-                x: x - padding + width,
-                y: y + padding * 1.65 + i * CONFIG.battle.actionBox.choices.gap,
-                radius: CONFIG.battle.healthBar.stamina.radius,
-                startAngle: 0,
-                endAngle: Math.PI * 2,
-                color: CONFIG.battle.healthBar.stamina.color,
-              });
             }
 
             if (
@@ -485,7 +452,7 @@ class BattleManager {
               i < this.actionPointer + 1
             ) {
               ctx.fillText(
-                `${i + 1}. ${attacks[i].name}`, // Mostra l'indice reale (1-based)
+                `${i + 1}. ${options[i].name}`, // Mostra l'indice reale (1-based)
                 x + padding,
                 y +
                   padding * 2 +
@@ -500,19 +467,6 @@ class BattleManager {
                   (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
                     CONFIG.battle.actionBox.choices.gap
               );
-              ctx.beginPath();
-              drawBullet({
-                x: x - padding + width,
-                y:
-                  y +
-                  padding * 1.65 +
-                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
-                    CONFIG.battle.actionBox.choices.gap,
-                radius: CONFIG.battle.healthBar.stamina.radius,
-                startAngle: 0,
-                endAngle: Math.PI * 2,
-                color: CONFIG.battle.healthBar.stamina.color,
-              });
             }
           }
           break;
@@ -639,14 +593,17 @@ class BattleManager {
 
   moveActionPointerUp() {
     let max = 0;
-    if (this.currentPhase === CONFIG.battle.phases.selection) {
+    if (this.phaseIsSelection) {
       max = ACTION_CHOICES.length - 1;
     }
-    if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
+    if (this.phaseIsAttacksOptions) {
       max = this.currentCharacter.freeAttacks.length - 1;
     }
-    if (this.currentPhase === CONFIG.battle.phases.specialAttacksOptions) {
+    if (this.phaseIsSpecialAttacksOptions) {
       max = this.currentCharacter.costAttacks.length - 1;
+    }
+    if (this.phaseIsBackpackOptions) {
+      max = backpack.itemsList.length - 1;
     }
     this.actionPointer--;
     if (this.actionPointer < 0) {
@@ -656,14 +613,17 @@ class BattleManager {
 
   moveActionPointerDown() {
     let max = 0;
-    if (this.currentPhase === CONFIG.battle.phases.selection) {
+    if (this.phaseIsSelection) {
       max = ACTION_CHOICES.length;
     }
-    if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
+    if (this.phaseIsAttacksOptions) {
       max = this.currentCharacter.freeAttacks.length;
     }
-    if (this.currentPhase === CONFIG.battle.phases.specialAttacksOptions) {
+    if (this.phaseIsSpecialAttacksOptions) {
       max = this.currentCharacter.costAttacks.length;
+    }
+    if (this.phaseIsBackpackOptions) {
+      max = backpack.itemsList.length;
     }
     this.actionPointer++;
     if (this.actionPointer >= max) {
@@ -686,22 +646,27 @@ class BattleManager {
       ASSETS.soundEffects.selection.pause();
       ASSETS.soundEffects.selection.currentTime = 0;
 
-      if (this.currentPhase === CONFIG.battle.phases.selection) {
+      if (this.phaseIsSelection) {
         this.handleSelectionPhase();
         return;
       }
 
-      if (this.currentPhase === CONFIG.battle.phases.attacksOptions) {
+      if (this.phaseIsAttacksOptions) {
         this.handleAttacksOptionsPhase();
         return;
       }
 
-      if (this.currentPhase === CONFIG.battle.phases.specialAttacksOptions) {
+      if (this.phaseIsSpecialAttacksOptions) {
         this.handleSpecialAttacksOptionsPhase();
         return;
       }
 
-      if (this.currentPhase === CONFIG.battle.phases.target) {
+      if (this.phaseIsBackpackOptions) {
+        this.handleBackpackOptionsPhase();
+        return;
+      }
+
+      if (this.phaseIsTarget) {
         this.handleTargetPhase();
         return;
       }
@@ -716,17 +681,8 @@ class BattleManager {
         ASSETS.soundEffects.selection.play();
         return;
       }
-      case keyboard.isUp: {
-        this.moveActionPointerUp();
-        ASSETS.soundEffects.choices.play();
-        return;
-      }
-      case keyboard.isDown: {
-        this.moveActionPointerDown();
-        ASSETS.soundEffects.choices.play();
-        return;
-      }
     }
+    this.handleActionPointer();
   }
 
   handleAttacksOptionsPhase() {
@@ -766,23 +722,9 @@ class BattleManager {
         ASSETS.soundEffects.selection.play();
         return;
       }
-      case keyboard.isCancel: {
-        this.prevPhase();
-        this.actionPointer = 0; // resetto per usarlo per il submenu
-        ASSETS.soundEffects.cancel.play();
-        return;
-      }
-      case keyboard.isUp: {
-        this.moveActionPointerUp();
-        ASSETS.soundEffects.choices.play();
-        return;
-      }
-      case keyboard.isDown: {
-        this.moveActionPointerDown();
-        ASSETS.soundEffects.choices.play();
-        return;
-      }
     }
+    this.handleActionPointer();
+    this.handleCancelAsBack();
   }
 
   handleSpecialAttacksOptionsPhase() {
@@ -822,23 +764,54 @@ class BattleManager {
         ASSETS.soundEffects.selection.play();
         return;
       }
-      case keyboard.isCancel: {
-        this.prevPhase();
-        this.actionPointer = 0; // resetto per usarlo per il submenu
-        ASSETS.soundEffects.cancel.play();
-        return;
-      }
-      case keyboard.isUp: {
-        this.moveActionPointerUp();
-        ASSETS.soundEffects.choices.play();
-        return;
-      }
-      case keyboard.isDown: {
-        this.moveActionPointerDown();
-        ASSETS.soundEffects.choices.play();
+    }
+    this.handleActionPointer();
+    this.handleCancelAsBack();
+  }
+
+  handleBackpackOptionsPhase() {
+    switch (true) {
+      case keyboard.isInteract: {
+        this.nextPhase();
+        console.log(backpack.itemsList[this.actionPointer]);
+
+        this.currentAttack = backpack.itemsList[this.actionPointer].attack;
+
+        console.log(this.currentAttack);
+
+        const targetAllowedValues = [];
+        if (this.turns[this.currentTurn].originalIndex === 0) {
+          if (this.currentAttack.canTargetSelf) {
+            targetAllowedValues.push(0);
+          }
+          if (this.currentAttack.canTargetAlly) {
+            targetAllowedValues.push(1);
+          }
+        }
+        if (this.turns[this.currentTurn].originalIndex === 1) {
+          if (this.currentAttack.canTargetAlly) {
+            targetAllowedValues.push(0);
+          }
+          if (this.currentAttack.canTargetSelf) {
+            targetAllowedValues.push(1);
+          }
+        }
+
+        if (this.currentAttack.canTargetEnemies) {
+          for (var i = 0; i < this.battle.enemies.length; i++) {
+            targetAllowedValues.push(i + 2);
+          }
+        }
+
+        this.targetAllowedValues = targetAllowedValues;
+
+        this.targetPointer = 0;
+        ASSETS.soundEffects.selection.play();
         return;
       }
     }
+    this.handleActionPointer();
+    this.handleCancelAsBack();
   }
 
   handleTargetPhase() {
@@ -865,12 +838,65 @@ class BattleManager {
     }
   }
 
+  /**
+   * Gestisce il puntatore nelle fasi di selezione. Funziona sia per il menu principale,
+   * che per la selezione di attacchi, attacchi speciali ed oggetti
+   */
+  handleActionPointer() {
+    switch (true) {
+      case keyboard.isUp: {
+        this.moveActionPointerUp();
+        ASSETS.soundEffects.choices.play();
+        return;
+      }
+      case keyboard.isDown: {
+        this.moveActionPointerDown();
+        ASSETS.soundEffects.choices.play();
+        return;
+      }
+    }
+  }
+
+  /**
+   * Gestisce il tornare indietro dalle fasi di attacco, attacco speciale, zaino e target
+   */
+  handleCancelAsBack() {
+    switch (true) {
+      case keyboard.isCancel: {
+        this.prevPhase();
+        this.actionPointer = 0; // resetto per usarlo per il submenu
+        ASSETS.soundEffects.cancel.play();
+        return;
+      }
+    }
+  }
+
   get currentCharacter() {
     return this.turns[this.currentTurn].entity;
   }
 
   get currentPhase() {
     return this.phasesHistory[this.phasesHistory.length - 1];
+  }
+
+  get phaseIsSelection() {
+    return this.currentPhase === CONFIG.battle.phases.selection;
+  }
+
+  get phaseIsAttacksOptions() {
+    return this.currentPhase === CONFIG.battle.phases.attacksOptions;
+  }
+
+  get phaseIsSpecialAttacksOptions() {
+    return this.currentPhase === CONFIG.battle.phases.specialAttacksOptions;
+  }
+
+  get phaseIsBackpackOptions() {
+    return this.currentPhase === CONFIG.battle.phases.backpackOptions;
+  }
+
+  get phaseIsTarget() {
+    return this.currentPhase === CONFIG.battle.phases.target;
   }
 
   resetCurrentPhase() {
@@ -893,7 +919,8 @@ class BattleManager {
         return;
       }
       case CONFIG.battle.phases.attacksOptions:
-      case CONFIG.battle.phases.specialAttacksOptions: {
+      case CONFIG.battle.phases.specialAttacksOptions:
+      case CONFIG.battle.phases.backpackOptions: {
         this.phasesHistory.push(CONFIG.battle.phases.target);
         return;
       }
