@@ -7,7 +7,7 @@ class Attack {
     targetAllEnemies = false,
     targetSelf = false, // indica che l'attacco può essere rivolto a se stessi
     targetAlly = false, // indica che l'attacco può essere rivolto all'alleato
-    targetAllPlayers = false,
+    targetAllAlliesGroup = false,
     targetAll = false, // indica che l'attacco coinvolge tutti
     gif,
     sound,
@@ -22,7 +22,7 @@ class Attack {
     this.targetAlly = targetAlly;
     this.targetAll = targetAll;
     this.targetAllEnemies = targetAllEnemies;
-    this.targetAllPlayers = targetAllPlayers;
+    this.targetAllAlliesGroup = targetAllAlliesGroup;
     this.gif = gif;
     this.sound = sound;
     this.cost = cost;
@@ -85,8 +85,6 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
       effect: function ({ performer, targets }) {
-        console.log(targets);
-
         targets.forEach((target) => {
           target.characterBattleStats.recoverHealth(20);
         });
@@ -156,7 +154,7 @@ const ATTACKS = {
     new Attack({
       name: "Cura tutti",
       description: "Un pugno veemente, infligge gravi danni",
-      targetAllPlayers: true,
+      targetAllAlliesGroup: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
       effect: function ({ performer, targets }) {

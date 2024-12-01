@@ -18,23 +18,39 @@ const ACTION_CHOICES = [
 ];
 
 class BattleManager {
+  // Puntatore che indica il target dell'attacco
   targetPointer = 0;
+  // Puntatore che indica l'azione scelta nell'action box
   actionPointer = 0;
+  // Cooldown dell'interazione dei tasti della tastiera
   interactionCooldown;
-  attackAnimationCooldown = 0;
+  // Numero che rappresenta il turno in corso
   currentTurn;
+  // Rappresenta l'attacco di questo turno
   currentAttack;
+  // Indica che l'animazione dell'attacco è terminata
   attackAnimationEnded = false;
-  targetAllowedValues = [];
+  // Contiene la lista dei target selezionabili durante l'attacco
+  selectableTargets = [];
+  // I turni di gioco. Ogni turno contiene il giocatore
   turns = [];
+  // L'ultimo tasto premuto nella tastiera
   lastKeyPressedId;
-  maxItemsToDisplay = 0;
+  // Lista delle fasi compiute. L'ultima è quella in atto. Serve a poter tornare indietro
   phasesHistory = [CONFIG.battle.phases.selection];
+  // Gli attaccanti del turno
+  attackers = [];
+  // I difensori del turno
+  defenders = [];
 
   constructor(battle) {
     this.battle = battle;
   }
 
+  /**
+   * Da invocare prima dell'inizio della battaglia. Istanzia tutte le variabili
+   * e prepara tutti i valori necessari ai fini della battaglia.
+   */
   init() {
     // Calculate turns
     const turns = [
@@ -68,6 +84,8 @@ class BattleManager {
     this.turns = turns;
     this.currentTurn = 0;
 
+    this.handleAttackersAndDefenders();
+
     players[CONFIG.player.gianni].currentDirection = CONFIG.directions.right;
     players[CONFIG.player.fabrissazzo].currentDirection =
       CONFIG.directions.right;
@@ -98,8 +116,6 @@ class BattleManager {
       };
     }
 
-    this.maxItemsToDisplay = CONFIG.battle.actionBox.maxItemsToDisplay;
-
     // Avoid clicking on interaction when entering the battle
     this.interactionCooldown = Infinity;
     setTimeout(() => {
@@ -107,6 +123,21 @@ class BattleManager {
     }, CONFIG.keyboard.interactionCooldown);
 
     // ASSETS.music.battle.play();
+  }
+
+  /**
+   * Valorizza gli attaccanti e i difensori in base al personaggio che sta giocando in questo momento.
+   * Se il personaggio attivo è un giocatore, allora gli attaccanti saranno i giocatori ed i
+   * difensori saranno i nemici, altrimenti viceversa.
+   */
+  handleAttackersAndDefenders() {
+    if (this.turns[this.currentTurn].isPlayer) {
+      this.attackers = [...Object.values(players)];
+      this.defenders = [...this.battle.enemies];
+    } else {
+      this.attackers = [...this.battle.enemies];
+      this.defenders = [...Object.values(players)];
+    }
   }
 
   drawPlayers() {
@@ -210,21 +241,8 @@ class BattleManager {
     const height = pointer.height;
     const startY = tile.canvasHeight / 2 + height * 4;
 
-    const getPlayerPosX = (index) =>
-      battle.arenaPaddingX +
-      players[player.gianni].displayedWidth / 4 +
-      battle.gapBetweenCharacters * index +
-      width / 4;
-
-    const getEnemyPosX = (index) =>
-      tile.canvasWidth -
-      battle.arenaPaddingX -
-      this.battle.enemies[0].displayedWidth / 2 -
-      battle.gapBetweenCharacters +
-      index * battle.gapBetweenCharacters -
-      width / 4;
-
     const drawArrow = (posX, posY) => {
+      posX += players[player.gianni].displayedWidth / 4;
       ctx.beginPath();
       ctx.moveTo(posX, posY + height); // Base sinistra
       ctx.lineTo(posX + width / 2, posY); // Vertice superiore
@@ -235,40 +253,29 @@ class BattleManager {
     };
 
     const drawCharacterName = (posX, posY, name) => {
+      posX += players[player.gianni].displayedWidth / 4;
       ctx.textAlign = "center";
       ctx.fillText(name, posX + width / 2, posY + height + 20);
     };
 
     if (this.currentAttack.targetAll) {
-      Object.values(players).forEach((_, index) => {
-        drawArrow(getPlayerPosX(index), startY);
-      });
-      this.battle.enemies.forEach((_, index) => {
-        drawArrow(getEnemyPosX(index), startY);
+      [...this.attackers, ...this.defenders].forEach((character) => {
+        drawArrow(character.position.x, startY);
       });
     } else if (this.currentAttack.targetAllEnemies) {
-      this.battle.enemies.forEach((_, index) => {
-        drawArrow(getEnemyPosX(index), startY);
+      this.defenders.forEach((character) => {
+        drawArrow(character.position.x, startY);
       });
-    } else if (this.currentAttack.targetAllPlayers) {
-      Object.values(players).forEach((_, index) => {
-        drawArrow(getPlayerPosX(index), startY);
+    } else if (this.currentAttack.targetAllAlliesGroup) {
+      this.attackers.forEach((character) => {
+        drawArrow(character.position.x, startY);
       });
     } else {
-      const targetIndex = this.targetAllowedValues[this.targetPointer];
-      const isPlayer = targetIndex < Object.values(players).length;
+      const target = this.selectableTargets[this.targetPointer];
 
-      const posX = isPlayer
-        ? getPlayerPosX(targetIndex)
-        : getEnemyPosX(targetIndex - Object.values(players).length);
+      drawArrow(target.position.x, startY);
 
-      drawArrow(posX, startY);
-
-      const characterName = isPlayer
-        ? Object.values(players)[targetIndex].name
-        : this.battle.enemies[targetIndex - Object.values(players).length].name;
-
-      drawCharacterName(posX, startY, characterName);
+      drawCharacterName(target.position.x, startY, target.name);
     }
   }
 
@@ -286,7 +293,7 @@ class BattleManager {
     ctx.strokeStyle = CONFIG.battle.actionBox.border.color;
     ctx.lineWidth = CONFIG.battle.actionBox.border.width;
 
-    if (this.actionPointer >= this.maxItemsToDisplay) {
+    if (this.actionPointer >= CONFIG.battle.actionBox.maxItemsToDisplay) {
       ctx.strokeRect(
         x + padding / 2,
         firstChoiceY - 22.5 + choices.gap * 3,
@@ -403,9 +410,9 @@ class BattleManager {
             }
 
             if (
-              this.actionPointer < this.maxItemsToDisplay &&
+              this.actionPointer < CONFIG.battle.actionBox.maxItemsToDisplay &&
               i >= 0 &&
-              i < this.maxItemsToDisplay
+              i < CONFIG.battle.actionBox.maxItemsToDisplay
             ) {
               ctx.fillText(
                 `${i + 1}. ${options[i].name}`, // Mostra l'indice reale (1-based)
@@ -420,8 +427,10 @@ class BattleManager {
             }
 
             if (
-              this.actionPointer >= this.maxItemsToDisplay &&
-              i >= this.actionPointer - (this.maxItemsToDisplay - 1) &&
+              this.actionPointer >= CONFIG.battle.actionBox.maxItemsToDisplay &&
+              i >=
+                this.actionPointer -
+                  (CONFIG.battle.actionBox.maxItemsToDisplay - 1) &&
               i < this.actionPointer + 1
             ) {
               ctx.fillText(
@@ -429,7 +438,9 @@ class BattleManager {
                 x + padding,
                 y +
                   padding * 2 +
-                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
+                  (i -
+                    (this.actionPointer -
+                      (CONFIG.battle.actionBox.maxItemsToDisplay - 1))) *
                     CONFIG.battle.actionBox.choices.gap
               );
               ctx.fillText(
@@ -437,7 +448,9 @@ class BattleManager {
                 x - padding + width - textWidth(details) - 7,
                 y +
                   padding * 2 +
-                  (i - (this.actionPointer - (this.maxItemsToDisplay - 1))) *
+                  (i -
+                    (this.actionPointer -
+                      (CONFIG.battle.actionBox.maxItemsToDisplay - 1))) *
                     CONFIG.battle.actionBox.choices.gap
               );
             }
@@ -470,49 +483,56 @@ class BattleManager {
           break;
         }
         case CONFIG.battle.phases.target: {
+          const wrappedDescription = wrapText(
+            this.currentAttack.description,
+            width - padding * 2
+          );
+
+          ctx.fillText(this.currentAttack.name, x + padding, y + padding * 2);
+
+          wrappedDescription.forEach((line, index) => {
+            ctx.fillText(line, x + padding, y + padding * 3 + index * 20);
+          });
           break;
         }
       }
     }
   }
 
-  /**
-   * Draw the animation of an attack
-   */
   drawAttack() {
     if (this.currentPhase !== CONFIG.battle.phases.performAttack) {
       return;
     }
 
-    const index = this.targetAllowedValues[this.targetPointer];
-    const turn = this.turns.find((turn) => turn.originalIndex === index);
-
-    let gifX = turn.entity.position.x;
-    let gifY = turn.entity.position.y;
+    const target = this.selectableTargets[this.targetPointer];
 
     const propagations = [];
-    const playersPropagation = {
-      quantity: Object.values(players).length - 1,
+    const attackersPropagation = {
+      quantity: this.attackers.length - 1,
       amount: CONFIG.battle.gapBetweenCharacters,
-      startX: players[CONFIG.player.gianni].position.x,
-      startY: players[CONFIG.player.gianni].position.y,
+      startX: this.attackers[0].position.x,
+      startY: this.attackers[0].position.y,
     };
-    const enemiesPropagation = {
-      quantity: this.battle.enemies.length - 1,
+    const defendersPropagation = {
+      quantity: this.defenders.length - 1,
       amount: CONFIG.battle.gapBetweenCharacters,
-      startX: this.battle.enemies[0].position.x,
-      startY: this.battle.enemies[0].position.y,
+      startX: this.defenders[0].position.x,
+      startY: this.defenders[0].position.y,
     };
 
     if (this.currentAttack.targetAll) {
-      propagations.push(playersPropagation, enemiesPropagation);
-    } else if (this.currentAttack.targetAllPlayers) {
-      propagations.push(playersPropagation);
+      propagations.push(attackersPropagation, defendersPropagation);
+    } else if (this.currentAttack.targetAllAlliesGroup) {
+      propagations.push(attackersPropagation);
     } else if (this.currentAttack.targetAllEnemies) {
-      propagations.push(enemiesPropagation);
+      propagations.push(defendersPropagation);
     }
 
-    this.currentAttack.animate(gifX, gifY, propagations);
+    this.currentAttack.animate(
+      target.position.x,
+      target.position.y,
+      propagations
+    );
 
     if (this.currentAttack.animationIsFinished()) {
       this.currentFrame = 0;
@@ -568,20 +588,29 @@ class BattleManager {
     this.drawAttack();
   }
 
+  /**
+   * Sposta il selettore del target verso destra
+   */
   moveTargetPointerRight() {
     this.targetPointer++;
-    if (this.targetPointer >= this.targetAllowedValues.length) {
+    if (this.targetPointer >= this.selectableTargets.length) {
       this.targetPointer = 0;
     }
   }
 
+  /**
+   * Sposta il selettore del target verso sinistra
+   */
   moveTargetPointerLeft() {
     this.targetPointer--;
     if (this.targetPointer < 0) {
-      this.targetPointer = this.targetAllowedValues.length - 1;
+      this.targetPointer = this.selectableTargets.length - 1;
     }
   }
 
+  /**
+   * Sposta il selettore dell'azione in alto
+   */
   moveActionPointerUp() {
     let max = 0;
     if (this.phaseIsSelection) {
@@ -602,6 +631,9 @@ class BattleManager {
     }
   }
 
+  /**
+   * Sposta il selettore dell'azione in basso
+   */
   moveActionPointerDown() {
     let max = 0;
     if (this.phaseIsSelection) {
@@ -622,7 +654,10 @@ class BattleManager {
     }
   }
 
-  handlePointer(keyboard) {
+  /**
+   * Gestisce le interazioni con la tastiera in base ai tasti premuti ed alla fase in corso
+   */
+  handleKeyboard(keyboard) {
     const now = Date.now();
 
     if (
@@ -664,6 +699,10 @@ class BattleManager {
     }
   }
 
+  /**
+   * Gestisce la fase di selezione iniziale. All'inizio si può scegliere di eseguire un attacco,
+   * usare un oggetto o ritirarsi temporaneamente.
+   */
   handleSelectionPhase() {
     switch (true) {
       case keyboard.isInteract: {
@@ -676,35 +715,52 @@ class BattleManager {
     this.handleActionPointer();
   }
 
-  setTargetAllowedValues() {
-    const targetAllowedValues = [];
+  /**
+   * Crea un array che contiene tutti i possibili target selezionabili durante l'attacco
+   */
+  setSelectableTargets() {
+    const selectableTargets = [];
     if (this.currentAttack.targetAll) {
-      targetAllowedValues.push(0, 1);
-      for (var i = 0; i < this.battle.enemies.length; i++) {
-        targetAllowedValues.push(i + 2);
-      }
+      this.attackers.forEach((a) => {
+        selectableTargets.push(a);
+      });
+      this.defenders.forEach((d) => {
+        selectableTargets.push(d);
+      });
     }
 
-    if (this.currentAttack.targetAllPlayers) {
-      targetAllowedValues.push(0, 1);
+    if (this.currentAttack.targetAllAlliesGroup) {
+      this.attackers.forEach((a) => {
+        selectableTargets.push(a);
+      });
     }
     if (this.currentAttack.targetSelf) {
-      targetAllowedValues.push(this.turns[this.currentTurn].originalIndex);
+      for (var i = 0; i < this.attackers.length; i++) {
+        if (i === this.turns[this.currentTurn].originalIndex) {
+          selectableTargets.push(this.attackers[i]);
+        }
+      }
     }
     if (this.currentAttack.targetAlly) {
-      const index = Math.abs(this.turns[this.currentTurn].originalIndex - 1);
-      targetAllowedValues.push(index);
+      for (var i = 0; i < this.attackers.length; i++) {
+        if (i !== this.turns[this.currentTurn].originalIndex) {
+          selectableTargets.push(this.attackers[i]);
+        }
+      }
     }
 
     if (this.currentAttack.targetEnemy || this.currentAttack.targetAllEnemies) {
-      for (var i = 0; i < this.battle.enemies.length; i++) {
-        targetAllowedValues.push(i + 2);
-      }
+      this.defenders.forEach((a) => {
+        selectableTargets.push(a);
+      });
     }
 
-    this.targetAllowedValues = targetAllowedValues;
+    this.selectableTargets = selectableTargets;
   }
 
+  /**
+   * Gestisce la selezione di un attacco
+   */
   handleAttacksOptionsPhase() {
     switch (true) {
       case keyboard.isInteract: {
@@ -712,17 +768,22 @@ class BattleManager {
         this.currentAttack =
           this.currentCharacter.freeAttacks[this.actionPointer];
 
-        this.setTargetAllowedValues();
+        this.setSelectableTargets();
 
         this.targetPointer = 0;
         ASSETS.soundEffects.selection.play();
         return;
       }
     }
-    this.handleActionPointer();
-    this.handleCancelAsBack();
+    if (this.isPlayerTurn) {
+      this.handleActionPointer();
+      this.handleCancelAsBack();
+    }
   }
 
+  /**
+   * Gestisce la selezione di un attacco speciale
+   */
   handleSpecialAttacksOptionsPhase() {
     switch (true) {
       case keyboard.isInteract: {
@@ -730,44 +791,46 @@ class BattleManager {
         this.currentAttack =
           this.currentCharacter.costAttacks[this.actionPointer];
 
-        this.setTargetAllowedValues();
+        this.setSelectableTargets();
 
         this.targetPointer = 0;
         ASSETS.soundEffects.selection.play();
         return;
       }
     }
-    this.handleActionPointer();
-    this.handleCancelAsBack();
+    if (this.isPlayerTurn) {
+      this.handleActionPointer();
+      this.handleCancelAsBack();
+    }
   }
 
+  /**
+   * Gestisce la selezione di un oggetto dallo zaino
+   */
   handleBackpackOptionsPhase() {
     switch (true) {
       case keyboard.isInteract: {
         this.nextPhase();
         this.currentAttack = backpack.itemsList[this.actionPointer].attack;
 
-        this.setTargetAllowedValues();
+        this.setSelectableTargets();
 
         this.targetPointer = 0;
         ASSETS.soundEffects.selection.play();
         return;
       }
     }
-    this.handleActionPointer();
-    this.handleCancelAsBack();
+    if (this.isPlayerTurn) {
+      this.handleActionPointer();
+      this.handleCancelAsBack();
+    }
   }
 
+  /**
+   * Gestisce la selezione di un target
+   */
   handleTargetPhase() {
     switch (true) {
-      case keyboard.isLeft: {
-        this.moveTargetPointerLeft();
-        return;
-      }
-      case keyboard.isRight: {
-        this.moveTargetPointerRight();
-        return;
-      }
       case keyboard.isInteract: {
         this.nextPhase();
         ASSETS.soundEffects.selection.play();
@@ -778,6 +841,18 @@ class BattleManager {
         this.targetPointer = 0;
         ASSETS.soundEffects.cancel.play();
         return;
+      }
+    }
+    if (this.isPlayerTurn) {
+      switch (true) {
+        case keyboard.isLeft: {
+          this.moveTargetPointerLeft();
+          return;
+        }
+        case keyboard.isRight: {
+          this.moveTargetPointerRight();
+          return;
+        }
       }
     }
   }
@@ -851,13 +926,23 @@ class BattleManager {
     this.phasesHistory = [CONFIG.battle.phases.selection];
   }
 
+  /**
+   * Imposta la fase corrente a quella precedente
+   */
   prevPhase() {
     this.phasesHistory = this.phasesHistory.slice(0, -1);
   }
 
+  /**
+   * Imposta la fase corrente a quella successiva
+   */
   nextPhase() {
     switch (this.currentPhase) {
       case CONFIG.battle.phases.selection: {
+        if (!this.isPlayerTurn) {
+          this.phasesHistory.push(CONFIG.battle.phases.target);
+          return;
+        }
         this.phasesHistory.push(
           ACTION_CHOICES[this.actionPointer].triggerPhase
         );
@@ -879,6 +964,10 @@ class BattleManager {
     }
   }
 
+  /**
+   * Prepara il necessario all'inizio di un nuovo turno, calcolando il giocatore
+   * attivo, attaccanti e difensori
+   */
   startNextTurn() {
     this.resetCurrentPhase();
     this.targetPointer = 0;
@@ -887,8 +976,16 @@ class BattleManager {
     if (this.currentTurn >= this.turns.length) {
       this.currentTurn = 0;
     }
+    this.handleAttackersAndDefenders();
+    if (!this.isPlayerTurn) {
+      this.handleEnemyTurn();
+      return;
+    }
   }
 
+  /**
+   * Gestisce l'attacco selezionato, applicando danni ed effetti
+   */
   handleAttack() {
     if (
       this.currentPhase === CONFIG.battle.phases.performAttack &&
@@ -898,22 +995,17 @@ class BattleManager {
       let targets = [];
 
       ASSETS.soundEffects.damage.play();
-      if (this.currentAttack.targetAll) {
-        targets.push(...this.battle.enemies);
-        targets.push(...Object.values(players));
-      } else if (this.currentAttack.targetAllEnemies) {
-        targets = this.battle.enemies;
-      } else if (this.currentAttack.targetEnemy) {
-        const entity = this.battle.enemies[this.targetPointer];
-        targets = [entity];
-      } else if (this.currentAttack.targetAllPlayers) {
-        targets = Object.values(players);
-      } else {
-        const targetPlayer =
-          this.targetAllowedValues[this.targetPointer] === 0
-            ? players[CONFIG.player.gianni]
-            : players[CONFIG.player.fabrissazzo];
 
+      if (this.currentAttack.targetAll) {
+        targets.push(...this.attackers);
+        targets.push(...this.defenders);
+      } else if (this.currentAttack.targetAllEnemies) {
+        targets = this.defenders;
+      } else if (this.currentAttack.targetAllAlliesGroup) {
+        targets = this.attackers;
+      } else {
+        // targetEnemy, targetSelf, targetAlly
+        const targetPlayer = this.selectableTargets[this.targetPointer];
         targets = [targetPlayer];
       }
 
@@ -937,8 +1029,28 @@ class BattleManager {
     }
   }
 
+  /**
+   * L'IA che gestisce il turno dei nemici
+   */
+  handleEnemyTurn() {
+    // attack selection
+    const attack =
+      this.currentCharacter.attacks[
+        getRandomIndex(this.currentCharacter.attacks)
+      ];
+
+    this.currentAttack = attack;
+
+    // target selection
+    this.setSelectableTargets();
+  }
+
+  /**
+   * Da richiamare all'avvio della battaglia per permettere allo script principale di
+   * avviare la gestione della tastiera
+   */
   handle(keyboard) {
-    this.handlePointer(keyboard);
+    this.handleKeyboard(keyboard);
     this.handleAttack();
   }
 }
