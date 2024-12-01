@@ -3,10 +3,12 @@ class Attack {
     name,
     description,
     damage = 0,
-    canTargetEnemies = true, // indica che l'attacco può essere rivolto verso i nemici
-    isAoE = false, // indica che tutti i nemici verranno colpiti
-    canTargetSelf = false, // indica che l'attacco può essere rivolto a se stessi
-    canTargetAlly = false, // indica che l'attacco può essere rivolto all'alleato
+    targetEnemy = false, // indica che l'attacco può essere rivolto verso un nemico
+    targetAllEnemies = false,
+    targetSelf = false, // indica che l'attacco può essere rivolto a se stessi
+    targetAlly = false, // indica che l'attacco può essere rivolto all'alleato
+    targetAllPlayers = false,
+    targetAll = false, // indica che l'attacco coinvolge tutti
     gif,
     sound,
     cost = 0, // Indica il costo in stamina. Se è zero è un attacco normale, se maggiore è speciale
@@ -15,16 +17,18 @@ class Attack {
     this.name = name;
     this.description = description;
     this.damage = damage;
-    this.canTargetEnemies = canTargetEnemies;
-    this.isAoE = isAoE;
-    this.canTargetSelf = canTargetSelf;
-    this.canTargetAlly = canTargetAlly;
+    this.targetEnemy = targetEnemy;
+    this.targetSelf = targetSelf;
+    this.targetAlly = targetAlly;
+    this.targetAll = targetAll;
+    this.targetAllEnemies = targetAllEnemies;
+    this.targetAllPlayers = targetAllPlayers;
     this.gif = gif;
     this.sound = sound;
     this.cost = cost;
     this.effect = effect;
     if (!this.effect) {
-      this.effect = ({ performer, targets, players }) => {
+      this.effect = function ({ performer, targets, players }) {
         targets.forEach((target) => {
           target.characterBattleStats.dealDamage(this.damage);
         });
@@ -36,18 +40,11 @@ class Attack {
     this.gif.reset();
   }
 
-  animate(
-    x,
-    y,
-    propagation = {
-      quantity: 0,
-      amount: 0,
-    }
-  ) {
+  animate(x, y, propagations = []) {
     if (this.sound) {
       this.sound.play();
     }
-    this.gif.animate(x, y, propagation);
+    this.gif.animate(x, y, propagations);
   }
 
   animationIsFinished() {
@@ -64,6 +61,7 @@ const ATTACKS = {
     new Attack({
       name: "Ceffone",
       description: "Un ceffone inferto con massima violenza",
+      targetEnemy: true,
       damage: 20,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
@@ -72,7 +70,7 @@ const ATTACKS = {
       name: "Pugnazzo ad area",
       description: "Un pugno veemente, infligge gravi danni",
       damage: 30,
-      isAoE: true,
+      targetAllEnemies: true,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 1,
@@ -80,12 +78,11 @@ const ATTACKS = {
     new Attack({
       name: "Cura",
       description: "Un ceffone inferto con massima violenza",
-      canTargetEnemies: false,
-      canTargetSelf: true,
-      canTargetAlly: true,
+      targetSelf: true,
+      targetAlly: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
-      effect: ({ performer, targets }) => {
+      effect: function ({ performer, targets }) {
         targets.forEach((target) => {
           target.characterBattleStats.recoverHealth(20);
         });
@@ -94,33 +91,28 @@ const ATTACKS = {
     new Attack({
       name: "Cura personale",
       description: "Un ceffone inferto con massima violenza",
-      canTargetEnemies: false,
-      canTargetSelf: true,
+      targetSelf: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
     }),
     new Attack({
       name: "Cura generosa",
       description: "Un ceffone inferto con massima violenza",
-      canTargetEnemies: false,
-      canTargetAlly: true,
+      targetAlly: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
       cost: 3,
-      effect: ({ performer, targets }) => {
+      effect: function ({ performer, targets }) {
         performer.characterBattleStats.recoverHealth(20);
       },
     }),
     new Attack({
       name: "Cura tutti",
       description: "Un pugno veemente, infligge gravi danni",
-      isAoE: true,
-      canTargetAlly: true,
-      canTargetSelf: true,
-      canTargetEnemies: false,
+      targetAllPlayers: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
-      effect: ({ performer, targets }) => {
+      effect: function ({ performer, targets }) {
         targets.forEach((target) => {
           target.characterBattleStats.recoverHealth(20);
         });
@@ -130,15 +122,14 @@ const ATTACKS = {
       name: "π/2",
       description:
         "Potentissimo attacco che sfrutta un angolo di 90°. L'esecutore subisce 20 danni",
-      isAoE: true,
       damage: 50,
-      canTargetEnemies: true,
+      targetEnemy: true,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
-      effect: ({ performer, targets }) => {
+      effect: function ({ performer, targets }) {
         targets.forEach((target) => {
-          target.characterBattleStats.dealDamage(50);
+          target.characterBattleStats.dealDamage(this.damage);
         });
         performer.characterBattleStats.dealDamage(20);
       },
@@ -147,13 +138,12 @@ const ATTACKS = {
       name: "Fibonacci",
       description:
         "Pugni sferrati come la serie di Fibonacci. A partire dal nemico piu a sinistra, infligge danni pari a Fibonacci per 10, quindi 10, 10, 20, ...",
-      isAoE: true,
       damage: 0,
-      canTargetEnemies: true,
+      targetAllEnemies: true,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
-      effect: ({ targets }) => {
+      effect: function ({ targets }) {
         targets[0].characterBattleStats.dealDamage(10);
         targets[1].characterBattleStats.dealDamage(20);
       },
@@ -161,18 +151,17 @@ const ATTACKS = {
     new Attack({
       name: "Ma che oooh!",
       description: "Un urlo che percuote gli organi interni. Danneggia tutti.",
-      isAoE: true,
       damage: 20,
-      canTargetEnemies: true,
+      targetAll: true,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
-      effect: ({ targets }) => {
+      effect: function ({ targets }) {
         targets.forEach((target) => {
-          target.characterBattleStats.dealDamage(20);
+          target.characterBattleStats.dealDamage(this.damage);
         });
         Object.values(players).forEach((player) => {
-          player.characterBattleStats.dealDamage(20);
+          player.characterBattleStats.dealDamage(this.damage);
         });
       },
     }),

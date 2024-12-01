@@ -29,34 +29,40 @@ class GIF {
     }
   }
 
-  animate(
-    x,
-    y,
-    propagation = {
-      quantity: 0,
-      amount: 0,
-    }
-  ) {
+  animate(x, y, propagations = []) {
     const now = Date.now();
 
-    ctx.drawImage(
-      this.frames[this.currentFrame],
-      x - this.width / 2 + this.driftX,
-      y - this.height / 2 + this.driftY,
-      this.width,
-      this.height
-    );
-
-    if (propagation.quantity) {
-      for (var i = 0; i < propagation.quantity; i++) {
+    if (!propagations.length) {
+      ctx.drawImage(
+        this.frames[this.currentFrame],
+        x - this.width / 2 + this.driftX,
+        y - this.height / 2 + this.driftY,
+        this.width,
+        this.height
+      );
+    } else {
+      propagations.forEach((propagation) => {
         ctx.drawImage(
           this.frames[this.currentFrame],
-          x - this.width / 2 + this.driftX + propagation.amount,
-          y - this.height / 2 + this.driftY,
+          propagation.startX - this.width / 2 + this.driftX,
+          propagation.startY - this.height / 2 + this.driftY,
           this.width,
           this.height
         );
-      }
+
+        for (var i = 0; i < propagation.quantity; i++) {
+          ctx.drawImage(
+            this.frames[this.currentFrame],
+            propagation.startX -
+              this.width / 2 +
+              this.driftX +
+              propagation.amount,
+            propagation.startY - this.height / 2 + this.driftY,
+            this.width,
+            this.height
+          );
+        }
+      });
     }
 
     // Avanza al frame successivo
