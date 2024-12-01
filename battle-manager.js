@@ -305,10 +305,11 @@ class BattleManager {
 
   drawPointer() {
     if (
-      this.phaseIsSelection ||
-      this.phaseIsAttacksOptions ||
-      this.phaseIsSpecialAttacksOptions ||
-      this.phaseIsBackpackOptions
+      this.isPlayerTurn &&
+      (this.phaseIsSelection ||
+        this.phaseIsAttacksOptions ||
+        this.phaseIsSpecialAttacksOptions ||
+        this.phaseIsBackpackOptions)
     ) {
       this.drawActionSelectionPointer();
     } else if (this.phaseIsTarget) {
@@ -317,7 +318,7 @@ class BattleManager {
   }
 
   drawActionBox() {
-    const { entity: activeCharacter, isPlayer } = this.turns[this.currentTurn];
+    const { entity: activeCharacter } = this.turns[this.currentTurn];
     const {
       padding,
       fontSize,
@@ -328,7 +329,10 @@ class BattleManager {
       height,
     } = CONFIG.battle.actionBox;
 
-    const x = activeCharacter.position.x;
+    const enemyDrift = this.isPlayerTurn
+      ? 0
+      : width - this.battle.enemies[0].displayedWidth - padding;
+    const x = activeCharacter.position.x - enemyDrift;
     const y =
       activeCharacter.position.y -
       CONFIG.battle.actionBox.height -
@@ -343,9 +347,9 @@ class BattleManager {
 
     // Aggiungi il triangolo in basso
     ctx.beginPath(); // Inizia un nuovo percorso
-    ctx.moveTo(x + 20, y + CONFIG.battle.actionBox.height); // Punto sinistro del triangolo
-    ctx.lineTo(x + 40, y + CONFIG.battle.actionBox.height); // Punto destro del triangolo
-    ctx.lineTo(x + 30, y + CONFIG.battle.actionBox.height + 20); // Punta del triangolo
+    ctx.moveTo(x + enemyDrift + 20, y + CONFIG.battle.actionBox.height); // Punto sinistro del triangolo
+    ctx.lineTo(x + enemyDrift + 40, y + CONFIG.battle.actionBox.height); // Punto destro del triangolo
+    ctx.lineTo(x + enemyDrift + 30, y + CONFIG.battle.actionBox.height + 20); // Punta del triangolo
     ctx.closePath(); // Chiude il triangolo
 
     ctx.fill(); // riempie il triangolo
@@ -356,7 +360,7 @@ class BattleManager {
     ctx.fillStyle = CONFIG.typography.textColor;
     ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
 
-    if (this.turns[this.currentTurn].isPlayer) {
+    if (this.isPlayerTurn) {
       switch (this.currentPhase) {
         case CONFIG.battle.phases.selection: {
           ACTION_CHOICES.forEach((choice, index) => {
@@ -826,6 +830,10 @@ class BattleManager {
     return this.currentPhase === CONFIG.battle.phases.target;
   }
 
+  get isPlayerTurn() {
+    return this.turns[this.currentTurn].isPlayer;
+  }
+
   resetCurrentPhase() {
     this.phasesHistory = [CONFIG.battle.phases.selection];
   }
@@ -909,6 +917,7 @@ class BattleManager {
       });
 
       this.resetCurrentPhase();
+      this.startNextTurn();
       this.actionPointer = 0;
       this.targetPointer = 0;
       this.attackAnimationEnded = false;
