@@ -14,6 +14,7 @@ const NPCS = {
         stamina: 6,
         velocity: 3,
       }),
+      attacks: ATTACKS[[NPC_IDS.furlanetto]],
     }),
     [NPC_IDS.cozza]: new NPC({
       details: BESTIARY[NPC_IDS.cozza],
@@ -27,6 +28,7 @@ const NPCS = {
         stamina: 4,
         velocity: 2,
       }),
+      attacks: ATTACKS[[NPC_IDS.cozza]],
     }),
   },
 };

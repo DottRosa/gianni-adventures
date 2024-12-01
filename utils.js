@@ -102,3 +102,7 @@ function wrapText(text, maxWidth) {
   lines.push(line.trim()); // Aggiungi l'ultima riga
   return lines;
 }
+
+function getRandomIndex(list) {
+  return Math.floor(Math.random() * list.length);
+}

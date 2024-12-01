@@ -57,6 +57,53 @@ class Attack {
 }
 
 const ATTACKS = {
+  [NPC_IDS.furlanetto]: [
+    new Attack({
+      name: "Ceffone",
+      description: "Un ceffone inferto con massima violenza",
+      targetEnemy: true,
+      damage: 20,
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
+    }),
+    new Attack({
+      name: "Pugnazzo ad area",
+      description: "Un pugno veemente, infligge gravi danni",
+      damage: 30,
+      targetAllEnemies: true,
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
+      cost: 1,
+    }),
+  ],
+  [NPC_IDS.cozza]: [
+    new Attack({
+      name: "Cura",
+      description: "Un ceffone inferto con massima violenza",
+      targetSelf: true,
+      targetAlly: true,
+      gif: GIFS[GIF_IDS.heal],
+      sound: ASSETS.soundEffects.heal,
+      effect: function ({ performer, targets }) {
+        console.log(targets);
+
+        targets.forEach((target) => {
+          target.characterBattleStats.recoverHealth(20);
+        });
+      },
+    }),
+    // new Attack({
+    //   name: "Cura generosa",
+    //   description: "Un ceffone inferto con massima violenza",
+    //   targetSelf: true,
+    //   gif: GIFS[GIF_IDS.heal],
+    //   sound: ASSETS.soundEffects.heal,
+    //   cost: 3,
+    //   effect: function ({ performer, targets }) {
+    //     performer.characterBattleStats.recoverHealth(20);
+    //   },
+    // }),
+  ],
   [CONFIG.player.fabrissazzo]: [
     new Attack({
       name: "Ceffone",
@@ -160,7 +207,7 @@ const ATTACKS = {
         targets.forEach((target) => {
           target.characterBattleStats.dealDamage(this.damage);
         });
-        Object.values(players).forEach((player) => {
+        players.forEach((player) => {
           player.characterBattleStats.dealDamage(this.damage);
         });
       },

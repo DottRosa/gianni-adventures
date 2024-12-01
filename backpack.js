@@ -64,5 +64,3 @@ const elixir = new Item({
 
 backpack.addItem(potion);
 backpack.addItem(elixir);
-
-console.log(backpack);

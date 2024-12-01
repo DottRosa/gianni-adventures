@@ -80,6 +80,9 @@ const CONFIG = {
     get arenaPaddingY() {
       return CONFIG.tile.tileDim / 2;
     },
+    enemies: {
+      standardDialogue: "Ora è il mio turno!",
+    },
     characterStats: {
       health: {
         min: 20,

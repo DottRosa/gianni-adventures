@@ -5,6 +5,8 @@ class NPC extends Sprite {
     mapPositionCell = { cellX: 0, cellY: 0 },
     dialogueManager = null,
     characterBattleStats,
+    battleDialogues = [],
+    attacks = [],
   }) {
     super({ spriteImages: details.spriteImages, startDirection });
     this.details = details;
@@ -13,8 +15,13 @@ class NPC extends Sprite {
       mapPositionCell.cellX,
       mapPositionCell.cellY
     );
+    this.attacks = attacks;
     this.dialogueManager = dialogueManager;
     this.characterBattleStats = characterBattleStats;
+    this.battleDialogues = battleDialogues;
+    if (!battleDialogues.length) {
+      this.battleDialogues.push(CONFIG.battle.enemies.standardDialogue);
+    }
   }
 
   updatePosition(position) {
@@ -65,5 +72,10 @@ class NPC extends Sprite {
 
   get name() {
     return this.details.fullName;
+  }
+
+  get battleDialogue() {
+    const randomIndex = getRandomIndex(this.battleDialogues);
+    return this.battleDialogues[randomIndex];
   }
 }

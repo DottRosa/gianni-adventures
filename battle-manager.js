@@ -460,6 +460,19 @@ class BattleManager {
         }
       }
     } else {
+      switch (this.currentPhase) {
+        case CONFIG.battle.phases.selection: {
+          ctx.fillText(
+            this.currentCharacter.battleDialogue,
+            x + padding,
+            y + padding * 2
+          );
+          break;
+        }
+        case CONFIG.battle.phases.target: {
+          break;
+        }
+      }
     }
   }
 
@@ -912,7 +925,7 @@ class BattleManager {
 
       this.currentAttack.effect({
         performer: activeCharacter,
-        players,
+        players: Object.values(players),
         targets,
       });
 
