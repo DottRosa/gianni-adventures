@@ -91,6 +91,22 @@ const ATTACKS = {
       },
     }),
   ],
+  [CONFIG.player.gianni]: [
+    new Attack({
+      name: "Rallenta",
+      description:
+        "Rallenta un avversario, riducendone la velocità di un punto",
+      targetEnemy: true,
+      damage: 0,
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
+      effect: function ({ performer, targets }) {
+        targets.forEach((target) => {
+          target.characterBattleStats.reduceVelocity(1);
+        });
+      },
+    }),
+  ],
   [CONFIG.player.fabrissazzo]: [
     new Attack({
       name: "Ceffone",

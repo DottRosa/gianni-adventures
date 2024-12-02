@@ -80,6 +80,18 @@ class BattleManager {
   }
 
   /**
+   * Ricrea i turni considerando eventuali cambiamenti nelle statistiche
+   */
+  recalculateTurns() {
+    const turns = [];
+    for (var i = 0; i < 50; i++) {
+      turns.push(...this.buildTurns());
+    }
+
+    this.turns = turns;
+  }
+
+  /**
    * Da invocare prima dell'inizio della battaglia. Istanzia tutte le variabili
    * e prepara tutti i valori necessari ai fini della battaglia.
    */
@@ -1033,6 +1045,7 @@ class BattleManager {
     this.actionPointer = 0;
     this.currentTurn++;
     this.handleAttackersAndDefenders();
+    this.recalculateTurns();
     if (!this.isPlayerTurn) {
       this.handleEnemyTurn();
       return;

@@ -43,4 +43,11 @@ class CharacterBattleStats {
   dealStaminaUsage(usage) {
     this.currentStamina -= usage;
   }
+
+  reduceVelocity(amount) {
+    this.currentVelocity -= amount;
+    if (this.currentVelocity <= 0) {
+      this.currentVelocity = 1;
+    }
+  }
 }

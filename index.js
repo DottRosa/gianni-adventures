@@ -58,6 +58,7 @@ players[CONFIG.player.gianni] = new Player({
     stamina: 4,
     velocity: 1,
   }),
+  attacks: ATTACKS[CONFIG.player.gianni],
 });
 
 let backgroundPosition = { x: 0, y: 0 };
