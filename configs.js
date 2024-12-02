@@ -208,6 +208,7 @@ const ASSETS = {
     roar: new Audio("assets/sound-effects/roar.mp3"),
     damage: new Audio("assets/sound-effects/damage.wav"),
     heal: new Audio("assets/sound-effects/heal.mp3"),
+    wrong: new Audio("assets/sound-effects/wrong.mp3"),
   },
   music: {
     battle: new Audio("assets/music/battle.mp4"),

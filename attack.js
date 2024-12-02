@@ -135,7 +135,7 @@ const ATTACKS = {
       targetAlly: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
-      cost: 3,
+      cost: 6,
       effect: function ({ performer, targets }) {
         performer.characterBattleStats.recoverHealth(20);
       },

@@ -401,9 +401,9 @@ class BattleManager {
             options = backpack.itemsList;
           }
 
-          if (options.length === 0) {
+          if (!options || options.length === 0) {
             ctx.fillText(
-              `Nessun elemento da mostrare`, // Mostra l'indice reale (1-based)
+              `Nessun elemento da mostrare`,
               x + padding,
               y + padding * 2
             );
@@ -411,10 +411,16 @@ class BattleManager {
 
           for (var i = 0; i < options.length; i++) {
             let details = ``;
+            let disabled = false;
+            let disabledY = 0;
+
             if (this.phaseIsAttacksOptions) {
               details = `${options[i].damage}`;
             } else if (this.phaseIsSpecialAttacksOptions) {
               details = `${options[i].damage}/${options[i].cost}`;
+              disabled =
+                options[i].cost >
+                this.currentCharacter.characterBattleStats.currentStamina;
             } else if (this.phaseIsBackpackOptions) {
               details = `x${options[i].quantity}`;
             }
@@ -425,7 +431,7 @@ class BattleManager {
               i < CONFIG.battle.actionBox.maxItemsToDisplay
             ) {
               ctx.fillText(
-                `${i + 1}. ${options[i].name}`, // Mostra l'indice reale (1-based)
+                `${i + 1}. ${options[i].name}`,
                 x + padding,
                 y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
               );
@@ -434,6 +440,8 @@ class BattleManager {
                 x - padding + width - textWidth(details) - 7,
                 y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap
               );
+              disabledY =
+                y + padding * 2 + i * CONFIG.battle.actionBox.choices.gap;
             }
 
             if (
@@ -463,6 +471,26 @@ class BattleManager {
                       (CONFIG.battle.actionBox.maxItemsToDisplay - 1))) *
                     CONFIG.battle.actionBox.choices.gap
               );
+
+              disabledY =
+                y +
+                padding * 2 +
+                (i -
+                  (this.actionPointer -
+                    (CONFIG.battle.actionBox.maxItemsToDisplay - 1))) *
+                  CONFIG.battle.actionBox.choices.gap;
+            }
+
+            if (disabled) {
+              ctx.beginPath();
+              // Definisci il punto iniziale del segmento
+              ctx.moveTo(x + padding, disabledY - 5); // Coordinate (x1, y1)
+
+              // Definisci il punto finale del segmento
+              ctx.strokeStyle = "red";
+              ctx.lineTo(x + width - textWidth(details), disabledY - 5); // Coordinate (x2, y2)
+              ctx.stroke();
+              ctx.closePath();
             }
           }
           break;
@@ -811,6 +839,13 @@ class BattleManager {
   handleSpecialAttacksOptionsPhase() {
     switch (true) {
       case keyboard.isInteract: {
+        if (
+          this.currentCharacter.costAttacks[this.actionPointer].cost >
+          this.currentCharacter.characterBattleStats.currentStamina
+        ) {
+          ASSETS.soundEffects.wrong.play();
+          return;
+        }
         this.nextPhase();
         this.currentAttack =
           this.currentCharacter.costAttacks[this.actionPointer];
