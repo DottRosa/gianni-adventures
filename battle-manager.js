@@ -47,12 +47,7 @@ class BattleManager {
     this.battle = battle;
   }
 
-  /**
-   * Da invocare prima dell'inizio della battaglia. Istanzia tutte le variabili
-   * e prepara tutti i valori necessari ai fini della battaglia.
-   */
-  init() {
-    // Calculate turns
+  buildTurns() {
     const turns = [
       {
         isPlayer: true,
@@ -81,7 +76,22 @@ class BattleManager {
         : 1;
     });
 
+    return turns;
+  }
+
+  /**
+   * Da invocare prima dell'inizio della battaglia. Istanzia tutte le variabili
+   * e prepara tutti i valori necessari ai fini della battaglia.
+   */
+  init() {
+    // Calculate turns
+    const turns = [];
+    for (var i = 0; i < 50; i++) {
+      turns.push(...this.buildTurns());
+    }
+
     this.turns = turns;
+
     this.currentTurn = 0;
 
     this.handleAttackersAndDefenders();
@@ -542,19 +552,33 @@ class BattleManager {
   }
 
   drawTurns() {
-    const { radius, backgroundColor, currentTurnBackgroundColor, gap } =
-      CONFIG.battle.turns;
+    const {
+      radius,
+      backgroundColor,
+      currentTurnBackgroundColor,
+      gap,
+      quantityToDisplay,
+    } = CONFIG.battle.turns;
 
-    const boxWidth = (radius * 2 + gap) * this.turns.length - gap - gap / 3;
+    const boxWidth = (radius * 2 + gap) * quantityToDisplay - gap - gap / 3;
 
     let x =
-      CONFIG.tile.canvasWidth - CONFIG.tile.canvasWidth / 2 - boxWidth / 2;
+      CONFIG.tile.canvasWidth -
+      CONFIG.tile.canvasWidth / 2 +
+      boxWidth / 2 +
+      gap * 3;
     let y = CONFIG.battle.arenaPaddingY;
-    this.turns.forEach((turn, index) => {
+
+    const turnsMask = this.turns.slice(
+      this.currentTurn,
+      this.currentTurn + quantityToDisplay
+    );
+
+    turnsMask.reverse().forEach((turn, index) => {
       ctx.beginPath();
       ctx.arc(x + 25, y + 50, radius, 0, 2 * Math.PI); // Centra il cerchio
       ctx.fillStyle =
-        this.currentTurn === index
+        turnsMask.length - 1 === index
           ? currentTurnBackgroundColor
           : backgroundColor; // Sfondo bianco
       ctx.fill(); // Riempi il cerchio
@@ -565,7 +589,7 @@ class BattleManager {
       // Disegna l'icona
       turn.entity.drawIcon(x, y);
 
-      x += radius * 2 + gap; // Sposta la posizione
+      x -= radius * 2 + gap; // Sposta la posizione
     });
 
     const turnString = `È il turno di ${this.currentCharacter.name}`;
@@ -973,9 +997,6 @@ class BattleManager {
     this.targetPointer = 0;
     this.actionPointer = 0;
     this.currentTurn++;
-    if (this.currentTurn >= this.turns.length) {
-      this.currentTurn = 0;
-    }
     this.handleAttackersAndDefenders();
     if (!this.isPlayerTurn) {
       this.handleEnemyTurn();

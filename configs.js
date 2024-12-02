@@ -175,7 +175,8 @@ const CONFIG = {
       radius: 30,
       backgroundColor: "white",
       currentTurnBackgroundColor: "yellow",
-      gap: 25,
+      gap: -20,
+      quantityToDisplay: 8,
     },
   },
 };
