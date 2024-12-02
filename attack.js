@@ -90,17 +90,6 @@ const ATTACKS = {
         });
       },
     }),
-    // new Attack({
-    //   name: "Cura generosa",
-    //   description: "Un ceffone inferto con massima violenza",
-    //   targetSelf: true,
-    //   gif: GIFS[GIF_IDS.heal],
-    //   sound: ASSETS.soundEffects.heal,
-    //   cost: 3,
-    //   effect: function ({ performer, targets }) {
-    //     performer.characterBattleStats.recoverHealth(20);
-    //   },
-    // }),
   ],
   [CONFIG.player.fabrissazzo]: [
     new Attack({
@@ -201,7 +190,7 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
-      effect: function ({ targets }) {
+      effect: function ({ targets, players }) {
         targets.forEach((target) => {
           target.characterBattleStats.dealDamage(this.damage);
         });
