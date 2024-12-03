@@ -30,7 +30,7 @@ class Attack {
     if (!this.effect) {
       this.effect = function ({ performer, targets, players }) {
         targets.forEach((target) => {
-          target.characterBattleStats.dealDamage(this.damage);
+          target.stats.dealDamage(this.damage);
         });
       };
     }
@@ -86,7 +86,7 @@ const ATTACKS = {
       sound: ASSETS.soundEffects.heal,
       effect: function ({ performer, targets }) {
         targets.forEach((target) => {
-          target.characterBattleStats.recoverHealth(20);
+          target.stats.recoverHealth(20);
         });
       },
     }),
@@ -100,11 +100,6 @@ const ATTACKS = {
       damage: 0,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
-      effect: function ({ performer, targets }) {
-        targets.forEach((target) => {
-          target.characterBattleStats.reduceVelocity(1);
-        });
-      },
     }),
   ],
   [CONFIG.player.fabrissazzo]: [
@@ -127,33 +122,33 @@ const ATTACKS = {
     }),
     new Attack({
       name: "Cura",
-      description: "Un ceffone inferto con massima violenza",
+      description: "Cura se stesso o un alleato",
       targetSelf: true,
       targetAlly: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
       effect: function ({ performer, targets }) {
         targets.forEach((target) => {
-          target.characterBattleStats.recoverHealth(20);
+          target.stats.recoverHealth(20);
         });
       },
     }),
     new Attack({
       name: "Cura personale",
-      description: "Un ceffone inferto con massima violenza",
+      description: "Cura se stesso",
       targetSelf: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
     }),
     new Attack({
-      name: "Cura generosa",
-      description: "Un ceffone inferto con massima violenza",
-      targetAlly: true,
+      name: "Polvere negli occhi",
+      description: "Lancia della polvere negli occhi. Induce Cecità",
+      targetEnemy: true,
       gif: GIFS[GIF_IDS.heal],
       sound: ASSETS.soundEffects.heal,
-      cost: 6,
+      cost: 2,
       effect: function ({ performer, targets }) {
-        performer.characterBattleStats.recoverHealth(20);
+        targets[0].stats.setStatusEffect(STATUS_EFFECTS.blindness);
       },
     }),
     new Attack({
@@ -164,7 +159,7 @@ const ATTACKS = {
       sound: ASSETS.soundEffects.heal,
       effect: function ({ performer, targets }) {
         targets.forEach((target) => {
-          target.characterBattleStats.recoverHealth(20);
+          target.stats.recoverHealth(20);
         });
       },
     }),
@@ -179,9 +174,9 @@ const ATTACKS = {
       cost: 4,
       effect: function ({ performer, targets }) {
         targets.forEach((target) => {
-          target.characterBattleStats.dealDamage(this.damage);
+          target.stats.dealDamage(this.damage);
         });
-        performer.characterBattleStats.dealDamage(20);
+        performer.stats.dealDamage(20);
       },
     }),
     new Attack({
@@ -194,8 +189,8 @@ const ATTACKS = {
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
       effect: function ({ targets }) {
-        targets[0].characterBattleStats.dealDamage(10);
-        targets[1].characterBattleStats.dealDamage(20);
+        targets[0].stats.dealDamage(10);
+        targets[1].stats.dealDamage(20);
       },
     }),
     new Attack({
@@ -208,10 +203,10 @@ const ATTACKS = {
       cost: 4,
       effect: function ({ targets, players }) {
         targets.forEach((target) => {
-          target.characterBattleStats.dealDamage(this.damage);
+          target.stats.dealDamage(this.damage);
         });
         players.forEach((player) => {
-          player.characterBattleStats.dealDamage(this.damage);
+          player.stats.dealDamage(this.damage);
         });
       },
     }),

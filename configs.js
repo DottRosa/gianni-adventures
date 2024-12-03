@@ -1,3 +1,5 @@
+// https://tibia.fandom.com/wiki/Category:Attack_Effects
+
 const CONFIG = {
   zoom: 500,
   typography: {
@@ -176,7 +178,7 @@ const CONFIG = {
       backgroundColor: "white",
       currentTurnBackgroundColor: "yellow",
       gap: -20,
-      quantityToDisplay: 8,
+      quantityToDisplay: 4,
     },
   },
 };

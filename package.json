@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "gifs": "node utils/extract-gif-frames.js"
+  },
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "omggif": "^1.0.10",
+    "sharp": "^0.33.5"
+  }
+}

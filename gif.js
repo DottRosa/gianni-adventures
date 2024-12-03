@@ -101,7 +101,9 @@ const GIFS = {
     folderName: "aura",
     totalFrames: 4,
     width: 100,
-    height: 100,
+    height: 150,
+    driftX: 25,
+    driftY: 20,
   }),
   [GIF_IDS.beast]: new GIF({
     folderName: "beast",
@@ -118,3 +120,6 @@ const GIFS = {
     driftY: 25,
   }),
 };
+
+const a = new Image("assets/attacks/dust.gif");
+console.log(a);

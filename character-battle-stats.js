@@ -24,6 +24,7 @@ class CharacterBattleStats {
 
     this.attacks = attacks;
     this.specialAttacks = specialAttacks;
+    this.currentStatusEffect = null;
   }
 
   dealDamage(damage) {
@@ -44,10 +45,7 @@ class CharacterBattleStats {
     this.currentStamina -= usage;
   }
 
-  reduceVelocity(amount) {
-    this.currentVelocity -= amount;
-    if (this.currentVelocity <= 0) {
-      this.currentVelocity = 1;
-    }
+  setStatusEffect(statusEffect) {
+    this.currentStatusEffect = statusEffect;
   }
 }

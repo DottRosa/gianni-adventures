@@ -1,4 +1,4 @@
-class NPC extends Sprite {
+class NPC extends Character {
   constructor({
     details,
     startDirection = CONFIG.directions.right,
@@ -8,16 +8,20 @@ class NPC extends Sprite {
     battleDialogues = [],
     attacks = [],
   }) {
-    super({ spriteImages: details.spriteImages, startDirection });
+    super({
+      spriteImages: details.spriteImages,
+      startDirection,
+      attacks,
+      characterBattleStats,
+    });
     this.details = details;
+    this.id = this.name.toLowerCase().replace(" ", "-");
     this.mapPositionCell = mapPositionCell;
     this.mapCoords = getCoordsByCell(
       mapPositionCell.cellX,
       mapPositionCell.cellY
     );
-    this.attacks = attacks;
     this.dialogueManager = dialogueManager;
-    this.characterBattleStats = characterBattleStats;
     this.battleDialogues = battleDialogues;
     if (!battleDialogues.length) {
       this.battleDialogues.push(CONFIG.battle.enemies.standardDialogue);

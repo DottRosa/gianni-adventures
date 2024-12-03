@@ -49,46 +49,19 @@ class BattleManager {
 
   buildTurns() {
     const turns = [
-      {
-        isPlayer: true,
-        entity: players[CONFIG.player.gianni],
-        originalIndex: 0,
-      },
-      {
-        isPlayer: true,
-        entity: players[CONFIG.player.fabrissazzo],
-        originalIndex: 1,
-      },
+      players[CONFIG.player.gianni],
+      players[CONFIG.player.fabrissazzo],
     ];
 
-    this.battle.enemies.forEach((enemy, index) => {
-      turns.push({
-        isPlayer: false,
-        entity: enemy,
-        originalIndex: index + 2,
-      });
+    this.battle.enemies.forEach((enemy) => {
+      turns.push(enemy);
     });
 
     turns.sort((a, b) => {
-      return a.entity.characterBattleStats.currentVelocity >
-        b.entity.characterBattleStats.currentVelocity
-        ? -1
-        : 1;
+      return a.stats.currentVelocity > b.stats.currentVelocity ? -1 : 1;
     });
 
     return turns;
-  }
-
-  /**
-   * Ricrea i turni considerando eventuali cambiamenti nelle statistiche
-   */
-  recalculateTurns() {
-    const turns = [];
-    for (var i = 0; i < 50; i++) {
-      turns.push(...this.buildTurns());
-    }
-
-    this.turns = turns;
   }
 
   /**
@@ -153,7 +126,7 @@ class BattleManager {
    * difensori saranno i nemici, altrimenti viceversa.
    */
   handleAttackersAndDefenders() {
-    if (this.turns[this.currentTurn].isPlayer) {
+    if (this.isPlayerTurn) {
       this.attackers = [...Object.values(players)];
       this.defenders = [...this.battle.enemies];
     } else {
@@ -188,8 +161,7 @@ class BattleManager {
         height -
         verticalGap;
       const healthPercent =
-        character.characterBattleStats.currentHealth /
-        character.characterBattleStats.health;
+        character.stats.currentHealth / character.stats.health;
 
       let barColor;
       if (healthPercent > CONFIG.battle.healthBar.ranges.high.threshold) {
@@ -217,7 +189,7 @@ class BattleManager {
       ctx.textAlign = "right";
       ctx.fillStyle = CONFIG.typography.textColor;
       ctx.fillText(
-        `${character.characterBattleStats.currentHealth}/${character.characterBattleStats.health}`,
+        `${character.stats.currentHealth}/${character.stats.health}`,
         x + width,
         y - 5
       );
@@ -225,7 +197,7 @@ class BattleManager {
       // Disegno dei pallini della stamina
       const staminaY = y + height + 10; // Posizione Y dei pallini
       let staminaX = x; // Posizione iniziale X dei pallini
-      for (let i = 0; i < character.characterBattleStats.currentStamina; i++) {
+      for (let i = 0; i < character.stats.currentStamina; i++) {
         drawBullet({
           x:
             staminaX +
@@ -302,12 +274,11 @@ class BattleManager {
   }
 
   drawActionSelectionPointer() {
-    const { entity: activeCharacter } = this.turns[this.currentTurn];
     const { padding, marginBottom, choices, width } = CONFIG.battle.actionBox;
 
-    const x = activeCharacter.position.x;
+    const x = this.currentCharacter.position.x;
     const y =
-      activeCharacter.position.y -
+      this.currentCharacter.position.y -
       CONFIG.battle.actionBox.height -
       marginBottom;
 
@@ -347,7 +318,6 @@ class BattleManager {
   }
 
   drawActionBox() {
-    const { entity: activeCharacter } = this.turns[this.currentTurn];
     const {
       padding,
       fontSize,
@@ -361,9 +331,9 @@ class BattleManager {
     const enemyDrift = this.isPlayerTurn
       ? 0
       : width - this.battle.enemies[0].displayedWidth - padding;
-    const x = activeCharacter.position.x - enemyDrift;
+    const x = this.currentCharacter.position.x - enemyDrift;
     const y =
-      activeCharacter.position.y -
+      this.currentCharacter.position.y -
       CONFIG.battle.actionBox.height -
       marginBottom;
 
@@ -431,8 +401,7 @@ class BattleManager {
             } else if (this.phaseIsSpecialAttacksOptions) {
               details = `${options[i].damage}/${options[i].cost}`;
               disabled =
-                options[i].cost >
-                this.currentCharacter.characterBattleStats.currentStamina;
+                options[i].cost > this.currentCharacter.stats.currentStamina;
             } else if (this.phaseIsBackpackOptions) {
               details = `x${options[i].quantity}`;
             }
@@ -627,7 +596,7 @@ class BattleManager {
       ctx.stroke(); // Disegna il contorno
 
       // Disegna l'icona
-      turn.entity.drawIcon(x, y);
+      turn.drawIcon(x, y);
 
       x -= radius * 2 + gap; // Sposta la posizione
     });
@@ -640,6 +609,12 @@ class BattleManager {
     ctx.fillText(turnString, x, y);
   }
 
+  drawStatusEffects() {
+    [...this.attackers, ...this.defenders].forEach((character) => {
+      character.drawStatusEffect();
+    });
+  }
+
   draw() {
     this.battle.background.draw();
     this.drawPlayers();
@@ -647,6 +622,7 @@ class BattleManager {
     this.drawPlayersHealthBar();
     this.drawEnemiesHealthBar();
     this.drawTurns();
+    this.drawStatusEffects();
     this.drawActionBox();
     this.drawPointer();
     this.drawAttack();
@@ -799,15 +775,11 @@ class BattleManager {
       });
     }
     if (this.currentAttack.targetSelf) {
-      for (var i = 0; i < this.attackers.length; i++) {
-        if (i === this.turns[this.currentTurn].originalIndex) {
-          selectableTargets.push(this.attackers[i]);
-        }
-      }
+      selectableTargets.push(this.turns[this.currentTurn]);
     }
     if (this.currentAttack.targetAlly) {
       for (var i = 0; i < this.attackers.length; i++) {
-        if (i !== this.turns[this.currentTurn].originalIndex) {
+        if (this.attackers[i].id !== this.turns[this.currentTurn].id) {
           selectableTargets.push(this.attackers[i]);
         }
       }
@@ -853,7 +825,7 @@ class BattleManager {
       case keyboard.isInteract: {
         if (
           this.currentCharacter.costAttacks[this.actionPointer].cost >
-          this.currentCharacter.characterBattleStats.currentStamina
+          this.currentCharacter.stats.currentStamina
         ) {
           ASSETS.soundEffects.wrong.play();
           return;
@@ -962,7 +934,7 @@ class BattleManager {
   }
 
   get currentCharacter() {
-    return this.turns[this.currentTurn].entity;
+    return this.turns[this.currentTurn];
   }
 
   get currentPhase() {
@@ -1045,7 +1017,6 @@ class BattleManager {
     this.actionPointer = 0;
     this.currentTurn++;
     this.handleAttackersAndDefenders();
-    this.recalculateTurns();
     if (!this.isPlayerTurn) {
       this.handleEnemyTurn();
       return;
@@ -1060,7 +1031,6 @@ class BattleManager {
       this.currentPhase === CONFIG.battle.phases.performAttack &&
       this.attackAnimationEnded
     ) {
-      const { entity: activeCharacter } = this.turns[this.currentTurn];
       let targets = [];
 
       ASSETS.soundEffects.damage.play();
@@ -1079,13 +1049,11 @@ class BattleManager {
       }
 
       if (this.currentAttack.hasCost) {
-        activeCharacter.characterBattleStats.dealStaminaUsage(
-          this.currentAttack.cost
-        );
+        this.currentCharacter.stats.dealStaminaUsage(this.currentAttack.cost);
       }
 
       this.currentAttack.effect({
-        performer: activeCharacter,
+        performer: this.currentCharacter,
         players: Object.values(players),
         targets,
       });
