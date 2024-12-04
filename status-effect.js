@@ -24,7 +24,7 @@ const STATUS_EFFECTS = {
     icon: "",
     name: "Cecità",
     description: "Chi ne è afflitto potrebbe non attaccare",
-    gif: GIFS[GIF_IDS.aura],
+    gif: GIFS[GIF_IDS.dust],
   }),
   debilitation: new StatusEffect({
     id: "debilitation",

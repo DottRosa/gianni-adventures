@@ -25,7 +25,7 @@ const CONFIG = {
   },
   assets: {
     folder: "./assets",
-    attacks: "./assets/attacks",
+    animations: "./assets/animations",
   },
   player: {
     movementFrames: 12,

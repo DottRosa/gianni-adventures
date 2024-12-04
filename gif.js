@@ -19,7 +19,7 @@ class GIF {
     this.driftX = driftX;
     this.driftY = driftY;
 
-    const folder = `${CONFIG.assets.attacks}/${folderName}`;
+    const folder = `${CONFIG.assets.animations}/${folderName}`;
 
     // Caricamento dei frame
     for (let i = 0; i < totalFrames; i++) {
@@ -82,44 +82,50 @@ class GIF {
 }
 
 const GIF_IDS = {
-  heal: "heal",
+  heal: "healing",
   aura: "aura",
-  beast: "beast",
+  dragon: "dragon",
   punch: "punch",
+  dust: "dust",
 };
 
 const GIFS = {
   [GIF_IDS.heal]: new GIF({
-    folderName: "heal",
-    totalFrames: 16,
+    folderName: GIF_IDS.heal,
+    totalFrames: 11,
     width: 50,
     height: 100,
     driftX: 28,
     driftY: 25,
   }),
   [GIF_IDS.aura]: new GIF({
-    folderName: "aura",
+    folderName: GIF_IDS.aura,
     totalFrames: 4,
     width: 100,
     height: 150,
     driftX: 25,
     driftY: 20,
   }),
-  [GIF_IDS.beast]: new GIF({
-    folderName: "beast",
+  [GIF_IDS.dragon]: new GIF({
+    folderName: GIF_IDS.dragon,
     totalFrames: 11,
     width: 400,
     height: 200,
   }),
   [GIF_IDS.punch]: new GIF({
-    folderName: "punch",
+    folderName: GIF_IDS.punch,
     totalFrames: 6,
     width: 200,
     height: 200,
     driftX: 30,
     driftY: 25,
   }),
+  [GIF_IDS.dust]: new GIF({
+    folderName: GIF_IDS.dust,
+    totalFrames: 16,
+    width: 50,
+    height: 50,
+    driftX: 15,
+    driftY: 15,
+  }),
 };
-
-const a = new Image("assets/attacks/dust.gif");
-console.log(a);
