@@ -82,16 +82,30 @@ class GIF {
 }
 
 const GIF_IDS = {
-  heal: "healing",
   aura: "aura",
+  "dark-blood": "dark-blood",
+  healing: "healing",
+  sparkle: "sparkle",
+  blood: "blood",
   dragon: "dragon",
   punch: "punch",
+  sparks: "sparks",
+  "blue-chain": "blue-chain",
   dust: "dust",
+  "purple-aura": "purple-aura",
+  spell: "spell",
+  "blue-electricity": "blue-electricity",
+  explosion: "explosion",
+  slash: "slash",
+  star: "star",
+  "blue-explosion": "blue-explosion",
+  fire: "fire",
+  slice: "slice",
 };
 
 const GIFS = {
-  [GIF_IDS.heal]: new GIF({
-    folderName: GIF_IDS.heal,
+  [GIF_IDS.healing]: new GIF({
+    folderName: GIF_IDS.healing,
     totalFrames: 11,
     width: 50,
     height: 100,

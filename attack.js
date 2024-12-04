@@ -82,7 +82,7 @@ const ATTACKS = {
       description: "Un ceffone inferto con massima violenza",
       targetSelf: true,
       targetAlly: true,
-      gif: GIFS[GIF_IDS.heal],
+      gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
       effect: function ({ performer, targets }) {
         targets.forEach((target) => {
@@ -125,7 +125,7 @@ const ATTACKS = {
       description: "Cura se stesso o un alleato",
       targetSelf: true,
       targetAlly: true,
-      gif: GIFS[GIF_IDS.heal],
+      gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
       effect: function ({ performer, targets }) {
         targets.forEach((target) => {
@@ -137,14 +137,14 @@ const ATTACKS = {
       name: "Cura personale",
       description: "Cura se stesso",
       targetSelf: true,
-      gif: GIFS[GIF_IDS.heal],
+      gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
     }),
     new Attack({
       name: "Polvere negli occhi",
       description: "Lancia della polvere negli occhi. Induce Cecità",
       targetEnemy: true,
-      gif: GIFS[GIF_IDS.heal],
+      gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
       cost: 2,
       effect: function ({ performer, targets }) {
@@ -155,7 +155,7 @@ const ATTACKS = {
       name: "Cura tutti",
       description: "Un pugno veemente, infligge gravi danni",
       targetAllAlliesGroup: true,
-      gif: GIFS[GIF_IDS.heal],
+      gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
       effect: function ({ performer, targets }) {
         targets.forEach((target) => {
