@@ -1,4 +1,6 @@
 class CharacterBattleStats {
+  currentStatusEffect = null;
+
   constructor({
     health = CONFIG.battle.characterStats.health.min,
     stamina = CONFIG.battle.characterStats.stamina.min,
@@ -24,18 +26,13 @@ class CharacterBattleStats {
 
     this.attacks = attacks;
     this.specialAttacks = specialAttacks;
-    this.currentStatusEffect = null;
   }
 
-  dealDamage(damage) {
-    this.currentHealth -= damage;
+  alterHealth(value) {
+    this.currentHealth += value;
     if (this.currentHealth < 0) {
       this.currentHealth = 0;
     }
-  }
-
-  recoverHealth(amount) {
-    this.currentHealth += amount;
     if (this.currentHealth > this.health) {
       this.currentHealth = this.health;
     }
@@ -45,7 +42,23 @@ class CharacterBattleStats {
     this.currentStamina -= usage;
   }
 
+  get hasStatusEffect() {
+    return !!this.currentStatusEffect;
+  }
+
+  applyStatusEffect() {}
+
+  reduceStatusEffectDuration() {
+    this.statusEffectDuration--;
+    if (this.statusEffectDuration === 0) {
+      this.currentStatusEffect = null;
+    }
+  }
+
   setStatusEffect(statusEffect) {
     this.currentStatusEffect = statusEffect;
+    if (statusEffect) {
+      this.statusEffectDuration = statusEffect.duration;
+    }
   }
 }

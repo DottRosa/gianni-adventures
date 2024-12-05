@@ -1012,11 +1012,13 @@ class BattleManager {
    * attivo, attaccanti e difensori
    */
   startNextTurn() {
+    this.handleStatusEffectDuration(); // in questo punto il giocatore attivo è ancora quello del turno precedente
     this.resetCurrentPhase();
     this.targetPointer = 0;
     this.actionPointer = 0;
     this.currentTurn++;
     this.handleAttackersAndDefenders();
+    this.handleStatusEffect(); // qui il giocatore è quello del turno corrente
     if (!this.isPlayerTurn) {
       this.handleEnemyTurn();
       return;
@@ -1052,7 +1054,7 @@ class BattleManager {
         this.currentCharacter.stats.dealStaminaUsage(this.currentAttack.cost);
       }
 
-      this.currentAttack.effect({
+      this.currentAttack.execute({
         performer: this.currentCharacter,
         players: Object.values(players),
         targets,
@@ -1080,6 +1082,18 @@ class BattleManager {
 
     // target selection
     this.setSelectableTargets();
+  }
+
+  handleStatusEffect() {
+    if (this.currentCharacter.stats.hasStatusEffect) {
+      this.currentCharacter.stats.applyStatusEffect();
+    }
+  }
+
+  handleStatusEffectDuration() {
+    if (this.currentCharacter.stats.hasStatusEffect) {
+      this.currentCharacter.stats.reduceStatusEffectDuration();
+    }
   }
 
   /**

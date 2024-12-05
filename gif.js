@@ -125,6 +125,7 @@ const GIFS = {
     totalFrames: 11,
     width: 400,
     height: 200,
+    driftX: 150,
   }),
   [GIF_IDS.punch]: new GIF({
     folderName: GIF_IDS.punch,
