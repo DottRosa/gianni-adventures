@@ -12,7 +12,8 @@ class Attack {
     gif,
     sound,
     cost = 0, // Indica il costo in stamina. Se è zero è un attacco normale, se maggiore è speciale
-    effect,
+    targetEffect,
+    performerEffect,
   }) {
     this.name = name;
     this.description = description;
@@ -26,23 +27,30 @@ class Attack {
     this.gif = gif;
     this.sound = sound;
     this.cost = cost;
-    this.effect = effect;
-    if (!this.effect) {
-      this.effect = function ({ damage, performer, targets, players }) {
-        targets.forEach((target) => {
-          target.stats.alterHealth(damage);
-        });
+    this.targetEffect = targetEffect;
+    if (!this.targetEffect) {
+      this.targetEffect = function ({ healthAlteration, target, index }) {
+        target.stats.alterHealth(healthAlteration);
       };
+    }
+    this.performerEffect = performerEffect;
+    if (!this.performerEffect) {
+      this.performerEffect = function ({ healthAlteration, performer }) {};
     }
   }
 
-  calculateDamage({ performer, targets }) {
-    return this.damage;
+  calculateHealthAlteration({ performer, target }) {
+    return this.damage * -1;
   }
 
-  execute({ performer, targets, players }) {
-    const damage = this.calculateDamage({ performer, targets });
-    this.effect({ damage, performer, targets, players });
+  execute({ performer, targets }) {
+    targets.forEach((target, index) => {
+      const healthAlteration = this.calculateHealthAlteration({
+        performer,
+        target,
+      });
+      this.targetEffect({ healthAlteration, target, index });
+    });
   }
 
   resetAnimation() {
@@ -119,6 +127,10 @@ const ATTACKS = {
       damage: 20,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.alterHealth(healthAlteration);
+      },
+      performerEffect: function ({ healthAlteration, performer }) {},
     }),
     new Attack({
       name: "Pugnazzo ad area",
@@ -136,10 +148,8 @@ const ATTACKS = {
       targetAlly: true,
       gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
-      effect: function ({ performer, targets }) {
-        targets.forEach((target) => {
-          target.stats.alterHealth(20);
-        });
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.alterHealth(20);
       },
     }),
     new Attack({
@@ -148,6 +158,9 @@ const ATTACKS = {
       targetSelf: true,
       gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.alterHealth(20);
+      },
     }),
     new Attack({
       name: "Polvere negli occhi",
@@ -156,20 +169,18 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
       cost: 2,
-      effect: function ({ performer, targets }) {
-        targets[0].stats.setStatusEffect(STATUS_EFFECTS.blindness);
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.setStatusEffect(STATUS_EFFECTS.blindness);
       },
     }),
     new Attack({
       name: "Cura tutti",
-      description: "Un pugno veemente, infligge gravi danni",
+      description: "Cura tutti gli alleati compreso se stesso",
       targetAllAlliesGroup: true,
       gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
-      effect: function ({ performer, targets }) {
-        targets.forEach((target) => {
-          target.stats.alterHealth(20);
-        });
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.alterHealth(20);
       },
     }),
     new Attack({
@@ -181,10 +192,10 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
-      effect: function ({ damage, performer, targets }) {
-        targets.forEach((target) => {
-          target.stats.alterHealth(-1 * damage);
-        });
+      targetEffect: function ({ healthAlteration, target }) {
+        target.stats.alterHealth(healthAlteration);
+      },
+      performerEffect: function ({ healthAlteration, performer }) {
         performer.stats.alterHealth(-20);
       },
     }),
@@ -197,9 +208,8 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
-      effect: function ({ damage, targets }) {
-        targets[0].stats.alterHealth(-1 * damage);
-        targets[1].stats.alterHealth(-1 * damage + 10);
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.alterHealth(healthAlteration + 10 * index);
       },
     }),
     new Attack({
@@ -210,13 +220,8 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       cost: 4,
-      effect: function ({ damage, targets, players }) {
-        targets.forEach((target) => {
-          target.stats.alterHealth(-1 * damage);
-        });
-        players.forEach((player) => {
-          player.stats.alterHealth(-1 * damage);
-        });
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.alterHealth(healthAlteration);
       },
     }),
   ],

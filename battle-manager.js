@@ -1056,7 +1056,6 @@ class BattleManager {
 
       this.currentAttack.execute({
         performer: this.currentCharacter,
-        players: Object.values(players),
         targets,
       });
 
