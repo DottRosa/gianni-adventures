@@ -44,20 +44,58 @@ class StatusEffect {
     this.gif.animate(x, y);
   }
 
-  alterDefense(value) {
+  alterDefense(statsValue) {
     if (STATUS_EFFECT_INFLUENCES.defenseIncrement in this.influence) {
       return this.influence[STATUS_EFFECT_INFLUENCES.defenseIncrement];
     }
-    return value;
+    return statsValue;
   }
 
-  alterAttack(value) {
+  alterAttack(statsValue) {
     if (STATUS_EFFECT_INFLUENCES.attackIncrement in this.influence) {
       return (
-        value + value * this.influence[STATUS_EFFECT_INFLUENCES.attackIncrement]
+        statsValue +
+        statsValue * this.influence[STATUS_EFFECT_INFLUENCES.attackIncrement]
       );
     }
-    return value;
+    return statsValue;
+  }
+
+  /**
+   * La rigenerazione della vita è sempre basata su una percentuale della vita totale del personaggio
+   * @param {number} statsValue il valore della statistica che si occupa della rigenerazione
+   * @param {number} totalHealth la vita massima totale del personaggio
+   * @returns
+   */
+  alterHealthRegeneration(statsValue, totalHealth) {
+    if (STATUS_EFFECT_INFLUENCES.healthRegeneration in this.influence) {
+      return (
+        totalHealth *
+        this.influence[STATUS_EFFECT_INFLUENCES.healthRegeneration]
+      );
+    }
+    if (STATUS_EFFECT_INFLUENCES.healthDegeneration in this.influence) {
+      return (
+        -1 *
+        totalHealth *
+        this.influence[STATUS_EFFECT_INFLUENCES.healthDegeneration]
+      );
+    }
+    return statsValue;
+  }
+
+  /**
+   * La stamina è un valore molto basso e viene consumata poche manciate alla volta,
+   * minimo 1 punto alla volta. Quindi il valore della rigenerazione sarà sempre un numero
+   * intero minore di 10
+   * @param {number} statsValue il valore della statistica che si occupa della rigenerazione
+   * @returns
+   */
+  alterStaminaRegeneration(statsValue) {
+    if (STATUS_EFFECT_INFLUENCES.staminaRegeneration in this.influence) {
+      return this.influence[STATUS_EFFECT_INFLUENCES.staminaRegeneration];
+    }
+    return statsValue;
   }
 
   getDamageVariation({ damage }) {

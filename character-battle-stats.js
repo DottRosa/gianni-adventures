@@ -1,23 +1,32 @@
 class CharacterBattleStats {
   currentStatusEffect = null;
+  statusEffectDuration = 0;
 
   _evasion = 1;
   _precision = 1;
-  /*
-  L'attacco base è 1 e permette di infliggere il danno indicato dall'attacco.
-  Ogni variazione positiva all'attacco ne aumenta il valore. Per esempio un danno del
-  20% aggiuntivo, significa che l'attacco vale 1.2
-  */
+  /**
+   * L'attacco base è 1 e permette di infliggere il danno indicato dall'attacco.
+   * Ogni variazione positiva all'attacco ne aumenta il valore. Per esempio un danno del
+   * 20% aggiuntivo, significa che l'attacco vale 1.2
+   */
   _attack = 1;
-  /*
-  Se la difesa vale 0, il danno subito sarà il 100%, se invece vale 1 allora il danno
-  "parato" equivale al 100%. Ogni alterazione alla difesa aggiunge un valore compreso 
-  tra 0 e 1. Se la difesa vale zero, ai fini dei calcoli del danno viene passato 1, così
-  che la moltiplicazione con il danno restituisca il danno stesso. Stessa cosa se la difesa
-  vale 0.2. Significa che vengono parati il 20% dei danni, cioè danno * 0.8, cioè 1-0.2.
-  */
+  /**
+   * Se la difesa vale 0, il danno subito sarà il 100%, se invece vale 1 allora il danno
+   * "parato" equivale al 100%. Ogni alterazione alla difesa aggiunge un valore compreso
+   * tra 0 e 1. Se la difesa vale zero, ai fini dei calcoli del danno viene passato 1, così
+   * che la moltiplicazione con il danno restituisca il danno stesso. Stessa cosa se la difesa
+   * vale 0.2. Significa che vengono parati il 20% dei danni, cioè danno * 0.8, cioè 1-0.2.
+   */
   _defense = 0;
+  /**
+   * Gestisce la rigenerazione/degenerazione della vita. Rappresenta esattamente il valore che andrà ad impattare
+   * (positivamente o negativamente) sulla vita del personaggio
+   */
   _healthRegeneration = 0;
+  /**
+   * Gestisce la rigenerazione della stamina. Rappresenta esattamente il valore che andrà ad impattare
+   * (positivamente o negativamente) sulla stamina del personaggio
+   */
   _staminaRegeneration = 0;
 
   constructor({
@@ -68,6 +77,25 @@ class CharacterBattleStats {
     return this._attack;
   }
 
+  get healthRegeneration() {
+    if (this.hasStatusEffect) {
+      return this.currentStatusEffect.alterHealthRegeneration(
+        this._healthRegeneration,
+        this.health
+      );
+    }
+    return this._healthRegeneration;
+  }
+
+  get staminaRegeneration() {
+    if (this.hasStatusEffect) {
+      return this.currentStatusEffect.alterStaminaRegeneration(
+        this._staminaRegeneration
+      );
+    }
+    return this._staminaRegeneration;
+  }
+
   alterHealth(value) {
     this.currentHealth = Math.ceil(this.currentHealth + value);
     if (this.currentHealth < 0) {
@@ -97,11 +125,10 @@ class CharacterBattleStats {
   }
 
   applyStatusEffect() {
-    const variation = this.currentStatusEffect.getStatsVariation({
-      health: this.health,
-    });
-    this.alterHealth(variation.health);
-    this.alterStamina(variation.stamina);
+    console.log(this.healthRegeneration);
+
+    this.alterHealth(this.healthRegeneration);
+    this.alterStamina(this.staminaRegeneration);
   }
 
   reduceStatusEffectDuration() {
@@ -115,6 +142,8 @@ class CharacterBattleStats {
     this.currentStatusEffect = statusEffect;
     if (statusEffect) {
       this.statusEffectDuration = statusEffect.duration;
+    } else {
+      this.statusEffectDuration = 0;
     }
   }
 }

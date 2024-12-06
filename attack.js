@@ -110,27 +110,27 @@ const ATTACKS = {
     //     target.stats.alterHealth(20);
     //   },
     // }),
+    new Attack({
+      name: "Grasso di ciccio",
+      description: "Permette ad un alleato di recuperare vita nel tempo",
+      targetAlly: true,
+      gif: GIFS[GIF_IDS.healing],
+      sound: ASSETS.soundEffects.heal,
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.setStatusEffect(STATUS_EFFECTS.poisoned);
+      },
+    }),
     // new Attack({
-    //   name: "Grasso di ciccio",
-    //   description: "Conferisce lo status 'Petto Villoso' ad un alleato.",
+    //   name: "Iron skin",
+    //   description: "Cura il bersaglio di 5 punti e lo rende Ironschinnoso",
     //   targetAlly: true,
     //   gif: GIFS[GIF_IDS.healing],
     //   sound: ASSETS.soundEffects.heal,
     //   targetEffect: function ({ healthAlteration, target, index }) {
     //     target.stats.setStatusEffect(STATUS_EFFECTS.ironSkin);
+    //     target.stats.alterHealth(5);
     //   },
     // }),
-    new Attack({
-      name: "Iron skin",
-      description: "Cura il bersaglio di 5 punti e lo rende Ironschinnoso",
-      targetAlly: true,
-      gif: GIFS[GIF_IDS.healing],
-      sound: ASSETS.soundEffects.heal,
-      targetEffect: function ({ healthAlteration, target, index }) {
-        target.stats.setStatusEffect(STATUS_EFFECTS.ironSkin);
-        target.stats.alterHealth(5);
-      },
-    }),
   ],
   [CONFIG.player.gianni]: [
     new Attack({
@@ -143,14 +143,14 @@ const ATTACKS = {
       sound: ASSETS.soundEffects.arrow,
     }),
     new Attack({
-      name: "Ti metto 2!",
+      name: "Stamina boost",
       description: "Il bersaglio ottiene lo status 'Debilitazione'",
       targetAlly: true,
       damage: 0,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       targetEffect: function ({ healthAlteration, target, index }) {
-        // target.stats.setStatusEffect(STATUS_EFFECTS.debilitation);
+        target.stats.setStatusEffect(STATUS_EFFECTS.staminaBoost);
       },
     }),
     new Attack({
