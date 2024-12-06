@@ -133,15 +133,25 @@ const ATTACKS = {
     }),
   ],
   [NPC_IDS.cozza]: [
+    // new Attack({
+    //   name: "Cura",
+    //   description: "Cura",
+    //   targetSelf: true,
+    //   targetAlly: true,
+    //   gif: GIFS[GIF_IDS.healing],
+    //   sound: ASSETS.soundEffects.heal,
+    //   targetEffect: function ({ healthAlteration, target, index }) {
+    //     target.stats.alterHealth(20);
+    //   },
+    // }),
     new Attack({
-      name: "Cura",
-      description: "Cura",
-      targetSelf: true,
+      name: "Grasso di ciccio",
+      description: "Conferisce lo status 'Petto Villoso' ad un alleato.",
       targetAlly: true,
       gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
       targetEffect: function ({ healthAlteration, target, index }) {
-        target.stats.alterHealth(20);
+        target.stats.setStatusEffect(STATUS_EFFECTS.ironSkin);
       },
     }),
   ],

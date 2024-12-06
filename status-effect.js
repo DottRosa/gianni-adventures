@@ -48,12 +48,20 @@ class StatusEffect {
   getDamageVariation({ damage }) {
     if (STATUS_EFFECT_INFLUENCES.damageReduction in this.influence) {
       const newDamage =
+        damage -
         damage * this.influence[STATUS_EFFECT_INFLUENCES.damageReduction];
       return newDamage - damage;
     }
     if (STATUS_EFFECT_INFLUENCES.damageIncrement in this.influence) {
       const newDamage =
+        damage +
         damage * this.influence[STATUS_EFFECT_INFLUENCES.damageIncrement];
+      return newDamage - damage;
+    }
+    if (STATUS_EFFECT_INFLUENCES.damageResistance in this.influence) {
+      const newDamage =
+        damage -
+        damage * this.influence[STATUS_EFFECT_INFLUENCES.damageResistance];
       return newDamage - damage;
     }
 
@@ -151,7 +159,7 @@ const STATUS_EFFECTS = {
   ironSkin: new StatusEffect({
     id: "ironSkin",
     icon: "",
-    name: "Petto villoso",
+    name: "Petto Villoso",
     description: "Riduce i danni subiti del 20%",
     duration: 2,
     influence: {
