@@ -65,6 +65,31 @@ class StatusEffect {
 
     return 0;
   }
+
+  getStatsVariation({ health }) {
+    const result = {
+      health: 0,
+      stamina: 0,
+    };
+    if (STATUS_EFFECT_INFLUENCES.healthDegeneration in this.influence) {
+      const newHealth =
+        health -
+        health * this.influence[STATUS_EFFECT_INFLUENCES.healthDegeneration];
+      result.health = newHealth - health;
+    }
+    if (STATUS_EFFECT_INFLUENCES.healthRegeneration in this.influence) {
+      const newHealth =
+        health +
+        health * this.influence[STATUS_EFFECT_INFLUENCES.healthRegeneration];
+      result.health = newHealth - health;
+    }
+    if (STATUS_EFFECT_INFLUENCES.staminaRegeneration in this.influence) {
+      result.stamina =
+        this.influence[STATUS_EFFECT_INFLUENCES.staminaRegeneration];
+    }
+
+    return result;
+  }
 }
 
 const STATUS_EFFECTS = {

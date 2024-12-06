@@ -82,14 +82,6 @@ class Attack {
         index,
       });
     });
-
-    // const performerHealthAlteration = this.calculateHealthAlteration({
-    //   character: performer,
-    // });
-    // this.performerEffect({
-    //   healthAlteration: performerHealthAlteration,
-    //   performer,
-    // });
   }
 
   resetAnimation() {
@@ -144,14 +136,24 @@ const ATTACKS = {
     //     target.stats.alterHealth(20);
     //   },
     // }),
+    // new Attack({
+    //   name: "Grasso di ciccio",
+    //   description: "Conferisce lo status 'Petto Villoso' ad un alleato.",
+    //   targetAlly: true,
+    //   gif: GIFS[GIF_IDS.healing],
+    //   sound: ASSETS.soundEffects.heal,
+    //   targetEffect: function ({ healthAlteration, target, index }) {
+    //     target.stats.setStatusEffect(STATUS_EFFECTS.ironSkin);
+    //   },
+    // }),
     new Attack({
-      name: "Grasso di ciccio",
-      description: "Conferisce lo status 'Petto Villoso' ad un alleato.",
+      name: "Rigenerazione",
+      description: "Conferisce lo status 'Rigenerazione' ad un alleato.",
       targetAlly: true,
       gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
       targetEffect: function ({ healthAlteration, target, index }) {
-        target.stats.setStatusEffect(STATUS_EFFECTS.ironSkin);
+        target.stats.setStatusEffect(STATUS_EFFECTS.regeneration);
       },
     }),
   ],

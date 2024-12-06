@@ -29,12 +29,22 @@ class CharacterBattleStats {
   }
 
   alterHealth(value) {
-    this.currentHealth += value;
+    this.currentHealth = Math.ceil(this.currentHealth + value);
     if (this.currentHealth < 0) {
       this.currentHealth = 0;
     }
     if (this.currentHealth > this.health) {
       this.currentHealth = this.health;
+    }
+  }
+
+  alterStamina(value) {
+    this.currentStamina = Math.ceil(this.currentStamina + value);
+    if (this.currentStamina < 0) {
+      this.currentStamina = 0;
+    }
+    if (this.currentStamina > this.stamina) {
+      this.currentStamina = this.stamina;
     }
   }
 
@@ -46,7 +56,13 @@ class CharacterBattleStats {
     return !!this.currentStatusEffect;
   }
 
-  applyStatusEffect() {}
+  applyStatusEffect() {
+    const variation = this.currentStatusEffect.getStatsVariation({
+      health: this.health,
+    });
+    this.alterHealth(variation.health);
+    this.alterStamina(variation.stamina);
+  }
 
   reduceStatusEffectDuration() {
     this.statusEffectDuration--;
