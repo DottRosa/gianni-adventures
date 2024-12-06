@@ -165,6 +165,28 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
     }),
+    new Attack({
+      name: "Ti metto 2!",
+      description: "Il bersaglio ottiene lo status 'Debilitazione'",
+      targetAlly: true,
+      damage: 0,
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.setStatusEffect(STATUS_EFFECTS.debilitation);
+      },
+    }),
+    new Attack({
+      name: "Concentrati Fabris!",
+      description: "Permette a Fabris di diventare 'Concentrato'",
+      targetAlly: true,
+      damage: 0,
+      gif: GIFS[GIF_IDS.punch],
+      sound: ASSETS.soundEffects.arrow,
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.setStatusEffect(STATUS_EFFECTS.concentrated);
+      },
+    }),
   ],
   [CONFIG.player.fabrissazzo]: [
     new Attack({

@@ -46,23 +46,21 @@ class StatusEffect {
   }
 
   getDamageVariation({ damage }) {
-    if (STATUS_EFFECT_INFLUENCES.damageReduction in this.influence) {
-      const newDamage =
-        damage -
-        damage * this.influence[STATUS_EFFECT_INFLUENCES.damageReduction];
-      return newDamage - damage;
-    }
-    if (STATUS_EFFECT_INFLUENCES.damageIncrement in this.influence) {
-      const newDamage =
-        damage +
-        damage * this.influence[STATUS_EFFECT_INFLUENCES.damageIncrement];
-      return newDamage - damage;
-    }
-    if (STATUS_EFFECT_INFLUENCES.damageResistance in this.influence) {
-      const newDamage =
-        damage -
-        damage * this.influence[STATUS_EFFECT_INFLUENCES.damageResistance];
-      return newDamage - damage;
+    const damageEffects = [
+      STATUS_EFFECT_INFLUENCES.damageReduction,
+      STATUS_EFFECT_INFLUENCES.damageIncrement,
+      STATUS_EFFECT_INFLUENCES.damageResistance,
+    ];
+
+    for (const effect of damageEffects) {
+      if (STATUS_EFFECT_INFLUENCES[effect] in this.influence) {
+        const influenceValue = this.influence[STATUS_EFFECT_INFLUENCES[effect]];
+        const newDamage =
+          effect === "damageIncrement"
+            ? damage + damage * influenceValue
+            : damage - damage * influenceValue;
+        return newDamage - damage;
+      }
     }
 
     return 0;
