@@ -1,6 +1,7 @@
 const STATUS_EFFECT_INFLUENCES = {
   // Modifiche al danno
-  damageReduction: "damageReduction", // Riduzione percentuale del danno subito
+  damageResistance: "damageResistance", // Riduzione percentuale del danno subito
+  damageReduction: "damageReduction", // Riduzione percentuale del danno inflitto
   damageIncrement: "damageIncrement", // Incremento percentuale del danno inflitto
 
   // Probabilità e azioni
@@ -36,12 +37,27 @@ class StatusEffect {
     if (!gif) {
       this.gif = GIFS[GIF_IDS.aura];
     }
-    this.influece = influence;
+    this.influence = influence;
     this.duration = duration;
   }
 
   draw(x, y) {
     this.gif.animate(x, y);
+  }
+
+  getDamageVariation({ damage }) {
+    if (STATUS_EFFECT_INFLUENCES.damageReduction in this.influence) {
+      const newDamage =
+        damage * this.influence[STATUS_EFFECT_INFLUENCES.damageReduction];
+      return newDamage - damage;
+    }
+    if (STATUS_EFFECT_INFLUENCES.damageIncrement in this.influence) {
+      const newDamage =
+        damage * this.influence[STATUS_EFFECT_INFLUENCES.damageIncrement];
+      return newDamage - damage;
+    }
+
+    return 0;
   }
 }
 
@@ -129,6 +145,17 @@ const STATUS_EFFECTS = {
     duration: 2,
     influence: {
       [STATUS_EFFECT_INFLUENCES.evasionChance]: 0.2, // Incrementa del 20% la probabilità di schivata
+    },
+  }),
+
+  ironSkin: new StatusEffect({
+    id: "ironSkin",
+    icon: "",
+    name: "Petto villoso",
+    description: "Riduce i danni subiti del 20%",
+    duration: 2,
+    influence: {
+      [STATUS_EFFECT_INFLUENCES.damageResistance]: 0.2,
     },
   }),
 };

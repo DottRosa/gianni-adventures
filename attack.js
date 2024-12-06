@@ -39,18 +39,57 @@ class Attack {
     }
   }
 
-  calculateHealthAlteration({ performer, target }) {
-    return this.damage * -1;
+  calculateHealthAlteration({ target, performer }) {
+    if (!target.stats.hasStatusEffect && !performer.stats.hasStatusEffect) {
+      return this.damage * -1;
+    }
+    let damageVariationByPerformer = 0;
+    let damageVariationByTarget = 0;
+
+    if (performer.stats.hasStatusEffect) {
+      damageVariationByPerformer =
+        performer.stats.currentStatusEffect.getDamageVariation({
+          damage: this.damage,
+        });
+    }
+
+    if (target.stats.hasStatusEffect) {
+      damageVariationByTarget =
+        target.stats.currentStatusEffect.getDamageVariation({
+          damage: this.damage,
+        });
+    }
+
+    const finalDamage =
+      this.damage + damageVariationByPerformer + damageVariationByTarget;
+
+    if (finalDamage < 0) {
+      return 0;
+    }
+    return finalDamage * -1;
   }
 
   execute({ performer, targets }) {
     targets.forEach((target, index) => {
-      const healthAlteration = this.calculateHealthAlteration({
-        performer,
+      const targetHealthAlteration = this.calculateHealthAlteration({
         target,
+        performer,
       });
-      this.targetEffect({ healthAlteration, target, index });
+
+      this.targetEffect({
+        healthAlteration: targetHealthAlteration,
+        target,
+        index,
+      });
     });
+
+    // const performerHealthAlteration = this.calculateHealthAlteration({
+    //   character: performer,
+    // });
+    // this.performerEffect({
+    //   healthAlteration: performerHealthAlteration,
+    //   performer,
+    // });
   }
 
   resetAnimation() {
@@ -101,10 +140,8 @@ const ATTACKS = {
       targetAlly: true,
       gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
-      effect: function ({ performer, targets }) {
-        targets.forEach((target) => {
-          target.stats.alterHealth(20);
-        });
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.alterHealth(20);
       },
     }),
   ],
@@ -171,6 +208,17 @@ const ATTACKS = {
       cost: 2,
       targetEffect: function ({ healthAlteration, target, index }) {
         target.stats.setStatusEffect(STATUS_EFFECTS.blindness);
+      },
+    }),
+    new Attack({
+      name: "Debilitazione",
+      description: "Riduce i danni inferti dal tuo avversario",
+      targetEnemy: true,
+      gif: GIFS[GIF_IDS.healing],
+      sound: ASSETS.soundEffects.heal,
+      cost: 1,
+      targetEffect: function ({ healthAlteration, target, index }) {
+        target.stats.setStatusEffect(STATUS_EFFECTS.debilitation);
       },
     }),
     new Attack({
