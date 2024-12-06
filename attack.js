@@ -39,39 +39,14 @@ class Attack {
     }
   }
 
-  calculateHealthAlteration({ target, performer }) {
-    if (!target.stats.hasStatusEffect && !performer.stats.hasStatusEffect) {
-      return this.damage * -1;
-    }
-    let damageVariationByPerformer = 0;
-    let damageVariationByTarget = 0;
-
-    if (performer.stats.hasStatusEffect) {
-      damageVariationByPerformer =
-        performer.stats.currentStatusEffect.getDamageVariation({
-          damage: this.damage,
-        });
-    }
-
-    if (target.stats.hasStatusEffect) {
-      damageVariationByTarget =
-        target.stats.currentStatusEffect.getDamageVariation({
-          damage: this.damage,
-        });
-    }
-
-    const finalDamage =
-      this.damage + damageVariationByPerformer + damageVariationByTarget;
-
-    if (finalDamage < 0) {
-      return 0;
-    }
-    return finalDamage * -1;
+  calculateDamage({ performer, target }) {
+    console.log(this.damage, performer.stats.attack, target.stats.defense);
+    return -1 * this.damage * performer.stats.attack * target.stats.defense;
   }
 
   execute({ performer, targets }) {
     targets.forEach((target, index) => {
-      const targetHealthAlteration = this.calculateHealthAlteration({
+      const targetHealthAlteration = this.calculateDamage({
         target,
         performer,
       });
@@ -128,7 +103,6 @@ const ATTACKS = {
     // new Attack({
     //   name: "Cura",
     //   description: "Cura",
-    //   targetSelf: true,
     //   targetAlly: true,
     //   gif: GIFS[GIF_IDS.healing],
     //   sound: ASSETS.soundEffects.heal,
@@ -147,13 +121,14 @@ const ATTACKS = {
     //   },
     // }),
     new Attack({
-      name: "Rigenerazione",
-      description: "Conferisce lo status 'Rigenerazione' ad un alleato.",
+      name: "Iron skin",
+      description: "Cura il bersaglio di 5 punti e lo rende Ironschinnoso",
       targetAlly: true,
       gif: GIFS[GIF_IDS.healing],
       sound: ASSETS.soundEffects.heal,
       targetEffect: function ({ healthAlteration, target, index }) {
-        target.stats.setStatusEffect(STATUS_EFFECTS.regeneration);
+        target.stats.setStatusEffect(STATUS_EFFECTS.ironSkin);
+        target.stats.alterHealth(5);
       },
     }),
   ],
@@ -175,7 +150,7 @@ const ATTACKS = {
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       targetEffect: function ({ healthAlteration, target, index }) {
-        target.stats.setStatusEffect(STATUS_EFFECTS.debilitation);
+        // target.stats.setStatusEffect(STATUS_EFFECTS.debilitation);
       },
     }),
     new Attack({

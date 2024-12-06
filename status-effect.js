@@ -1,8 +1,7 @@
 const STATUS_EFFECT_INFLUENCES = {
   // Modifiche al danno
-  damageResistance: "damageResistance", // Riduzione percentuale del danno subito
-  damageReduction: "damageReduction", // Riduzione percentuale del danno inflitto
-  damageIncrement: "damageIncrement", // Incremento percentuale del danno inflitto
+  defenseIncrement: "defenseIncrement", // Riduzione percentuale del danno subito
+  attackIncrement: "attackIncrement", // Incremento percentuale del danno inflitto
 
   // Probabilità e azioni
   actionProbability: "actionProbability", // Probabilità di eseguire un'azione
@@ -45,18 +44,33 @@ class StatusEffect {
     this.gif.animate(x, y);
   }
 
+  alterDefense(value) {
+    if (STATUS_EFFECT_INFLUENCES.defenseIncrement in this.influence) {
+      return this.influence[STATUS_EFFECT_INFLUENCES.defenseIncrement];
+    }
+    return value;
+  }
+
+  alterAttack(value) {
+    if (STATUS_EFFECT_INFLUENCES.attackIncrement in this.influence) {
+      return (
+        value + value * this.influence[STATUS_EFFECT_INFLUENCES.attackIncrement]
+      );
+    }
+    return value;
+  }
+
   getDamageVariation({ damage }) {
     const damageEffects = [
-      STATUS_EFFECT_INFLUENCES.damageReduction,
-      STATUS_EFFECT_INFLUENCES.damageIncrement,
-      STATUS_EFFECT_INFLUENCES.damageResistance,
+      STATUS_EFFECT_INFLUENCES.attackIncrement,
+      STATUS_EFFECT_INFLUENCES.defenseIncrement,
     ];
 
     for (const effect of damageEffects) {
       if (STATUS_EFFECT_INFLUENCES[effect] in this.influence) {
         const influenceValue = this.influence[STATUS_EFFECT_INFLUENCES[effect]];
         const newDamage =
-          effect === "damageIncrement"
+          effect === "attackIncrement"
             ? damage + damage * influenceValue
             : damage - damage * influenceValue;
         return newDamage - damage;
@@ -105,16 +119,6 @@ const STATUS_EFFECTS = {
       [STATUS_EFFECT_INFLUENCES.actionProbability]: 0.5, // 50% di probabilità di attaccare
     },
   }),
-  debilitation: new StatusEffect({
-    id: "debilitation",
-    icon: "",
-    name: "Debilitazione",
-    description: "Il danno del prossimo attacco viene ridotto del 50%",
-    duration: 1,
-    influence: {
-      [STATUS_EFFECT_INFLUENCES.damageReduction]: 0.5, // Riduzione del danno del 50%
-    },
-  }),
   poisoned: new StatusEffect({
     id: "poisoned",
     icon: "",
@@ -144,7 +148,7 @@ const STATUS_EFFECTS = {
     description: "Ogni attacco infligge il 10% di danno in più",
     duration: 3,
     influence: {
-      [STATUS_EFFECT_INFLUENCES.damageIncrement]: 0.1, // Incremento del danno del 10%
+      [STATUS_EFFECT_INFLUENCES.attackIncrement]: 0.1, // Incremento del danno del 10%
     },
   }),
   regeneration: new StatusEffect({
@@ -186,7 +190,7 @@ const STATUS_EFFECTS = {
     description: "Riduce i danni subiti del 20%",
     duration: 2,
     influence: {
-      [STATUS_EFFECT_INFLUENCES.damageResistance]: 0.2,
+      [STATUS_EFFECT_INFLUENCES.defenseIncrement]: 0.5,
     },
   }),
 };
