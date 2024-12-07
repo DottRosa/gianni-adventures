@@ -144,88 +144,117 @@ class BattleManager {
     this.battle.enemies.forEach((e) => e.drawFixed());
   }
 
-  drawHealth(characters, isEnemy = false) {
-    let verticalGap = CONFIG.battle.healthBar.verticalGap;
-    const width = CONFIG.battle.healthBar.width;
-    const height = CONFIG.battle.healthBar.height;
+  drawCharacterCard(characters, isEnemy = false) {
+    const {
+      horizontalGap,
+      width,
+      height,
+      areaPaddingX,
+      statBarGap,
+      ranges,
+      statsVerticalGap,
+    } = CONFIG.battle.healthBar;
 
-    let x = CONFIG.battle.arenaPaddingX;
+    let x = areaPaddingX;
+
     if (isEnemy) {
-      x = CONFIG.tile.canvasWidth - CONFIG.battle.arenaPaddingX - width;
+      x = CONFIG.tile.canvasWidth - areaPaddingX - width;
     }
 
-    characters.forEach((character) => {
-      let y =
-        CONFIG.tile.canvasHeight -
-        CONFIG.battle.arenaPaddingY -
-        height -
-        verticalGap;
-      const healthPercent =
-        character.stats.currentHealth / character.stats.health;
+    let y = CONFIG.tile.canvasHeight - CONFIG.battle.arenaPaddingY - 150;
 
+    function drawStatBar(x, y, character, type = "health") {
+      let statLabel = "HP";
+      if (type === "stamina") {
+        statLabel = "ST";
+      }
+      // Testo della statistica
+      ctx.fillStyle = "black";
+      ctx.textAlign = CONFIG.battle.healthBar.textAlign;
+      ctx.fillText(statLabel, x, y);
+
+      let percent = character.stats.currentHealth / character.stats.health;
+      if (type === "stamina") {
+        percent = character.stats.currentStamina / character.stats.stamina;
+      }
+      // Calcolo il colore della barra in base alla vita corrente
       let barColor;
-      if (healthPercent > CONFIG.battle.healthBar.ranges.high.threshold) {
-        barColor = CONFIG.battle.healthBar.ranges.high.color;
-      } else if (
-        healthPercent > CONFIG.battle.healthBar.ranges.medium.threshold
-      ) {
-        barColor = CONFIG.battle.healthBar.ranges.medium.color;
+
+      if (type === "health") {
+        if (percent > ranges.high.threshold) {
+          barColor = ranges.high.color;
+        } else if (percent > ranges.medium.threshold) {
+          barColor = ranges.medium.color;
+        } else {
+          barColor = ranges.low.color;
+        }
       } else {
-        barColor = CONFIG.battle.healthBar.ranges.low.color;
+        barColor = CONFIG.battle.healthBar.stamina.color;
       }
 
-      ctx.fillStyle = CONFIG.typography.textColor;
-      ctx.font = `${CONFIG.battle.healthBar.fontSize}px ${CONFIG.typography.fontFamily}`;
-      ctx.textAlign = CONFIG.battle.healthBar.textAlign;
-      ctx.fillText(character.name, x, y - 5);
+      // Disegno la barra della vita
+      const barX = x + statBarGap;
+      const barY = y - height;
 
       ctx.strokeStyle = CONFIG.battle.healthBar.border.color;
       ctx.lineWidth = CONFIG.battle.healthBar.border.width;
-      ctx.strokeRect(x, y, width, height);
-
+      ctx.strokeRect(barX, barY, width, height);
       ctx.fillStyle = barColor;
-      ctx.fillRect(x, y, width * healthPercent, height);
+      ctx.fillRect(barX, barY, width * percent, height);
 
+      // Testo della vita
       ctx.textAlign = "right";
       ctx.fillStyle = CONFIG.typography.textColor;
-      ctx.fillText(
-        `${character.stats.currentHealth}/${character.stats.health}`,
-        x + width,
-        y - 5
-      );
+      ctx.fillStyle = "white"; // Colore del riempimento del testo
+      ctx.strokeStyle = "black"; // Colore del contorno
+      ctx.lineWidth = 3; // Spessore del contorno
 
-      // Disegno dei pallini della stamina
-      const staminaY = y + height + 10; // Posizione Y dei pallini
-      let staminaX = x; // Posizione iniziale X dei pallini
-      for (let i = 0; i < character.stats.currentStamina; i++) {
-        drawBullet({
-          x:
-            staminaX +
-            CONFIG.battle.healthBar.stamina.radius +
-            (CONFIG.battle.healthBar.stamina.radius * 2 +
-              CONFIG.battle.healthBar.stamina.gap) *
-              i,
-          y: staminaY,
-          radius: CONFIG.battle.healthBar.stamina.radius,
-          startAngle: 0,
-          endAngle: Math.PI * 2,
-          color: CONFIG.battle.healthBar.stamina.color,
-        });
+      const textX = barX + width;
+      const textY = y - height / 2 - CONFIG.battle.healthBar.fontSize / 4;
+
+      const statText =
+        type === "health"
+          ? `${character.stats.currentHealth}/${character.stats.health}`
+          : `${character.stats.currentStamina}/${character.stats.stamina}`;
+
+      ctx.strokeText(statText, textX, textY);
+      ctx.fillText(statText, textX, textY);
+    }
+
+    function drawStatusEffect(x, y, character) {
+      if (character.stats.hasStatusEffect) {
+        ctx.fillStyle = CONFIG.typography.textColor;
+        ctx.font = `${CONFIG.battle.healthBar.fontSize}px ${CONFIG.typography.fontFamily}`;
+        ctx.textAlign = CONFIG.battle.healthBar.textAlign;
+        ctx.fillText(character.stats.currentStatusEffect.name, x, y);
       }
+    }
 
-      verticalGap -= 50;
+    characters.forEach((character) => {
+      ctx.fillStyle = CONFIG.typography.textColor;
+      ctx.font = `${CONFIG.battle.healthBar.fontSize}px ${CONFIG.typography.fontFamily}`;
+      ctx.textAlign = CONFIG.battle.healthBar.textAlign;
+
+      ctx.fillText(character.name, x, y);
+
+      drawStatBar(x, y + statsVerticalGap, character, "health");
+      drawStatBar(x, y + statsVerticalGap * 2, character, "stamina");
+      drawStatusEffect(x, y + statsVerticalGap * 3, character);
+
+      x = isEnemy ? x - horizontalGap : x + horizontalGap;
     });
   }
 
   drawPlayersHealthBar() {
-    this.drawHealth([
+    this.drawCharacterCard([
       players[CONFIG.player.gianni],
       players[CONFIG.player.fabrissazzo],
     ]);
   }
 
   drawEnemiesHealthBar() {
-    this.drawHealth(this.battle.enemies, true);
+    // Non posso fare qui il ciclo perchè i blocchi vanno disegnati uno in parte all'altro
+    this.drawCharacterCard(this.battle.enemies, true);
   }
 
   drawTargetPointer() {
@@ -1072,15 +1101,18 @@ class BattleManager {
    */
   handleEnemyTurn() {
     // attack selection
-    const attack =
-      this.currentCharacter.attacks[
-        getRandomIndex(this.currentCharacter.attacks)
-      ];
+    if (this.currentCharacter.attacks.length) {
+      const attack =
+        this.currentCharacter.attacks[
+          getRandomIndex(this.currentCharacter.attacks)
+        ];
 
-    this.currentAttack = attack;
-
-    // target selection
-    this.setSelectableTargets();
+      this.currentAttack = attack;
+      // target selection
+      this.setSelectableTargets();
+    } else {
+      this.startNextTurn();
+    }
   }
 
   handleStatusEffect() {

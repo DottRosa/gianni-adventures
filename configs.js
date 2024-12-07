@@ -108,11 +108,15 @@ const CONFIG = {
       },
     },
     healthBar: {
-      get verticalGap() {
-        return CONFIG.tile.tileDim;
+      get horizontalGap() {
+        // return CONFIG.tile.tileDim;
+        return 150;
       },
-      width: 200,
+      areaPaddingX: 50,
+      width: 100,
       height: 10,
+      statBarGap: 25, // distanza tra la statistica, tipo HP, e la relativa barra
+      statsVerticalGap: 25, // distanza verticale tra le varie righe di statistiche
       ranges: {
         high: {
           threshold: 0.5,
@@ -127,7 +131,7 @@ const CONFIG = {
           color: "red",
         },
       },
-      fontSize: 14,
+      fontSize: 12,
       textAlign: "left",
       border: {
         color: "black",
@@ -229,6 +233,7 @@ const MAP_OBJECT_IDS = {
 const NPC_IDS = {
   furlanetto: "furlanetto",
   cozza: "cozza",
+  tumus: "tumus",
 };
 
 const canvas = document.querySelector("canvas");
