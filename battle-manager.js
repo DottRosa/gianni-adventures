@@ -158,7 +158,7 @@ class BattleManager {
     let x = areaPaddingX;
 
     if (isEnemy) {
-      x = CONFIG.tile.canvasWidth - areaPaddingX - width;
+      x = CONFIG.tile.canvasWidth - areaPaddingX / 2 - horizontalGap * 3;
     }
 
     let y = CONFIG.tile.canvasHeight - CONFIG.battle.arenaPaddingY - 150;
@@ -239,9 +239,9 @@ class BattleManager {
 
       drawStatBar(x, y + statsVerticalGap, character, "health");
       drawStatBar(x, y + statsVerticalGap * 2, character, "stamina");
-      drawStatusEffect(x, y + statsVerticalGap * 3, character);
+      drawStatusEffect(x + statBarGap, y + statsVerticalGap * 3, character);
 
-      x = isEnemy ? x - horizontalGap : x + horizontalGap;
+      x += horizontalGap;
     });
   }
 
