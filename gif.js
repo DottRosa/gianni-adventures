@@ -29,41 +29,18 @@ class GIF {
     }
   }
 
-  animate(x, y, propagations = []) {
+  animate(positions = []) {
     const now = Date.now();
 
-    if (!propagations.length) {
+    positions.forEach((position) => {
       ctx.drawImage(
         this.frames[this.currentFrame],
-        x - this.width / 2 + this.driftX,
-        y - this.height / 2 + this.driftY,
+        position.x - this.width / 2 + this.driftX,
+        position.y - this.height / 2 + this.driftY,
         this.width,
         this.height
       );
-    } else {
-      propagations.forEach((propagation) => {
-        ctx.drawImage(
-          this.frames[this.currentFrame],
-          propagation.startX - this.width / 2 + this.driftX,
-          propagation.startY - this.height / 2 + this.driftY,
-          this.width,
-          this.height
-        );
-
-        for (var i = 0; i < propagation.quantity; i++) {
-          ctx.drawImage(
-            this.frames[this.currentFrame],
-            propagation.startX -
-              this.width / 2 +
-              this.driftX +
-              propagation.amount,
-            propagation.startY - this.height / 2 + this.driftY,
-            this.width,
-            this.height
-          );
-        }
-      });
-    }
+    });
 
     // Avanza al frame successivo
     if (now > this.cooldown) {

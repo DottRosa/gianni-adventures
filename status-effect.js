@@ -160,7 +160,7 @@ const STATUS_EFFECTS = {
   poisoned: new StatusEffect({
     id: "poisoned",
     icon: "",
-    name: "Avvelenamento",
+    name: "Avvelenato",
     description: "Perde il 5% della vita totale ogni turno",
     duration: 5,
     influence: {

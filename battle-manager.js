@@ -552,35 +552,16 @@ class BattleManager {
       return;
     }
 
-    const target = this.selectableTargets[this.targetPointer];
+    const targets = this.getTargets().map((target) => {
+      return {
+        x: target.position.x,
+        y: target.position.y,
+      };
+    });
 
-    const propagations = [];
-    const attackersPropagation = {
-      quantity: this.attackers.length - 1,
-      amount: CONFIG.battle.gapBetweenCharacters,
-      startX: this.attackers[0].position.x,
-      startY: this.attackers[0].position.y,
-    };
-    const defendersPropagation = {
-      quantity: this.defenders.length - 1,
-      amount: CONFIG.battle.gapBetweenCharacters,
-      startX: this.defenders[0].position.x,
-      startY: this.defenders[0].position.y,
-    };
+    console.log(targets);
 
-    if (this.currentAttack.targetAll) {
-      propagations.push(attackersPropagation, defendersPropagation);
-    } else if (this.currentAttack.targetAllAlliesGroup) {
-      propagations.push(attackersPropagation);
-    } else if (this.currentAttack.targetAllEnemies) {
-      propagations.push(defendersPropagation);
-    }
-
-    this.currentAttack.animate(
-      target.position.x,
-      target.position.y,
-      propagations
-    );
+    this.currentAttack.animate(targets);
 
     if (this.currentAttack.animationIsFinished()) {
       this.currentFrame = 0;
@@ -1062,26 +1043,9 @@ class BattleManager {
       this.currentPhase === CONFIG.battle.phases.performAttack &&
       this.attackAnimationEnded
     ) {
-      let targets = [];
-
       ASSETS.soundEffects.damage.play();
 
-      if (this.currentAttack.targetAll) {
-        targets.push(...this.attackers);
-        targets.push(...this.defenders);
-      } else if (this.currentAttack.targetAllEnemies) {
-        targets = this.defenders;
-      } else if (this.currentAttack.targetAllAlliesGroup) {
-        targets = this.attackers;
-      } else {
-        // targetEnemy, targetSelf, targetAlly
-        const targetPlayer = this.selectableTargets[this.targetPointer];
-        targets = [targetPlayer];
-      }
-
-      if (this.currentAttack.hasCost) {
-        this.currentCharacter.stats.dealStaminaUsage(this.currentAttack.cost);
-      }
+      const targets = this.getTargets();
 
       this.currentAttack.execute({
         performer: this.currentCharacter,
@@ -1125,6 +1089,25 @@ class BattleManager {
     if (this.currentCharacter.stats.hasStatusEffect) {
       this.currentCharacter.stats.reduceStatusEffectDuration();
     }
+  }
+
+  getTargets() {
+    let targets = [];
+
+    if (this.currentAttack.targetAll) {
+      targets.push(...this.attackers);
+      targets.push(...this.defenders);
+    } else if (this.currentAttack.targetAllEnemies) {
+      targets = this.defenders;
+    } else if (this.currentAttack.targetAllAlliesGroup) {
+      targets = this.attackers;
+    } else {
+      // targetEnemy, targetSelf, targetAlly
+      const targetPlayer = this.selectableTargets[this.targetPointer];
+      targets = [targetPlayer];
+    }
+
+    return targets;
   }
 
   /**

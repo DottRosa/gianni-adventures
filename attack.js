@@ -63,11 +63,11 @@ class Attack {
     this.gif.reset();
   }
 
-  animate(x, y, propagations = []) {
+  animate(positions = []) {
     if (this.sound) {
       this.sound.play();
     }
-    this.gif.animate(x, y, propagations);
+    this.gif.animate(positions);
   }
 
   animationIsFinished() {
