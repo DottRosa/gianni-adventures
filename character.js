@@ -18,6 +18,10 @@ class Character extends Sprite {
     return this.attacks.filter((a) => a.hasCost);
   }
 
+  get isDefeated() {
+    return this.stats.defeated;
+  }
+
   drawStatusEffect() {
     const status = this.stats.currentStatusEffect;
     if (status) {

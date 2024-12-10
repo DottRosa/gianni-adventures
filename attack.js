@@ -171,7 +171,7 @@ const ATTACKS = {
       name: "Ceffone",
       description: "Un ceffone inferto con massima violenza",
       targetEnemy: true,
-      damage: 20,
+      damage: 200,
       gif: GIFS[GIF_IDS.punch],
       sound: ASSETS.soundEffects.arrow,
       targetEffect: function ({ healthAlteration, target, index }) {

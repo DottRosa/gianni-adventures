@@ -1,6 +1,7 @@
 class CharacterBattleStats {
   currentStatusEffect = null;
   statusEffectDuration = 0;
+  defeated = false;
 
   _evasion = 1;
   _precision = 1;
@@ -100,6 +101,8 @@ class CharacterBattleStats {
     this.currentHealth = Math.ceil(this.currentHealth + value);
     if (this.currentHealth < 0) {
       this.currentHealth = 0;
+      this.defeated = true;
+      this.currentStatusEffect = null;
     }
     if (this.currentHealth > this.health) {
       this.currentHealth = this.health;

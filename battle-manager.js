@@ -43,6 +43,8 @@ class BattleManager {
   // I difensori del turno
   defenders = [];
 
+  battleEnd = false;
+
   constructor(battle) {
     this.battle = battle;
   }
@@ -127,7 +129,7 @@ class BattleManager {
 
   drawCharacters() {
     [...this.attackers, ...this.defenders].forEach((character) => {
-      character.drawFixed();
+      character.drawFixed(character.isDefeated);
     });
   }
 
@@ -267,9 +269,9 @@ class BattleManager {
       ctx.stroke();
     };
 
-    const targets = this.getTargets();
+    // const targets = this.getTargets();
 
-    targets.forEach((target) => {
+    this.getTargets().forEach((target) => {
       drawCircle(target.position.x, startY);
     });
   }
@@ -745,34 +747,40 @@ class BattleManager {
   setSelectableTargets() {
     const selectableTargets = [];
     if (this.currentAttack.targetAll) {
-      this.attackers.forEach((a) => {
-        selectableTargets.push(a);
-      });
-      this.defenders.forEach((d) => {
-        selectableTargets.push(d);
-      });
+      [...this.attackers, ...this.defenders]
+        .filter((character) => !character.isDefeated)
+        .forEach((character) => {
+          selectableTargets.push(character);
+        });
     }
 
     if (this.currentAttack.targetAllAlliesGroup) {
-      this.attackers.forEach((a) => {
-        selectableTargets.push(a);
-      });
+      this.attackers
+        .filter((character) => !character.isDefeated)
+        .forEach((character) => {
+          selectableTargets.push(character);
+        });
     }
     if (this.currentAttack.targetSelf) {
       selectableTargets.push(this.turns[this.currentTurn]);
     }
     if (this.currentAttack.targetAlly) {
       for (var i = 0; i < this.attackers.length; i++) {
-        if (this.attackers[i].id !== this.turns[this.currentTurn].id) {
+        if (
+          this.attackers[i].id !== this.turns[this.currentTurn].id &&
+          !this.attackers[i].isDefeated
+        ) {
           selectableTargets.push(this.attackers[i]);
         }
       }
     }
 
     if (this.currentAttack.targetEnemy || this.currentAttack.targetAllEnemies) {
-      this.defenders.forEach((a) => {
-        selectableTargets.push(a);
-      });
+      this.defenders
+        .filter((character) => !character.isDefeated)
+        .forEach((character) => {
+          selectableTargets.push(character);
+        });
     }
 
     this.selectableTargets = selectableTargets;
@@ -874,6 +882,7 @@ class BattleManager {
       }
     }
     if (this.isPlayerTurn) {
+      ASSETS.soundEffects.cancel.pause();
       switch (true) {
         case keyboard.isLeft: {
           this.moveTargetPointerLeft();
@@ -994,6 +1003,22 @@ class BattleManager {
     }
   }
 
+  endBattle() {
+    const enemiesDefeated = this.battle.enemies.every(
+      (enemy) => enemy.isDefeated
+    );
+    if (enemiesDefeated) {
+      battleEnd = true;
+    }
+
+    const playersDefeated = Object.keys(players).every(
+      (key) => players[key].isDefeated
+    );
+    if (enemiesDefeated || playersDefeated) {
+      battleEnd = true;
+    }
+  }
+
   /**
    * Prepara il necessario all'inizio di un nuovo turno, calcolando il giocatore
    * attivo, attaccanti e difensori
@@ -1005,6 +1030,10 @@ class BattleManager {
     this.actionPointer = 0;
     this.currentTurn++;
     this.handleAttackersAndDefenders();
+    if (this.currentCharacter.isDefeated) {
+      this.startNextTurn();
+      return;
+    }
     this.handleStatusEffect(); // qui il giocatore è quello del turno corrente
     if (!this.isPlayerTurn) {
       this.handleEnemyTurn();
@@ -1051,6 +1080,21 @@ class BattleManager {
       this.currentAttack = attack;
       // target selection
       this.setSelectableTargets();
+      let tries = 5;
+      while (tries >= 0) {
+        if (this.selectableTargets.length) {
+          break;
+        }
+        this.currentAttack =
+          this.currentCharacter.attacks[
+            getRandomIndex(this.currentCharacter.attacks)
+          ];
+        this.setSelectableTargets();
+        tries--;
+      }
+      if (!this.selectableTargets.length) {
+        this.startNextTurn();
+      }
     } else {
       this.startNextTurn();
     }
@@ -1072,16 +1116,20 @@ class BattleManager {
     let targets = [];
 
     if (this.currentAttack.targetAll) {
-      targets.push(...this.attackers);
-      targets.push(...this.defenders);
+      // targets.push(...this.attackers);
+      // targets.push(...this.defenders);
+      return this.selectableTargets;
     } else if (this.currentAttack.targetAllEnemies) {
-      targets = this.defenders;
+      // targets = this.defenders;
+      return this.selectableTargets;
     } else if (this.currentAttack.targetAllAlliesGroup) {
-      targets = this.attackers;
+      // targets = this.attackers;
+      return this.selectableTargets;
     } else {
       // targetEnemy, targetSelf, targetAlly
       const targetPlayer = this.selectableTargets[this.targetPointer];
-      targets = [targetPlayer];
+      // targets = [targetPlayer];
+      return [targetPlayer];
     }
 
     return targets;

@@ -72,8 +72,11 @@ class Sprite {
     );
   }
 
-  drawFixed() {
-    const image = this.image[this.currentDirection];
+  drawFixed(defeated) {
+    let image = this.image[this.currentDirection];
+    if (defeated) {
+      image = this.deadImage[this.currentDirection];
+    }
 
     ctx.drawImage(
       image,
