@@ -219,6 +219,10 @@ const ASSETS = {
   music: {
     battle: new Audio("assets/music/battle.mp4"),
   },
+  images: {
+    ghostRight: "assets/ghost-sprite-right.png",
+    ghostLeft: "assets/ghost-sprite-left.png",
+  },
 };
 
 const MAP_IDS = {

@@ -56,6 +56,8 @@ class Attack {
         index,
       });
     });
+
+    performer.stats.dealStaminaUsage(this.cost);
   }
 
   resetAnimation() {

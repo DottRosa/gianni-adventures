@@ -220,9 +220,12 @@ class BattleManager {
     characters.forEach((character) => {
       ctx.fillStyle = CONFIG.typography.textColor;
       ctx.font = `${CONFIG.battle.healthBar.fontSize}px ${CONFIG.typography.fontFamily}`;
-      ctx.textAlign = CONFIG.battle.healthBar.textAlign;
+      // ctx.textAlign = CONFIG.battle.healthBar.textAlign;
+      ctx.textAlign = "left";
 
       ctx.fillText(character.name, x, y);
+
+      ctx.textAlign = CONFIG.battle.healthBar.textAlign;
 
       drawStatBar(x, y + statsVerticalGap, character, "health");
       drawStatBar(x, y + statsVerticalGap * 2, character, "stamina");
@@ -253,32 +256,22 @@ class BattleManager {
     const height = pointer.height;
     const startY = tile.canvasHeight / 2 + height * 4;
 
-    const drawArrow = (posX, posY) => {
-      posX += players[player.gianni].displayedWidth / 4;
-      ctx.beginPath();
-      ctx.moveTo(posX, posY + height); // Base sinistra
-      ctx.lineTo(posX + width / 2, posY); // Vertice superiore
-      ctx.lineTo(posX + width, posY + height); // Base destra
-      ctx.strokeStyle = pointer.border.color;
-      ctx.lineWidth = pointer.border.width;
-      ctx.stroke();
-    };
+    const drawCircle = (posX, posY) => {
+      posX += players[player.gianni].displayedWidth / 2;
+      posY -= height * 2; // Posizionare il cerchio sopra al personaggio
 
-    const drawCharacterName = (posX, posY, name) => {
-      posX += players[player.gianni].displayedWidth / 4;
-      ctx.textAlign = "center";
-      ctx.fillText(name, posX + width / 2, posY + height + 20);
+      ctx.beginPath();
+      ctx.arc(posX, posY, 50, 0, 2 * Math.PI);
+      ctx.strokeStyle = pointer.border.color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
     };
 
     const targets = this.getTargets();
 
     targets.forEach((target) => {
-      drawArrow(target.position.x, startY);
+      drawCircle(target.position.x, startY);
     });
-
-    if (targets.length === 1) {
-      drawCharacterName(targets[0].position.x, startY, targets[0].name);
-    }
   }
 
   drawActionSelectionPointer() {
@@ -814,6 +807,9 @@ class BattleManager {
   handleSpecialAttacksOptionsPhase() {
     switch (true) {
       case keyboard.isInteract: {
+        if (!this.currentCharacter.costAttacks.length) {
+          return;
+        }
         if (
           this.currentCharacter.costAttacks[this.actionPointer].cost >
           this.currentCharacter.stats.currentStamina

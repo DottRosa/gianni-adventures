@@ -14,6 +14,13 @@ class Sprite {
       right: new Image(),
     };
 
+    this.deadImage = {
+      left: new Image(),
+      right: new Image(),
+    };
+    this.deadImage.left.src = ASSETS.images.ghostLeft;
+    this.deadImage.right.src = ASSETS.images.ghostRight;
+
     Object.keys(spriteImages).forEach((direction) => {
       if (spriteImages[direction]) {
         this.image[direction].src = spriteImages[direction];
