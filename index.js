@@ -280,6 +280,8 @@ function handleInteractions() {
           EVENTS.battle.entity.init();
           ASSETS.soundEffects.footsteps.pause();
           ASSETS.soundEffects.footsteps.currentTime = 0;
+          EVENTS.dialogue.inProgress = false;
+          EVENTS.dialogue.entity = null;
           break;
         }
       }
