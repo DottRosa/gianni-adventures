@@ -76,36 +76,26 @@ class BattleManager {
     }
 
     this.turns = turns;
-
     this.currentTurn = 0;
-
     this.handleAttackersAndDefenders();
 
-    players[CONFIG.player.gianni].currentDirection = CONFIG.directions.right;
-    players[CONFIG.player.fabrissazzo].currentDirection =
-      CONFIG.directions.right;
+    const { horizontalGap, width, areaPaddingX } = CONFIG.battle.healthBar;
 
-    players[CONFIG.player.gianni].position = {
-      x: CONFIG.battle.arenaPaddingX,
-      y: CONFIG.tile.canvasHeight / 2,
-    };
-
-    players[CONFIG.player.fabrissazzo].position = {
-      x: CONFIG.battle.arenaPaddingX + CONFIG.battle.gapBetweenCharacters,
-      y: CONFIG.tile.canvasHeight / 2,
-    };
+    Object.keys(players).forEach((key, index) => {
+      players[key].currentDirection = CONFIG.directions.right;
+      players[key].position = {
+        x: areaPaddingX + width / 2 + horizontalGap * index,
+        y: CONFIG.tile.canvasHeight / 2,
+      };
+    });
 
     for (var i = 0; i < this.battle.enemies.length; i++) {
       const posX =
-        CONFIG.tile.canvasWidth - // the full width of the canvas
-        CONFIG.battle.arenaPaddingX - // the padding of the arena
-        this.battle.enemies[i].displayedWidth - // the width of the character, because it start to draw images from top-left corner
-        CONFIG.battle.gapBetweenCharacters *
-          (this.battle.enemies.length - 1 - i); // si parte dalla posizione piu a sinistra possibile
+        CONFIG.tile.canvasWidth - areaPaddingX / 2 - width - horizontalGap * i;
 
       const posY = CONFIG.tile.canvasHeight / 2;
 
-      this.battle.enemies[i].position = {
+      this.battle.enemies[this.battle.enemies.length - 1 - i].position = {
         x: posX,
         y: posY,
       };
@@ -135,13 +125,10 @@ class BattleManager {
     }
   }
 
-  drawPlayers() {
-    players[CONFIG.player.gianni].drawFixed();
-    players[CONFIG.player.fabrissazzo].drawFixed();
-  }
-
-  drawEnemies() {
-    this.battle.enemies.forEach((e) => e.drawFixed());
+  drawCharacters() {
+    [...this.attackers, ...this.defenders].forEach((character) => {
+      character.drawFixed();
+    });
   }
 
   drawCharacterCard(characters, isEnemy = false) {
@@ -246,10 +233,12 @@ class BattleManager {
   }
 
   drawPlayersHealthBar() {
-    this.drawCharacterCard([
-      players[CONFIG.player.gianni],
-      players[CONFIG.player.fabrissazzo],
-    ]);
+    const list = [];
+    Object.keys(players).forEach((key) => {
+      list.push(players[key]);
+    });
+
+    this.drawCharacterCard(list);
   }
 
   drawEnemiesHealthBar() {
@@ -1113,8 +1102,7 @@ class BattleManager {
 
   draw() {
     this.battle.background.draw();
-    this.drawPlayers();
-    this.drawEnemies();
+    this.drawCharacters();
     this.drawPlayersHealthBar();
     this.drawEnemiesHealthBar();
     this.drawTurns();
