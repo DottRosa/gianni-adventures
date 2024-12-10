@@ -559,8 +559,6 @@ class BattleManager {
       };
     });
 
-    console.log(targets);
-
     this.currentAttack.animate(targets);
 
     if (this.currentAttack.animationIsFinished()) {
@@ -571,13 +569,10 @@ class BattleManager {
   }
 
   drawTurns() {
-    const {
-      radius,
-      backgroundColor,
-      currentTurnBackgroundColor,
-      gap,
-      quantityToDisplay,
-    } = CONFIG.battle.turns;
+    const { radius, backgroundColor, currentTurnBackgroundColor, gap } =
+      CONFIG.battle.turns;
+
+    const quantityToDisplay = this.attackers.length + this.defenders.length;
 
     const boxWidth = (radius * 2 + gap) * quantityToDisplay - gap - gap / 3;
 
@@ -623,19 +618,6 @@ class BattleManager {
     [...this.attackers, ...this.defenders].forEach((character) => {
       character.drawStatusEffect();
     });
-  }
-
-  draw() {
-    this.battle.background.draw();
-    this.drawPlayers();
-    this.drawEnemies();
-    this.drawPlayersHealthBar();
-    this.drawEnemiesHealthBar();
-    this.drawTurns();
-    this.drawStatusEffects();
-    this.drawActionBox();
-    this.drawPointer();
-    this.drawAttack();
   }
 
   /**
@@ -1117,5 +1099,18 @@ class BattleManager {
   handle(keyboard) {
     this.handleKeyboard(keyboard);
     this.handleAttack();
+  }
+
+  draw() {
+    this.battle.background.draw();
+    this.drawPlayers();
+    this.drawEnemies();
+    this.drawPlayersHealthBar();
+    this.drawEnemiesHealthBar();
+    this.drawTurns();
+    this.drawStatusEffects();
+    this.drawActionBox();
+    this.drawPointer();
+    this.drawAttack();
   }
 }

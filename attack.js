@@ -40,7 +40,6 @@ class Attack {
   }
 
   calculateDamage({ performer, target }) {
-    console.log(this.damage, performer.stats.attack, target.stats.defense);
     return -1 * this.damage * performer.stats.attack * target.stats.defense;
   }
 

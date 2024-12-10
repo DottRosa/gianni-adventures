@@ -125,8 +125,6 @@ class CharacterBattleStats {
   }
 
   applyStatusEffect() {
-    console.log(this.healthRegeneration);
-
     this.alterHealth(this.healthRegeneration);
     this.alterStamina(this.staminaRegeneration);
   }
