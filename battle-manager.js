@@ -511,11 +511,37 @@ class BattleManager {
             width - padding * 2
           );
 
+          ctx.font = `bold ${fontSize}px ${CONFIG.typography.fontFamily}`;
           ctx.fillText(this.currentAttack.name, x + padding, y + padding * 2);
 
+          ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
           wrappedDescription.forEach((line, index) => {
-            ctx.fillText(line, x + padding, y + padding * 3 + index * 20);
+            ctx.fillText(line, x + padding, y + padding * 4 + index * 20);
           });
+
+          ctx.beginPath(); // Inizia un nuovo percorso di disegno
+          ctx.moveTo(x + padding, height * 2 - padding * 1.8); // Punto di partenza (x: 50, y: 150)
+          ctx.lineTo(x - padding + width, height * 2 - padding * 1.8); // Punto finale (x: 450, y: 150)
+          ctx.strokeStyle = "blue"; // Colore della linea
+          ctx.lineWidth = 1; // Spessore della linea
+          ctx.stroke(); // Traccia la linea
+          ctx.strokeStyle = "black";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          const damage = `Danni: ${this.currentAttack.damage}`;
+
+          ctx.fillText(
+            `Danni: ${this.currentAttack.damage}`,
+            x + padding,
+            height * 2 - padding / 2
+          );
+
+          ctx.fillText(
+            `Stamina: ${this.currentAttack.cost}`,
+            x + padding * 2 + textWidth(damage),
+            height * 2 - padding / 2
+          );
 
           break;
         }
