@@ -281,24 +281,14 @@ class BattleManager {
       ctx.fillText(name, posX + width / 2, posY + height + 20);
     };
 
-    if (this.currentAttack.targetAll) {
-      [...this.attackers, ...this.defenders].forEach((character) => {
-        drawArrow(character.position.x, startY);
-      });
-    } else if (this.currentAttack.targetAllEnemies) {
-      this.defenders.forEach((character) => {
-        drawArrow(character.position.x, startY);
-      });
-    } else if (this.currentAttack.targetAllAlliesGroup) {
-      this.attackers.forEach((character) => {
-        drawArrow(character.position.x, startY);
-      });
-    } else {
-      const target = this.selectableTargets[this.targetPointer];
+    const targets = this.getTargets();
 
+    targets.forEach((target) => {
       drawArrow(target.position.x, startY);
+    });
 
-      drawCharacterName(target.position.x, startY, target.name);
+    if (targets.length === 1) {
+      drawCharacterName(targets[0].position.x, startY, targets[0].name);
     }
   }
 
@@ -387,6 +377,45 @@ class BattleManager {
     ctx.textAlign = CONFIG.typography.textAlign;
     ctx.fillStyle = CONFIG.typography.textColor;
     ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
+
+    const drawTargetPhase = (x, y) => {
+      const wrappedDescription = wrapText(
+        this.currentAttack.description,
+        width - padding * 2
+      );
+
+      ctx.font = `bold ${fontSize}px ${CONFIG.typography.fontFamily}`;
+      ctx.fillText(this.currentAttack.name, x + padding, y + padding * 2);
+
+      ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
+      wrappedDescription.forEach((line, index) => {
+        ctx.fillText(line, x + padding, y + padding * 4 + index * 20);
+      });
+
+      ctx.beginPath(); // Inizia un nuovo percorso di disegno
+      ctx.moveTo(x + padding, height * 2 - padding * 1.8); // Punto di partenza
+      ctx.lineTo(x - padding + width, height * 2 - padding * 1.8); // Punto finale
+      ctx.strokeStyle = "blue"; // Colore della linea
+      ctx.lineWidth = 1; // Spessore della linea
+      ctx.stroke(); // Traccia la linea
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      const damage = `Danni: ${this.currentAttack.damage}`;
+
+      ctx.fillText(
+        `Danni: ${this.currentAttack.damage}`,
+        x + padding,
+        height * 2 - padding / 2
+      );
+
+      ctx.fillText(
+        `Stamina: ${this.currentAttack.cost}`,
+        x + padding * 2 + textWidth(damage),
+        height * 2 - padding / 2
+      );
+    };
 
     if (this.isPlayerTurn) {
       switch (this.currentPhase) {
@@ -506,43 +535,7 @@ class BattleManager {
           break;
         }
         case CONFIG.battle.phases.target: {
-          const wrappedDescription = wrapText(
-            this.currentAttack.description,
-            width - padding * 2
-          );
-
-          ctx.font = `bold ${fontSize}px ${CONFIG.typography.fontFamily}`;
-          ctx.fillText(this.currentAttack.name, x + padding, y + padding * 2);
-
-          ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
-          wrappedDescription.forEach((line, index) => {
-            ctx.fillText(line, x + padding, y + padding * 4 + index * 20);
-          });
-
-          ctx.beginPath(); // Inizia un nuovo percorso di disegno
-          ctx.moveTo(x + padding, height * 2 - padding * 1.8); // Punto di partenza (x: 50, y: 150)
-          ctx.lineTo(x - padding + width, height * 2 - padding * 1.8); // Punto finale (x: 450, y: 150)
-          ctx.strokeStyle = "blue"; // Colore della linea
-          ctx.lineWidth = 1; // Spessore della linea
-          ctx.stroke(); // Traccia la linea
-          ctx.strokeStyle = "black";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          const damage = `Danni: ${this.currentAttack.damage}`;
-
-          ctx.fillText(
-            `Danni: ${this.currentAttack.damage}`,
-            x + padding,
-            height * 2 - padding / 2
-          );
-
-          ctx.fillText(
-            `Stamina: ${this.currentAttack.cost}`,
-            x + padding * 2 + textWidth(damage),
-            height * 2 - padding / 2
-          );
-
+          drawTargetPhase(x, y);
           break;
         }
       }
@@ -557,16 +550,7 @@ class BattleManager {
           break;
         }
         case CONFIG.battle.phases.target: {
-          const wrappedDescription = wrapText(
-            this.currentAttack.description,
-            width - padding * 2
-          );
-
-          ctx.fillText(this.currentAttack.name, x + padding, y + padding * 2);
-
-          wrappedDescription.forEach((line, index) => {
-            ctx.fillText(line, x + padding, y + padding * 3 + index * 20);
-          });
+          drawTargetPhase(x, y);
           break;
         }
       }

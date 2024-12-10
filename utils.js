@@ -106,3 +106,27 @@ function wrapText(text, maxWidth) {
 function getRandomIndex(list) {
   return Math.floor(Math.random() * list.length);
 }
+
+/**
+ * Disegna un arco tra due punti A e B
+ * @param {number} startX - Coordinata X del punto di partenza
+ * @param {number} startY - Coordinata Y del punto di partenza
+ * @param {number} endX - Coordinata X del punto di arrivo
+ * @param {number} endY - Coordinata Y del punto di arrivo
+ * @param {number} height - Altezza massima dell'arco
+ */
+function drawArc({ startX, startY, endX, endY, height }) {
+  ctx.beginPath();
+  ctx.moveTo(startX, startY);
+
+  // Calcola il punto di controllo per la curva quadratica
+  const controlX = (startX + endX) / 2;
+  const controlY = Math.min(startY, endY) - height;
+
+  // Disegna una curva quadratica
+  ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
