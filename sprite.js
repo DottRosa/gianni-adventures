@@ -5,6 +5,10 @@ class Sprite {
     x: 0,
     y: 0,
   };
+  battlePosition = {
+    x: 0,
+    y: 0,
+  };
 
   constructor({ spriteImages, startDirection = CONFIG.directions.right }) {
     this.currentDirection = startDirection;
@@ -72,7 +76,7 @@ class Sprite {
     );
   }
 
-  drawFixed(defeated) {
+  drawBattle(defeated) {
     let image = this.image[this.currentDirection];
     if (defeated) {
       image = this.deadImage[this.currentDirection];
@@ -84,8 +88,8 @@ class Sprite {
       0,
       this.displayedWidth,
       image.height,
-      this.position.x,
-      this.position.y,
+      this.battlePosition.x,
+      this.battlePosition.y,
       this.displayedWidth,
       image.height
     );
@@ -95,8 +99,11 @@ class Sprite {
     return this.image[this.currentDirection].width / 4;
   }
 
-  drawIcon(x, y) {
-    const image = this.image[this.currentDirection];
+  drawIcon(x, y, defeated) {
+    let image = this.image[this.currentDirection];
+    if (defeated) {
+      image = this.deadImage[this.currentDirection];
+    }
 
     ctx.drawImage(
       image,

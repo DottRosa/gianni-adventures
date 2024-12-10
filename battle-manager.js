@@ -85,7 +85,7 @@ class BattleManager {
 
     Object.keys(players).forEach((key, index) => {
       players[key].currentDirection = CONFIG.directions.right;
-      players[key].position = {
+      players[key].battlePosition = {
         x: areaPaddingX + width / 2 + horizontalGap * index,
         y: CONFIG.tile.canvasHeight / 2,
       };
@@ -97,7 +97,7 @@ class BattleManager {
 
       const posY = CONFIG.tile.canvasHeight / 2;
 
-      this.battle.enemies[this.battle.enemies.length - 1 - i].position = {
+      this.battle.enemies[this.battle.enemies.length - 1 - i].battlePosition = {
         x: posX,
         y: posY,
       };
@@ -129,7 +129,7 @@ class BattleManager {
 
   drawCharacters() {
     [...this.attackers, ...this.defenders].forEach((character) => {
-      character.drawFixed(character.isDefeated);
+      character.drawBattle(character.isDefeated);
     });
   }
 
@@ -269,19 +269,17 @@ class BattleManager {
       ctx.stroke();
     };
 
-    // const targets = this.getTargets();
-
     this.getTargets().forEach((target) => {
-      drawCircle(target.position.x, startY);
+      drawCircle(target.battlePosition.x, startY);
     });
   }
 
   drawActionSelectionPointer() {
     const { padding, marginBottom, choices, width } = CONFIG.battle.actionBox;
 
-    const x = this.currentCharacter.position.x;
+    const x = this.currentCharacter.battlePosition.x;
     const y =
-      this.currentCharacter.position.y -
+      this.currentCharacter.battlePosition.y -
       CONFIG.battle.actionBox.height -
       marginBottom;
 
@@ -334,9 +332,9 @@ class BattleManager {
     const enemyDrift = this.isPlayerTurn
       ? 0
       : width - this.battle.enemies[0].displayedWidth - padding;
-    const x = this.currentCharacter.position.x - enemyDrift;
+    const x = this.currentCharacter.battlePosition.x - enemyDrift;
     const y =
-      this.currentCharacter.position.y -
+      this.currentCharacter.battlePosition.y -
       CONFIG.battle.actionBox.height -
       marginBottom;
 
@@ -548,8 +546,8 @@ class BattleManager {
 
     const targets = this.getTargets().map((target) => {
       return {
-        x: target.position.x,
-        y: target.position.y,
+        x: target.battlePosition.x,
+        y: target.battlePosition.y,
       };
     });
 
@@ -595,7 +593,7 @@ class BattleManager {
       ctx.stroke(); // Disegna il contorno
 
       // Disegna l'icona
-      turn.drawIcon(x, y);
+      turn.drawIcon(x, y, turn.isDefeated);
 
       x -= radius * 2 + gap; // Sposta la posizione
     });
@@ -1003,19 +1001,17 @@ class BattleManager {
     }
   }
 
-  endBattle() {
+  checkEndBattle() {
     const enemiesDefeated = this.battle.enemies.every(
       (enemy) => enemy.isDefeated
     );
-    if (enemiesDefeated) {
-      battleEnd = true;
-    }
 
     const playersDefeated = Object.keys(players).every(
       (key) => players[key].isDefeated
     );
     if (enemiesDefeated || playersDefeated) {
-      battleEnd = true;
+      this.battleEnd = true;
+      EVENTS.battle.inProgress = false;
     }
   }
 
@@ -1024,6 +1020,7 @@ class BattleManager {
    * attivo, attaccanti e difensori
    */
   startNextTurn() {
+    this.checkEndBattle();
     this.handleStatusEffectDuration(); // in questo punto il giocatore attivo è ancora quello del turno precedente
     this.resetCurrentPhase();
     this.targetPointer = 0;
@@ -1035,6 +1032,7 @@ class BattleManager {
       return;
     }
     this.handleStatusEffect(); // qui il giocatore è quello del turno corrente
+    this.checkEndBattle();
     if (!this.isPlayerTurn) {
       this.handleEnemyTurn();
       return;
@@ -1113,26 +1111,17 @@ class BattleManager {
   }
 
   getTargets() {
-    let targets = [];
-
-    if (this.currentAttack.targetAll) {
-      // targets.push(...this.attackers);
-      // targets.push(...this.defenders);
-      return this.selectableTargets;
-    } else if (this.currentAttack.targetAllEnemies) {
-      // targets = this.defenders;
-      return this.selectableTargets;
-    } else if (this.currentAttack.targetAllAlliesGroup) {
-      // targets = this.attackers;
+    if (
+      this.currentAttack.targetAll ||
+      this.currentAttack.targetAllEnemies ||
+      this.currentAttack.targetAllAlliesGroup
+    ) {
       return this.selectableTargets;
     } else {
       // targetEnemy, targetSelf, targetAlly
       const targetPlayer = this.selectableTargets[this.targetPointer];
-      // targets = [targetPlayer];
       return [targetPlayer];
     }
-
-    return targets;
   }
 
   /**
