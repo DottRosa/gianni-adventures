@@ -9,7 +9,7 @@ const NPC_DIALOGUES = {
             next: "gianni_answer",
           },
           [CONFIG.player.fabrissazzo]: {
-            text: "Ciao Ruben, briscolata?",
+            text: "Ciao Ruben, ho qui er mazzo da briscola. Briscolata?",
             next: "fabris_answer",
           },
         },
@@ -66,6 +66,23 @@ const NPC_DIALOGUES = {
         id: "start",
         text: "Ma che ooooooooh",
         speaker: CONFIG.player.gianni,
+        conditions: [],
+        events: [],
+        next: "fabris",
+      },
+      fabris: {
+        id: "fabris",
+        choices: [
+          {
+            text: "Calmati Gianni! Non cedere alle sue provocazioni, sono dei maledetti!",
+            next: "battle",
+          },
+          {
+            text: "Mi metto 2",
+            next: "battle",
+          },
+        ],
+        speaker: CONFIG.player.fabrissazzo,
         conditions: [],
         events: [],
         next: "battle",

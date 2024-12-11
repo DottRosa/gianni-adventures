@@ -66,7 +66,7 @@ class NPC extends Character {
   }
 
   drawDialogue({ players, partnerDrift }) {
-    this.dialogueManager.draw({
+    this.dialogueManager.draw2({
       position: this.position,
       name: this.details.nickname[CONFIG.player.main],
       players,

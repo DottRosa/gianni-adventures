@@ -25,7 +25,11 @@ class Character extends Sprite {
   drawStatusEffect() {
     const status = this.stats.currentStatusEffect;
     if (status) {
-      status.draw([{ x: this.position.x, y: this.position.y }]);
+      status.draw([{ x: this.battlePosition.x, y: this.battlePosition.y }]);
     }
+  }
+
+  getAttackDamage(attack) {
+    return Math.floor(attack.damage * this.stats.attack);
   }
 }

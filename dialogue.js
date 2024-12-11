@@ -171,4 +171,102 @@ class DialogueManager {
       );
     }
   }
+
+  draw2({ position, name, partnerDrift }) {
+    const {
+      padding,
+      fontSize,
+      marginBottom,
+      shadow,
+      backgroundColor,
+      width,
+      height,
+    } = CONFIG.battle.actionBox;
+
+    let entityName = name;
+
+    let x = position.x;
+    let y = position.y - CONFIG.battle.actionBox.height - marginBottom;
+
+    // when a player is speaking
+    if (this.currentDialogue.speaker) {
+      const player = players[this.currentDialogue.speaker];
+      const partner = getOtherPlayer(this.currentDialogue.speaker);
+
+      if (this.currentDialogue.speaker === CONFIG.player.main) {
+        x = player.position.x;
+        y = player.position.y - CONFIG.battle.actionBox.height - marginBottom;
+      } else {
+        x = partner.position.x + partnerDrift.x;
+        y =
+          partner.position.y -
+          CONFIG.battle.actionBox.height -
+          marginBottom +
+          partnerDrift.y;
+      }
+
+      entityName = player.name;
+    }
+
+    applyShadow({
+      ...shadow,
+    });
+
+    ctx.fillStyle = backgroundColor;
+    // ctx.fillRect(x, y, width, height);
+
+    drawRoundedRect(ctx, x, y, width, height, 25);
+
+    // Aggiungi il triangolo in basso
+    ctx.beginPath(); // Inizia un nuovo percorso
+    ctx.moveTo(x + 20, y + CONFIG.battle.actionBox.height - 2); // Punto sinistro del triangolo
+    ctx.lineTo(x + 40, y + CONFIG.battle.actionBox.height - 2); // Punto destro del triangolo
+    ctx.lineTo(x + 30, y + CONFIG.battle.actionBox.height - 2 + 20); // Punta del triangolo
+    ctx.closePath(); // Chiude il triangolo
+
+    ctx.fill(); // riempie il triangolo
+
+    resetShadow();
+
+    ctx.textAlign = CONFIG.dialogue.textAlign;
+    ctx.font = `bold ${16}px ${CONFIG.dialogue.fontFamily}`;
+    ctx.fillStyle = "black";
+    ctx.fillText(entityName, x + padding, y + padding * 1.5);
+
+    ctx.beginPath(); // Inizia un nuovo percorso di disegno
+    ctx.moveTo(x + padding, y + padding * 2); // Punto di partenza
+    ctx.lineTo(x - padding + width, y + padding * 2); // Punto finale
+    ctx.strokeStyle = "black"; // Colore della linea
+    ctx.lineWidth = 2; // Spessore della linea
+    ctx.stroke();
+
+    ctx.textAlign = CONFIG.typography.textAlign;
+    // ctx.fillStyle = CONFIG.typography.textColor;
+    ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
+
+    if (this.currentDialogue.choices) {
+      if (!this.choiceInProgress) {
+        this.choiceInProgress = true;
+        this.currentChoices = this.currentDialogue.choices;
+        this.currentChoice = 0;
+      }
+      this.currentDialogue.choices.forEach((choice, index) => {
+        const prefix = this.currentChoice === index ? "> " : "";
+        ctx.fillText(
+          `${prefix}${choice.text}`,
+          x + padding,
+          y + padding * 2 + index * CONFIG.battle.actionBox.choices.gap
+        );
+      });
+    } else {
+      const wrappedDescription = wrapText(
+        this.currentDialogText,
+        width - padding * 2
+      );
+
+      wrappedDescription.forEach((line, index) => {
+        ctx.fillText(line, x + padding, y + padding * 4 + index * 20);
+      });
+    }
+  }
 }

@@ -343,7 +343,7 @@ class BattleManager {
     });
 
     ctx.fillStyle = backgroundColor;
-    ctx.fillRect(x, y, width, height);
+    drawRoundedRect(ctx, x, y, width, height, 25);
 
     // Aggiungi il triangolo in basso
     ctx.beginPath(); // Inizia un nuovo percorso
@@ -387,7 +387,7 @@ class BattleManager {
       const damage = `Danni: ${this.currentAttack.damage}`;
 
       ctx.fillText(
-        `Danni: ${this.currentAttack.damage}`,
+        `Danni: ${this.currentCharacter.getAttackDamage(this.currentAttack)}`,
         x + padding,
         height * 2 - padding / 2
       );
@@ -437,9 +437,11 @@ class BattleManager {
             let disabledY = 0;
 
             if (this.phaseIsAttacksOptions) {
-              details = `${options[i].damage}`;
+              details = `${this.currentCharacter.getAttackDamage(options[i])}`;
             } else if (this.phaseIsSpecialAttacksOptions) {
-              details = `${options[i].damage}/${options[i].cost}`;
+              details = `${this.currentCharacter.getAttackDamage(options[i])}/${
+                options[i].cost
+              }`;
               disabled =
                 options[i].cost > this.currentCharacter.stats.currentStamina;
             } else if (this.phaseIsBackpackOptions) {

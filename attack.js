@@ -40,7 +40,9 @@ class Attack {
   }
 
   calculateDamage({ performer, target }) {
-    return -1 * this.damage * performer.stats.attack * target.stats.defense;
+    return Math.floor(
+      -1 * this.damage * performer.stats.attack * target.stats.defense
+    );
   }
 
   execute({ performer, targets }) {
