@@ -241,7 +241,6 @@ class DialogueManager {
     ctx.stroke();
 
     ctx.textAlign = CONFIG.typography.textAlign;
-    // ctx.fillStyle = CONFIG.typography.textColor;
     ctx.font = `${fontSize}px ${CONFIG.typography.fontFamily}`;
 
     if (this.currentDialogue.choices) {
@@ -251,12 +250,15 @@ class DialogueManager {
         this.currentChoice = 0;
       }
       this.currentDialogue.choices.forEach((choice, index) => {
-        const prefix = this.currentChoice === index ? "> " : "";
-        ctx.fillText(
-          `${prefix}${choice.text}`,
-          x + padding,
-          y + padding * 2 + index * CONFIG.battle.actionBox.choices.gap
-        );
+        if (this.currentChoice === index) {
+          ctx.fillText(`Risposta #${index + 1}`, x + padding, y + padding * 3);
+
+          const wrappedDescription = wrapText(choice.text, width - padding * 2);
+
+          wrappedDescription.forEach((line, index) => {
+            ctx.fillText(line, x + padding, y + padding * 4 + (index + 1) * 20);
+          });
+        }
       });
     } else {
       const wrappedDescription = wrapText(

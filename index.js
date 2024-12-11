@@ -237,11 +237,11 @@ function handleInteractions() {
     interactionCooldown = now + CONFIG.keyboard.choicesCooldown;
 
     switch (true) {
-      case keyboard.isDown: {
+      case keyboard.isRight: {
         EVENTS.dialogue.entity.changeChoice(true);
         break;
       }
-      case keyboard.isUp: {
+      case keyboard.isLeft: {
         EVENTS.dialogue.entity.changeChoice(false);
         break;
       }
