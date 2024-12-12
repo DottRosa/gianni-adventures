@@ -199,3 +199,42 @@ function drawHotkey(ctx, x, y, button) {
   ctx.textAlign = "left";
   ctx.fillText(button.label, x + 25, y + rectHeight / 2 + 1);
 }
+
+/**
+ * Oscura un colore esadecimale del 20% o di una percentuale specificata.
+ * @param {string} hexColor - Il colore esadecimale (es. #RRGGBB o #RGB).
+ * @param {number} percent - Percentuale di oscuramento (default 20%).
+ * @returns {string} - Il colore esadecimale scurito.
+ */
+function darkenHexColor(hexColor, percent = 20) {
+  // Rimuove il simbolo '#' se presente
+  hexColor = hexColor.replace(/^#/, "");
+
+  // Gestisce il formato esadecimale a 3 caratteri
+  if (hexColor.length === 3) {
+    hexColor = hexColor
+      .split("")
+      .map((char) => char + char)
+      .join("");
+  }
+
+  // Converte i valori R, G, B in numeri decimali
+  let [r, g, b] = [
+    parseInt(hexColor.substring(0, 2), 16),
+    parseInt(hexColor.substring(2, 4), 16),
+    parseInt(hexColor.substring(4, 6), 16),
+  ];
+
+  // Calcola la quantità di riduzione
+  const factor = 1 - percent / 100;
+
+  // Riduce ciascun canale RGB e si assicura che il valore sia tra 0 e 255
+  r = Math.max(0, Math.floor(r * factor));
+  g = Math.max(0, Math.floor(g * factor));
+  b = Math.max(0, Math.floor(b * factor));
+
+  // Converte i nuovi valori in esadecimale e ritorna il colore formattato
+  return `#${r.toString(16).padStart(2, "0")}${g
+    .toString(16)
+    .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+}

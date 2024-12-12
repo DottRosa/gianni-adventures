@@ -21,7 +21,7 @@ const NPC_DIALOGUES = {
         choices: [
           {
             text: "Cozzarini! Stai zitto",
-            next: "goodbye",
+            next: "stattezitto",
           },
           {
             text: "Ti metto 2",
@@ -57,6 +57,12 @@ const NPC_DIALOGUES = {
       goodbye: {
         id: "goodbye",
         text: "(sta sempre incazzato sto qua)",
+        conditions: [],
+        next: null,
+      },
+      stattezitto: {
+        id: "stattezitto",
+        text: "Ma statte zitto te baffone demmerda",
         conditions: [],
         next: null,
       },

@@ -61,7 +61,7 @@ const CONFIG = {
     nameColor: "red",
     textColor: "black",
     balloon: {
-      backgroundColor: "white",
+      backgroundColor: "#FFF",
       borderColor: "black",
       height: 75,
       width: 150,
@@ -151,7 +151,7 @@ const CONFIG = {
       marginBottom: 20,
       width: 300,
       height: 150,
-      backgroundColor: "white",
+      backgroundColor: "#FFF",
       border: {
         color: "black",
         width: 1,
@@ -183,7 +183,7 @@ const CONFIG = {
     },
     turns: {
       radius: 30,
-      backgroundColor: "white",
+      backgroundColor: "#FFF",
       currentTurnBackgroundColor: "yellow",
       gap: -20,
       quantityToDisplay: 4,

@@ -185,12 +185,45 @@ class DialogueManager {
       entityName = player.name;
     }
 
+    ctx.fillStyle = backgroundColor;
+
+    let fillStyles = [];
+    let newFillStyle = backgroundColor;
+
+    for (var i = 0; i < this.currentDialogue.choices?.length - 1; i++) {
+      newFillStyle = darkenHexColor(newFillStyle, 10);
+      fillStyles.push(newFillStyle);
+    }
+
+    // -2 perchè devo escludere quella che sto gia mostrando
+    for (var i = this.currentDialogue.choices?.length - 2; i >= 0; i--) {
+      ctx.fillStyle = fillStyles[i];
+      drawRoundedRect(
+        ctx,
+        x - (i + 1) * 10,
+        y - (i + 1) * 10,
+        width,
+        height,
+        25
+      );
+    }
+
+    // this.currentDialogue.choices?.forEach((choice, index) => {
+    //   drawRoundedRect(
+    //     ctx,
+    //     x - (index + 1) * 15,
+    //     y - (index + 1) * 15,
+    //     width,
+    //     height,
+    //     25
+    //   );
+
+    // });
+
     applyShadow({
       ...shadow,
     });
-
     ctx.fillStyle = backgroundColor;
-    // ctx.fillRect(x, y, width, height);
 
     drawRoundedRect(ctx, x, y, width, height, 25);
 
