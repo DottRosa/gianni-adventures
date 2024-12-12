@@ -71,6 +71,10 @@ const CONFIG = {
       stop: "stop",
       battle: "battle",
     },
+    hotkeys: {
+      gap: 5,
+      height: 20,
+    },
   },
   battle: {
     get gapBetweenCharacters() {
@@ -242,3 +246,23 @@ const NPC_IDS = {
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+
+const BUTTONS = {
+  ok: {
+    key: CONFIG.keyboard.interactKey,
+    label: "Ok",
+  },
+  confirm: {
+    key: CONFIG.keyboard.interactKey,
+    label: "Conferma",
+  },
+  horizontalScroll: {
+    key: "⇄",
+    label: "Scorri",
+  },
+};
+
+Object.keys(BUTTONS).forEach((key) => {
+  ctx.font = "bold 13px Arial";
+  BUTTONS[key].width = ctx.measureText(BUTTONS[key].label).width + 30;
+});

@@ -183,6 +183,8 @@ class DialogueManager {
       height,
     } = CONFIG.battle.actionBox;
 
+    let buttons = [BUTTONS.ok];
+
     let entityName = name;
 
     let x = position.x;
@@ -251,15 +253,20 @@ class DialogueManager {
       }
       this.currentDialogue.choices.forEach((choice, index) => {
         if (this.currentChoice === index) {
-          ctx.fillText(`Risposta #${index + 1}`, x + padding, y + padding * 3);
+          ctx.fillText(
+            `Risposta #${index + 1}`,
+            x + width - padding - textWidth(`Risposta #${index + 1}`),
+            y + padding * 1.3
+          );
 
           const wrappedDescription = wrapText(choice.text, width - padding * 2);
 
           wrappedDescription.forEach((line, index) => {
-            ctx.fillText(line, x + padding, y + padding * 4 + (index + 1) * 20);
+            ctx.fillText(line, x + padding, y + padding * 2 + (index + 1) * 20);
           });
         }
       });
+      buttons = [BUTTONS.horizontalScroll, BUTTONS.confirm];
     } else {
       const wrappedDescription = wrapText(
         this.currentDialogText,
@@ -267,8 +274,30 @@ class DialogueManager {
       );
 
       wrappedDescription.forEach((line, index) => {
-        ctx.fillText(line, x + padding, y + padding * 4 + index * 20);
+        ctx.fillText(line, x + padding, y + padding * 3.5 + index * 20);
       });
     }
+
+    this.drawHotkeys(x, y, buttons);
+  }
+
+  drawHotkeys(x, y, buttons = []) {
+    const { padding, width, height } = CONFIG.battle.actionBox;
+    const { gap, height: hotkeyHeight } = CONFIG.dialogue.hotkeys;
+
+    const totalWidth = buttons.reduce((acc, button, index) => {
+      acc += button.width;
+      if (index < buttons.length - 1) {
+        acc += gap;
+      }
+      return acc;
+    }, 0);
+
+    let startX = x + width - totalWidth;
+
+    buttons.forEach((button) => {
+      drawHotkey(ctx, startX, y + height - padding + hotkeyHeight, button);
+      startX += button.width + gap;
+    });
   }
 }

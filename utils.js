@@ -103,6 +103,11 @@ function wrapText(text, maxWidth) {
   return lines;
 }
 
+/**
+ * Data una lista restituisce un indice a caso
+ * @param {*} list la lista di cui prendere l'indice
+ * @returns un indice casuale della lista
+ */
 function getRandomIndex(list) {
   return Math.floor(Math.random() * list.length);
 }
@@ -140,6 +145,15 @@ function getOtherPlayer(playerId) {
   }
 }
 
+/**
+ * Disegna un rettangolo dai bordi arrotondati
+ * @param {*} ctx il contesto
+ * @param {*} x posizione x
+ * @param {*} y posizione y
+ * @param {*} width larghezza del rettangolo
+ * @param {*} height altezza del rettangolo
+ * @param {*} radius border radius
+ */
 function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
@@ -153,4 +167,35 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.quadraticCurveTo(x, y, x + radius, y);
   ctx.closePath();
   ctx.fill();
+}
+
+function drawHotkey(ctx, x, y, button) {
+  const rectWidth = button.width;
+
+  const rectHeight = CONFIG.dialogue.hotkeys.height;
+  const borderRadius = 10;
+
+  // Disegna il rettangolo arrotondato di sfondo
+  ctx.fillStyle = "black";
+  drawRoundedRect(ctx, x, y, rectWidth, rectHeight, borderRadius);
+
+  // Disegna il pallino bianco per il tasto
+  const circleRadius = 7;
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.arc(x + 10, y + rectHeight / 2, circleRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Scrivi il nome del tasto dentro il pallino
+  ctx.fillStyle = "black";
+  ctx.font = "bold 13px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(button.key.toUpperCase(), x + 10, y + rectHeight / 2 + 1);
+
+  // Scrivi l'azione accanto al pallino
+  ctx.fillStyle = "white";
+  ctx.font = "13px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText(button.label, x + 25, y + rectHeight / 2 + 1);
 }
