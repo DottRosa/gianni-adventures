@@ -11,6 +11,7 @@ class DialogueManager {
   currentDialogue = null;
   // Se true indica che la battaglia è stata triggherata
   battleIsTriggered = false;
+  briscolaIsTriggered = false;
 
   constructor({ dialogues, entity }) {
     this.dialogues = dialogues;
@@ -75,6 +76,11 @@ class DialogueManager {
         return;
       }
 
+      if (this.currentDialogue.briscolaId) {
+        this.briscolaIsTriggered = true;
+        return;
+      }
+
       this.stopDialogue();
       return;
     }
@@ -96,6 +102,13 @@ class DialogueManager {
    */
   get battleId() {
     return this.currentDialogue.battleId;
+  }
+
+  /**
+   * Restituisce il briscola id del dialogo
+   */
+  get briscolaId() {
+    return this.currentDialogue.briscolaId;
   }
 
   /**

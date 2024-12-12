@@ -6,6 +6,7 @@ ctx.textBaseline = "top";
 
 let currentMap = MAPS[MAP_IDS.intro];
 let currentBattle = null;
+let currentBriscola = null;
 let currentDialogue = null;
 
 function handleFootstepsSound() {
@@ -258,7 +259,10 @@ function animate() {
 
   if (currentBattle?.inProgress) {
     currentBattle.draw();
-    currentBattle.handle(GLOBALS.keyboard);
+    currentBattle.handle();
+  } else if (currentBriscola?.inProgress) {
+    currentBriscola.draw();
+    currentBriscola.handle();
   } else {
     currentMap.drawBackgrounds();
     currentMap.drawNpcs();
@@ -279,6 +283,13 @@ function animate() {
         const battleId = currentDialogue.battleId;
         currentBattle = new BattleManager(BATTLES[currentMap.id][battleId]);
         currentBattle.init();
+        currentDialogue.stopDialogue();
+      }
+
+      if (currentDialogue.briscolaIsTriggered) {
+        const briscolaId = currentDialogue.briscolaId;
+        currentBriscola = new BriscolaManager(BRISCOLATE[briscolaId]);
+        currentBriscola.init();
         currentDialogue.stopDialogue();
       }
     } else {
