@@ -18,9 +18,7 @@ const MAPS = {
           cellX: 25,
           cellY: 18,
         },
-        dialogueManager: new DialogueManager(
-          MAP_OBJECT_DIALOGUES.intro[MAP_OBJECT_IDS.fiorellino]
-        ),
+        dialogues: MAP_OBJECT_DIALOGUES.intro[MAP_OBJECT_IDS.fiorellino],
       }),
     ],
     backgroundImages: [`${CONFIG.assets.folder}/first-map.png`],

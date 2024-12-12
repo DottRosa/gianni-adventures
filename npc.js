@@ -3,7 +3,7 @@ class NPC extends Character {
     details,
     startDirection = CONFIG.directions.right,
     mapPositionCell = { cellX: 0, cellY: 0 },
-    dialogueManager = null,
+    dialogues = null,
     characterBattleStats,
     battleDialogues = [],
     attacks = [],
@@ -21,7 +21,7 @@ class NPC extends Character {
       mapPositionCell.cellX,
       mapPositionCell.cellY
     );
-    this.dialogueManager = dialogueManager;
+    this.dialogues = dialogues;
     this.battleDialogues = battleDialogues;
     if (!battleDialogues.length) {
       this.battleDialogues.push(CONFIG.battle.enemies.standardDialogue);

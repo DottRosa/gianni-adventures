@@ -102,7 +102,7 @@ class Map {
   getNearestInteractionEntity() {
     return [...this.npcs, ...this.mapObjects].find((entity) => {
       const entityPosition = entity.position;
-      const playerPosition = players[CONFIG.player.main].position;
+      const playerPosition = GLOBALS.players[CONFIG.player.main].position;
 
       const deltaX = entityPosition.x - playerPosition.x;
       const deltaY = entityPosition.y - playerPosition.y;
@@ -113,7 +113,9 @@ class Map {
           deltaX > 0 ? CONFIG.directions.right : CONFIG.directions.left;
       }
 
-      if (players[CONFIG.player.main].currentDirection !== entityDirection) {
+      if (
+        GLOBALS.players[CONFIG.player.main].currentDirection !== entityDirection
+      ) {
         return false;
       }
 

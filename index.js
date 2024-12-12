@@ -1,14 +1,16 @@
 // Definizione delle costanti e variabili necessarie
 
-const keyboard = new Keyboard();
+GLOBALS.keyboard = new Keyboard();
 
 ctx.textBaseline = "top";
 
 let currentMap = MAPS[MAP_IDS.intro];
+let currentBattle = null;
+let currentDialogue = null;
 
 function handleFootstepsSound() {
-  const moveX = keyboard.isRight || keyboard.isLeft;
-  const moveY = keyboard.isUp || keyboard.isDown;
+  const moveX = GLOBALS.keyboard.isRight || GLOBALS.keyboard.isLeft;
+  const moveY = GLOBALS.keyboard.isUp || GLOBALS.keyboard.isDown;
 
   const currentlyMoving = moveX || moveY;
 
@@ -32,8 +34,7 @@ canvas.height = CONFIG.tile.canvasHeight;
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const players = {};
-players[CONFIG.player.fabrissazzo] = new Player({
+GLOBALS.players[CONFIG.player.fabrissazzo] = new Player({
   spriteImages: {
     left: `${CONFIG.assets.folder}/fabris-sprite-left.png`,
     right: `${CONFIG.assets.folder}/fabris-sprite-right.png`,
@@ -47,7 +48,7 @@ players[CONFIG.player.fabrissazzo] = new Player({
   attacks: ATTACKS[CONFIG.player.fabrissazzo],
 });
 
-players[CONFIG.player.gianni] = new Player({
+GLOBALS.players[CONFIG.player.gianni] = new Player({
   spriteImages: {
     left: `${CONFIG.assets.folder}/gianni-sprite-left.png`,
     right: `${CONFIG.assets.folder}/gianni-sprite-right.png`,
@@ -62,16 +63,15 @@ players[CONFIG.player.gianni] = new Player({
 });
 
 let backgroundPosition = { x: 0, y: 0 };
-let partnerDrift = { x: 0, y: 0 };
 
 function handlePlayersMovement() {
-  const moveX = keyboard.isRight ? -1 : keyboard.isLeft ? 1 : 0;
-  const moveY = keyboard.isDown ? -1 : keyboard.isUp ? 1 : 0;
+  const moveX = GLOBALS.keyboard.isRight ? -1 : GLOBALS.keyboard.isLeft ? 1 : 0;
+  const moveY = GLOBALS.keyboard.isDown ? -1 : GLOBALS.keyboard.isUp ? 1 : 0;
 
   if (moveX !== 0) {
-    players[CONFIG.player.partner].direction =
+    GLOBALS.players[CONFIG.player.partner].direction =
       moveX > 0 ? CONFIG.directions.left : CONFIG.directions.right;
-    players[CONFIG.player.main].direction =
+    GLOBALS.players[CONFIG.player.main].direction =
       moveX > 0 ? CONFIG.directions.left : CONFIG.directions.right;
   }
 
@@ -121,55 +121,57 @@ function handlePlayersMovement() {
   backgroundPosition = { x: 0, y: 0 };
 
   // The partner follows the path of the main player
-  if (keyboard.isRight) {
-    if (partnerDrift.x > -1 * CONFIG.player.distanceBetweenPartners) {
-      partnerDrift.x -= CONFIG.player.velocity;
+  if (GLOBALS.keyboard.isRight) {
+    if (GLOBALS.partnerDrift.x > -1 * CONFIG.player.distanceBetweenPartners) {
+      GLOBALS.partnerDrift.x -= CONFIG.player.velocity;
     }
   }
 
-  if (keyboard.isLeft) {
-    if (partnerDrift.x < CONFIG.player.distanceBetweenPartners) {
-      partnerDrift.x += CONFIG.player.velocity;
+  if (GLOBALS.keyboard.isLeft) {
+    if (GLOBALS.partnerDrift.x < CONFIG.player.distanceBetweenPartners) {
+      GLOBALS.partnerDrift.x += CONFIG.player.velocity;
     }
   }
 
-  if (keyboard.isUp) {
-    if (partnerDrift.y < CONFIG.player.distanceBetweenPartners) {
-      partnerDrift.y += CONFIG.player.velocity;
+  if (GLOBALS.keyboard.isUp) {
+    if (GLOBALS.partnerDrift.y < CONFIG.player.distanceBetweenPartners) {
+      GLOBALS.partnerDrift.y += CONFIG.player.velocity;
     }
   }
 
-  if (keyboard.isDown) {
-    if (partnerDrift.y > -1 * CONFIG.player.distanceBetweenPartners) {
-      partnerDrift.y -= CONFIG.player.velocity;
+  if (GLOBALS.keyboard.isDown) {
+    if (GLOBALS.partnerDrift.y > -1 * CONFIG.player.distanceBetweenPartners) {
+      GLOBALS.partnerDrift.y -= CONFIG.player.velocity;
     }
   }
 
   // Align the partner when the direction of the main player is only 1
   if (moveX === 0 && moveY !== 0) {
-    const mult = partnerDrift.x < 0 ? 1 : partnerDrift.x > 0 ? -1 : 0;
-    partnerDrift.x += (mult * CONFIG.player.velocity) / 2;
-    if (Math.abs(partnerDrift.x) < CONFIG.player.velocity / 2) {
-      partnerDrift.x = 0;
+    const mult =
+      GLOBALS.partnerDrift.x < 0 ? 1 : GLOBALS.partnerDrift.x > 0 ? -1 : 0;
+    GLOBALS.partnerDrift.x += (mult * CONFIG.player.velocity) / 2;
+    if (Math.abs(GLOBALS.partnerDrift.x) < CONFIG.player.velocity / 2) {
+      GLOBALS.partnerDrift.x = 0;
     }
   }
 
   if (moveX !== 0 && moveY === 0) {
-    const mult = partnerDrift.y < 0 ? 1 : partnerDrift.y > 0 ? -1 : 0;
-    partnerDrift.y += (mult * CONFIG.player.velocity) / 2;
-    if (Math.abs(partnerDrift.y) < CONFIG.player.velocity / 2) {
-      partnerDrift.y = 0;
+    const mult =
+      GLOBALS.partnerDrift.y < 0 ? 1 : GLOBALS.partnerDrift.y > 0 ? -1 : 0;
+    GLOBALS.partnerDrift.y += (mult * CONFIG.player.velocity) / 2;
+    if (Math.abs(GLOBALS.partnerDrift.y) < CONFIG.player.velocity / 2) {
+      GLOBALS.partnerDrift.y = 0;
     }
   }
 }
 
 function handleSwitch() {
-  if (keyboard.isSwitch) {
+  if (GLOBALS.keyboard.isSwitch) {
     const temp = CONFIG.player.main;
     CONFIG.player.main = CONFIG.player.partner;
     CONFIG.player.partner = temp;
 
-    keyboard.unsetSwitch();
+    GLOBALS.keyboard.unsetSwitch();
   }
 }
 
@@ -221,79 +223,31 @@ function debug() {
 }
 
 function drawDialogues() {
-  EVENTS.dialogue.entity.drawDialogue({ players, partnerDrift });
+  currentDialogue.drawDialogue({
+    players: GLOBALS.players,
+    partnerDrift: GLOBALS.partnerDrift,
+  });
 }
 
 function handleInteractions() {
   const now = Date.now();
 
   if (
-    EVENTS.dialogue.inProgress &&
-    EVENTS.dialogue.entity.dialogueManager.choiceInProgress &&
-    now > interactionCooldown &&
-    lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
+    GLOBALS.keyboard.isInteract &&
+    now > GLOBALS.interactionCooldown &&
+    GLOBALS.lastKeyPressedId !== GLOBALS.keyboard.keyId // avoid keep pressing the same key and executing the code
   ) {
-    lastKeyPressedId = keyboard.keyId;
-    interactionCooldown = now + CONFIG.keyboard.choicesCooldown;
-
-    switch (true) {
-      case keyboard.isRight: {
-        EVENTS.dialogue.entity.changeChoice(true);
-        break;
-      }
-      case keyboard.isLeft: {
-        EVENTS.dialogue.entity.changeChoice(false);
-        break;
-      }
-      case keyboard.isInteract: {
-        EVENTS.dialogue.entity.dialogueManager.selectChoice();
-        break;
-      }
-    }
-
-    return; // next interaction handling will be skipped
-  }
-
-  if (
-    keyboard.isInteract &&
-    now > interactionCooldown &&
-    lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
-  ) {
-    lastKeyPressedId = keyboard.keyId;
-    interactionCooldown = now + CONFIG.keyboard.interactionCooldown;
-
-    if (EVENTS.dialogue.inProgress && EVENTS.dialogue.entity) {
-      const dialogueStatus = EVENTS.dialogue.entity.dialogueManager.next();
-
-      switch (dialogueStatus) {
-        case CONFIG.dialogue.status.stop: {
-          EVENTS.dialogue.inProgress = false;
-          EVENTS.dialogue.entity = null;
-          break;
-        }
-        case CONFIG.dialogue.status.battle: {
-          EVENTS.battle.inProgress = true;
-          const battleId = EVENTS.dialogue.entity.dialogueManager.battleId;
-          EVENTS.battle.entity = new BattleManager(
-            BATTLES[currentMap.id][battleId]
-          );
-          EVENTS.battle.entity.init();
-          ASSETS.soundEffects.footsteps.pause();
-          ASSETS.soundEffects.footsteps.currentTime = 0;
-          EVENTS.dialogue.inProgress = false;
-          EVENTS.dialogue.entity = null;
-          break;
-        }
-      }
-      return;
-    }
+    GLOBALS.lastKeyPressedId = GLOBALS.keyboard.keyId;
+    GLOBALS.interactionCooldown = now + CONFIG.keyboard.interactionCooldown;
 
     const entity = currentMap.getNearestInteractionEntity();
 
     if (entity) {
-      EVENTS.dialogue.entity = entity;
-      EVENTS.dialogue.inProgress = true;
-      EVENTS.dialogue.entity.dialogueManager.start();
+      currentDialogue = new DialogueManager({
+        dialogues: entity.dialogues,
+        entity,
+      });
+      currentDialogue.init();
     }
   }
 }
@@ -302,26 +256,37 @@ function handleInteractions() {
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height); // Clean canvas
 
-  if (EVENTS.battle.inProgress) {
-    EVENTS.battle.entity.draw();
-    EVENTS.battle.entity.handle(keyboard);
+  if (currentBattle?.inProgress) {
+    currentBattle.draw();
+    currentBattle.handle(GLOBALS.keyboard);
   } else {
     currentMap.drawBackgrounds();
     currentMap.drawNpcs();
 
-    players[CONFIG.player.partner].draw(partnerDrift.x, partnerDrift.y);
-    players[CONFIG.player.main].draw();
+    GLOBALS.players[CONFIG.player.partner].draw(
+      GLOBALS.partnerDrift.x,
+      GLOBALS.partnerDrift.y
+    );
+    GLOBALS.players[CONFIG.player.main].draw();
 
     currentMap.drawForegrounds();
 
-    if (!EVENTS.dialogue.inProgress) {
+    if (currentDialogue?.inProgress) {
+      currentDialogue.draw();
+      currentDialogue.handle();
+
+      if (currentDialogue.battleIsTriggered) {
+        const battleId = currentDialogue.battleId;
+        currentBattle = new BattleManager(BATTLES[currentMap.id][battleId]);
+        currentBattle.init();
+        currentDialogue.stopDialogue();
+      }
+    } else {
       handlePlayersMovement();
       handleSwitch();
       handleFootstepsSound();
-    } else {
-      drawDialogues();
+      handleInteractions();
     }
-    handleInteractions();
   }
 
   // debug();
@@ -334,9 +299,9 @@ animate();
 
 // Gestione degli eventi di tastiera
 window.addEventListener("keydown", (e) => {
-  keyboard.registerKeyPressed(e);
+  GLOBALS.keyboard.registerKeyPressed(e);
 });
 
 window.addEventListener("keyup", (e) => {
-  keyboard.unsetKeyPressed(e);
+  GLOBALS.keyboard.unsetKeyPressed(e);
 });

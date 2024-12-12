@@ -1,65 +1,106 @@
 class DialogueManager {
+  // Se true indica che il giocatore sta scegliendo un dialogo alternativo
   choiceInProgress = false;
+  // le scelte disponibili in questo particolare dialogo
   currentChoices = null;
+  // Il puntatore per la scelta di un dialogo quando ci sono piu alternative
   currentChoice = -1;
+  // Se true indica che la conversazione è in corso
+  inProgress = false;
+  // Dialogo corrente
+  currentDialogue = null;
+  // Se true indica che la battaglia è stata triggherata
+  battleIsTriggered = false;
 
-  constructor(dialogues) {
+  constructor({ dialogues, entity }) {
     this.dialogues = dialogues;
-    this.currentDialogue = null;
+
+    if (!dialogues || dialogues?.start) {
+      console.error('"start" dialogue missing');
+    }
+    this.entity = entity; // può essere l'NPC o un MapObject. Colui che trigghera il dialogo
     this.state = {};
   }
 
-  start(dialogueId) {
-    let dialogue = this.dialogues.start;
-    if (!dialogue) {
-      console.error('"start" dialogue missing');
+  /**
+   * Avvia tutti i gestori
+   */
+  handle() {
+    if (this.choiceInProgress) {
+      this.handleChoices();
+    } else {
+      this.handleStandardDialogue();
     }
-
-    if (dialogueId) {
-      dialogue = this.dialogues[dialogueId];
-    }
-
-    if (!dialogue) {
-      return null;
-    }
-
-    if (dialogue.textVariants) {
-      const variant = dialogue.textVariants[CONFIG.player.main];
-      if (variant) {
-        this.currentDialogue = dialogue;
-      }
-    }
-
-    this.currentDialogue = dialogue;
   }
 
-  next() {
-    let nextId = this.currentDialogue.next;
+  /**
+   * Inizializza il manager
+   */
+  init() {
+    this.inProgress = true;
+    this.loadNextDialogue();
+
+    // Per evitare che il giocatore passi subito al secondo dialogo
+    GLOBALS.interactionCooldown = Infinity;
+    setTimeout(() => {
+      GLOBALS.interactionCooldown = 0;
+    }, CONFIG.keyboard.interactionCooldown);
+  }
+
+  /**
+   * Carica il dialogo successivo a quello corrente. Se non ce nè uno presente, allora viene
+   * impostato con il primo ("start")
+   */
+  loadNextDialogue() {
+    if (!this.currentDialogue) {
+      this.currentDialogue = this.dialogues.start;
+      return;
+    }
+
+    let nextDialogueId =
+      this.currentChoice >= 0
+        ? this.currentDialogue.choices[this.currentChoice].next
+        : this.currentDialogue.next;
+
     if (this.currentDialogue.textVariants) {
       const variant = this.currentDialogue.textVariants[CONFIG.player.main];
-      nextId = variant.next;
+      nextDialogueId = variant.next;
     }
 
-    if (!nextId) {
+    if (!nextDialogueId) {
+      // Devo dare il tempo all'index di prendere l'id della battle e posso farlo solo
+      // se la conversazione rimane in piedi
       if (this.currentDialogue.battleId) {
-        return CONFIG.dialogue.status.battle;
+        this.battleIsTriggered = true;
+        return;
       }
 
-      return CONFIG.dialogue.status.stop;
+      this.stopDialogue();
+      return;
     }
 
-    this.start(nextId);
-    return CONFIG.dialogue.status.continue;
+    this.currentDialogue = this.dialogues[nextDialogueId];
   }
 
+  /**
+   * Ferma il dialogo
+   */
+  stopDialogue() {
+    this.inProgress = false;
+    GLOBALS.interactionCooldown =
+      Date.now() + CONFIG.keyboard.interactionCooldown;
+  }
+
+  /**
+   * Restituisce il battle id del dialogo
+   */
   get battleId() {
     return this.currentDialogue.battleId;
   }
 
-  get ended() {
-    return !this.currentDialogue.next;
-  }
-
+  /**
+   * Restituisce il testo del dialogo
+   */
   get currentDialogText() {
     if (this.currentDialogue.textVariants) {
       const variant = this.currentDialogue.textVariants[CONFIG.player.main];
@@ -69,6 +110,9 @@ class DialogueManager {
     return this.currentDialogue.text;
   }
 
+  /**
+   * Permette di navigare in avanti le scelte di dialogo
+   */
   nextChoice() {
     this.currentChoice++;
     if (this.currentChoice >= this.currentChoices.length) {
@@ -76,6 +120,9 @@ class DialogueManager {
     }
   }
 
+  /**
+   * Permette di navigare in indietro le scelte di dialogo
+   */
   previousChoice() {
     this.currentChoice--;
     if (this.currentChoice < 0) {
@@ -83,96 +130,23 @@ class DialogueManager {
     }
   }
 
+  /**
+   * Permette di selezionare una scelta di dialogo
+   */
   selectChoice() {
-    let nextId = this.currentDialogue.choices[this.currentChoice].next;
+    this.loadNextDialogue();
     this.currentChoice = -1;
     this.choiceInProgress = false;
-
-    if (!nextId) {
-      return false;
-    }
-
-    this.start(nextId);
-    return true;
   }
 
-  draw({ position, name, players, partnerDrift }) {
-    // when the npc is speaking
-    let boxX = position.x + 20;
-    let boxY = position.y - CONFIG.dialogue.balloon.height;
-    let entityName = name;
-
-    // when a player is speaking
-    if (this.currentDialogue.speaker) {
-      const player = players[this.currentDialogue.speaker];
-
-      if (this.currentDialogue.speaker === CONFIG.player.main) {
-        boxX = player.position.x + 20;
-        boxY = player.position.y - CONFIG.dialogue.balloon.height;
-      } else {
-        boxX = player.position.x + 20 + partnerDrift.x;
-        boxY =
-          player.position.y - CONFIG.dialogue.balloon.height + partnerDrift.y;
-      }
-
-      entityName = player.name;
-    }
-
-    ctx.fillStyle = CONFIG.dialogue.balloon.backgroundColor;
-    ctx.fillRect(
-      boxX,
-      boxY,
-      CONFIG.dialogue.balloon.width,
-      CONFIG.dialogue.balloon.height
-    );
-
-    ctx.strokeStyle = CONFIG.dialogue.balloon.borderColor;
-    ctx.strokeRect(
-      boxX,
-      boxY,
-      CONFIG.dialogue.balloon.width,
-      CONFIG.dialogue.balloon.height
-    );
-
-    ctx.textAlign = CONFIG.dialogue.textAlign;
-    ctx.font = CONFIG.dialogue.fontBold;
-    ctx.fillStyle = CONFIG.dialogue.nameColor;
-    ctx.fillText(
-      entityName,
-      boxX + 5,
-      boxY + 5,
-      boxY + CONFIG.dialogue.balloon.height / 2
-    );
-
-    ctx.font = CONFIG.dialogue.fontNormal;
-    ctx.fillStyle = CONFIG.dialogue.textColor;
-
-    if (this.currentDialogue.choices) {
-      if (!this.choiceInProgress) {
-        this.choiceInProgress = true;
-        this.currentChoices = this.currentDialogue.choices;
-        this.currentChoice = 0;
-      }
-      this.currentDialogue.choices.forEach((choice, index) => {
-        const prefix = this.currentChoice === index ? "> " : "";
-        ctx.fillText(
-          `${prefix}${choice.text}`,
-          boxX + (prefix ? 5 : 15),
-          boxY + 20 + index * 15,
-          boxY + CONFIG.dialogue.balloon.height / 2 + index * 15
-        );
-      });
-    } else {
-      ctx.fillText(
-        this.currentDialogText,
-        boxX + 5,
-        boxY + 20,
-        boxY + CONFIG.dialogue.balloon.height / 2
-      );
-    }
+  draw() {
+    this.drawBalloon();
   }
 
-  draw2({ position, name, partnerDrift }) {
+  /**
+   * Disegna il fumetto
+   */
+  drawBalloon() {
     const {
       padding,
       fontSize,
@@ -185,26 +159,27 @@ class DialogueManager {
 
     let buttons = [BUTTONS.ok];
 
-    let entityName = name;
+    let entityName = this.entity.name;
 
-    let x = position.x;
-    let y = position.y - CONFIG.battle.actionBox.height - marginBottom;
+    let x = this.entity.position.x;
+    let y =
+      this.entity.position.y - CONFIG.battle.actionBox.height - marginBottom;
 
     // when a player is speaking
     if (this.currentDialogue.speaker) {
-      const player = players[this.currentDialogue.speaker];
+      const player = GLOBALS.players[this.currentDialogue.speaker];
       const partner = getOtherPlayer(this.currentDialogue.speaker);
 
       if (this.currentDialogue.speaker === CONFIG.player.main) {
         x = player.position.x;
         y = player.position.y - CONFIG.battle.actionBox.height - marginBottom;
       } else {
-        x = partner.position.x + partnerDrift.x;
+        x = partner.position.x + GLOBALS.partnerDrift.x;
         y =
           partner.position.y -
           CONFIG.battle.actionBox.height -
           marginBottom +
-          partnerDrift.y;
+          GLOBALS.partnerDrift.y;
       }
 
       entityName = player.name;
@@ -281,6 +256,12 @@ class DialogueManager {
     this.drawHotkeys(x, y, buttons);
   }
 
+  /**
+   * Disegna i pulsanti che si possono premere nel fumetto
+   * @param {*} x posizione X del fumetto
+   * @param {*} y posizione Y del fumetto
+   * @param {*} buttons bottoni da mostrare
+   */
   drawHotkeys(x, y, buttons = []) {
     const { padding, width, height } = CONFIG.battle.actionBox;
     const { gap, height: hotkeyHeight } = CONFIG.dialogue.hotkeys;
@@ -299,5 +280,53 @@ class DialogueManager {
       drawHotkey(ctx, startX, y + height - padding + hotkeyHeight, button);
       startX += button.width + gap;
     });
+  }
+
+  /**
+   * Gestisce i comandi da tastiera quando ci sono dei dialoghi alternativi
+   */
+  handleChoices() {
+    const now = Date.now();
+
+    if (
+      now > GLOBALS.interactionCooldown &&
+      GLOBALS.lastKeyPressedId !== GLOBALS.keyboard.keyId
+    ) {
+      GLOBALS.lastKeyPressedId = GLOBALS.keyboard.keyId;
+      GLOBALS.interactionCooldown = now + CONFIG.keyboard.choicesCooldown;
+
+      switch (true) {
+        case GLOBALS.keyboard.isRight: {
+          this.previousChoice();
+          break;
+        }
+        case GLOBALS.keyboard.isLeft: {
+          this.nextChoice();
+          break;
+        }
+        case GLOBALS.keyboard.isInteract: {
+          this.selectChoice();
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * Gestisce i comandi da tastiera mentre un dialogo standard è in corso
+   */
+  handleStandardDialogue() {
+    const now = Date.now();
+
+    if (
+      GLOBALS.keyboard.isInteract &&
+      now > GLOBALS.interactionCooldown &&
+      GLOBALS.lastKeyPressedId !== GLOBALS.keyboard.keyId
+    ) {
+      GLOBALS.lastKeyPressedId = GLOBALS.keyboard.keyId;
+      GLOBALS.interactionCooldown = now + CONFIG.keyboard.interactionCooldown;
+
+      this.loadNextDialogue();
+    }
   }
 }

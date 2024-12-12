@@ -4,7 +4,7 @@ class MapObject extends Sprite {
     spriteImage,
     isObstacle,
     mapPositionCell = { cellX: 0, cellY: 0 },
-    dialogueManager = null,
+    dialogues = null,
   }) {
     super({
       spriteImages: {
@@ -22,7 +22,7 @@ class MapObject extends Sprite {
       mapPositionCell.cellX,
       mapPositionCell.cellY
     );
-    this.dialogueManager = dialogueManager;
+    this.dialogues = dialogues;
   }
 
   updatePosition(position) {
@@ -55,22 +55,5 @@ class MapObject extends Sprite {
       image.width / 4,
       image.height
     );
-  }
-
-  changeChoice(goToNext = true) {
-    if (goToNext) {
-      this.dialogueManager.nextChoice();
-    } else {
-      this.dialogueManager.previousChoice();
-    }
-  }
-
-  drawDialogue({ players, partnerDrift }) {
-    this.dialogueManager.draw({
-      position: this.position,
-      name: this.name,
-      players,
-      partnerDrift,
-    });
   }
 }

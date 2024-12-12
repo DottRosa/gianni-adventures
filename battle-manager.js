@@ -45,14 +45,16 @@ class BattleManager {
 
   battleEnd = false;
 
+  inProgress = false;
+
   constructor(battle) {
     this.battle = battle;
   }
 
   buildTurns() {
     const turns = [
-      players[CONFIG.player.gianni],
-      players[CONFIG.player.fabrissazzo],
+      GLOBALS.players[CONFIG.player.gianni],
+      GLOBALS.players[CONFIG.player.fabrissazzo],
     ];
 
     this.battle.enemies.forEach((enemy) => {
@@ -71,6 +73,7 @@ class BattleManager {
    * e prepara tutti i valori necessari ai fini della battaglia.
    */
   init() {
+    this.inProgress = true;
     // Calculate turns
     const turns = [];
     for (var i = 0; i < 50; i++) {
@@ -83,9 +86,9 @@ class BattleManager {
 
     const { horizontalGap, width, areaPaddingX } = CONFIG.battle.healthBar;
 
-    Object.keys(players).forEach((key, index) => {
-      players[key].currentDirection = CONFIG.directions.right;
-      players[key].battlePosition = {
+    Object.keys(GLOBALS.players).forEach((key, index) => {
+      GLOBALS.players[key].currentDirection = CONFIG.directions.right;
+      GLOBALS.players[key].battlePosition = {
         x: areaPaddingX + width / 2 + horizontalGap * index,
         y: CONFIG.tile.canvasHeight / 2,
       };
@@ -119,11 +122,11 @@ class BattleManager {
    */
   handleAttackersAndDefenders() {
     if (this.isPlayerTurn) {
-      this.attackers = [...Object.values(players)];
+      this.attackers = [...Object.values(GLOBALS.players)];
       this.defenders = [...this.battle.enemies];
     } else {
       this.attackers = [...this.battle.enemies];
-      this.defenders = [...Object.values(players)];
+      this.defenders = [...Object.values(GLOBALS.players)];
     }
   }
 
@@ -239,8 +242,8 @@ class BattleManager {
 
   drawPlayersHealthBar() {
     const list = [];
-    Object.keys(players).forEach((key) => {
-      list.push(players[key]);
+    Object.keys(GLOBALS.players).forEach((key) => {
+      list.push(GLOBALS.players[key]);
     });
 
     this.drawCharacterCard(list);
@@ -259,7 +262,7 @@ class BattleManager {
     const startY = tile.canvasHeight / 2 + height * 4;
 
     const drawCircle = (posX, posY) => {
-      posX += players[player.gianni].displayedWidth / 2;
+      posX += GLOBALS.players[player.gianni].displayedWidth / 2;
       posY -= height * 2; // Posizionare il cerchio sopra al personaggio
 
       ctx.beginPath();
@@ -683,14 +686,14 @@ class BattleManager {
   /**
    * Gestisce le interazioni con la tastiera in base ai tasti premuti ed alla fase in corso
    */
-  handleKeyboard(keyboard) {
+  handleKeyboard() {
     const now = Date.now();
 
     if (
       now > this.interactionCooldown &&
-      this.lastKeyPressedId !== keyboard.keyId // avoid keep pressing the same key and executing the code
+      this.lastKeyPressedId !== GLOBALS.keyboard.keyId // avoid keep pressing the same key and executing the code
     ) {
-      this.lastKeyPressedId = keyboard.keyId;
+      this.lastKeyPressedId = GLOBALS.keyboard.keyId;
       this.interactionCooldown = now + CONFIG.keyboard.choicesCooldown;
 
       ASSETS.soundEffects.choices.pause();
@@ -731,7 +734,7 @@ class BattleManager {
    */
   handleSelectionPhase() {
     switch (true) {
-      case keyboard.isInteract: {
+      case GLOBALS.keyboard.isInteract: {
         this.nextPhase();
         this.actionPointer = 0; // resetto per usarlo per il submenu
         ASSETS.soundEffects.selection.play();
@@ -791,7 +794,7 @@ class BattleManager {
    */
   handleAttacksOptionsPhase() {
     switch (true) {
-      case keyboard.isInteract: {
+      case GLOBALS.keyboard.isInteract: {
         this.nextPhase();
         this.currentAttack =
           this.currentCharacter.freeAttacks[this.actionPointer];
@@ -814,7 +817,7 @@ class BattleManager {
    */
   handleSpecialAttacksOptionsPhase() {
     switch (true) {
-      case keyboard.isInteract: {
+      case GLOBALS.keyboard.isInteract: {
         if (!this.currentCharacter.costAttacks.length) {
           return;
         }
@@ -847,7 +850,7 @@ class BattleManager {
    */
   handleBackpackOptionsPhase() {
     switch (true) {
-      case keyboard.isInteract: {
+      case GLOBALS.keyboard.isInteract: {
         this.nextPhase();
         this.currentAttack = backpack.itemsList[this.actionPointer].attack;
 
@@ -869,12 +872,12 @@ class BattleManager {
    */
   handleTargetPhase() {
     switch (true) {
-      case keyboard.isInteract: {
+      case GLOBALS.keyboard.isInteract: {
         this.nextPhase();
         ASSETS.soundEffects.selection.play();
         return;
       }
-      case keyboard.isCancel: {
+      case GLOBALS.keyboard.isCancel: {
         this.prevPhase();
         this.targetPointer = 0;
         ASSETS.soundEffects.cancel.play();
@@ -884,11 +887,11 @@ class BattleManager {
     if (this.isPlayerTurn) {
       ASSETS.soundEffects.cancel.pause();
       switch (true) {
-        case keyboard.isLeft: {
+        case GLOBALS.keyboard.isLeft: {
           this.moveTargetPointerLeft();
           return;
         }
-        case keyboard.isRight: {
+        case GLOBALS.keyboard.isRight: {
           this.moveTargetPointerRight();
           return;
         }
@@ -902,12 +905,12 @@ class BattleManager {
    */
   handleActionPointer() {
     switch (true) {
-      case keyboard.isUp: {
+      case GLOBALS.keyboard.isUp: {
         this.moveActionPointerUp();
         ASSETS.soundEffects.choices.play();
         return;
       }
-      case keyboard.isDown: {
+      case GLOBALS.keyboard.isDown: {
         this.moveActionPointerDown();
         ASSETS.soundEffects.choices.play();
         return;
@@ -920,7 +923,7 @@ class BattleManager {
    */
   handleCancelAsBack() {
     switch (true) {
-      case keyboard.isCancel: {
+      case GLOBALS.keyboard.isCancel: {
         this.prevPhase();
         this.actionPointer = 0; // resetto per usarlo per il submenu
         ASSETS.soundEffects.cancel.play();
@@ -1008,12 +1011,12 @@ class BattleManager {
       (enemy) => enemy.isDefeated
     );
 
-    const playersDefeated = Object.keys(players).every(
-      (key) => players[key].isDefeated
+    const playersDefeated = Object.keys(GLOBALS.players).every(
+      (key) => GLOBALS.players[key].isDefeated
     );
     if (enemiesDefeated || playersDefeated) {
       this.battleEnd = true;
-      EVENTS.battle.inProgress = false;
+      this.inProgress = false;
     }
   }
 
@@ -1130,8 +1133,8 @@ class BattleManager {
    * Da richiamare all'avvio della battaglia per permettere allo script principale di
    * avviare la gestione della tastiera
    */
-  handle(keyboard) {
-    this.handleKeyboard(keyboard);
+  handle() {
+    this.handleKeyboard();
     this.handleAttack();
   }
 

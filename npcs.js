@@ -6,9 +6,7 @@ const NPCS = {
         cellX: 17,
         cellY: 22,
       },
-      dialogueManager: new DialogueManager(
-        NPC_DIALOGUES.intro[NPC_IDS.furlanetto]
-      ),
+      dialogues: NPC_DIALOGUES.intro[NPC_IDS.furlanetto],
       characterBattleStats: new CharacterBattleStats({
         health: 120,
         stamina: 6,
@@ -22,7 +20,7 @@ const NPCS = {
         cellX: 36,
         cellY: 17,
       },
-      dialogueManager: new DialogueManager(NPC_DIALOGUES.intro[NPC_IDS.cozza]),
+      dialogues: NPC_DIALOGUES.intro[NPC_IDS.cozza],
       characterBattleStats: new CharacterBattleStats({
         health: 120,
         stamina: 4,
@@ -36,7 +34,7 @@ const NPCS = {
         cellX: 36,
         cellY: 17,
       },
-      dialogueManager: new DialogueManager(NPC_DIALOGUES.intro[NPC_IDS.tumus]),
+      dialogues: NPC_DIALOGUES.intro[NPC_IDS.tumus],
       characterBattleStats: new CharacterBattleStats({
         health: 120,
         stamina: 4,

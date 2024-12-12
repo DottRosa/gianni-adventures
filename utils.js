@@ -138,10 +138,10 @@ function drawArc({ startX, startY, endX, endY, height }) {
 
 function getOtherPlayer(playerId) {
   if (playerId === CONFIG.player.fabrissazzo) {
-    return players[CONFIG.player.gianni];
+    return GLOBALS.players[CONFIG.player.gianni];
   }
   if (playerId === CONFIG.player.gianni) {
-    return players[CONFIG.player.fabrissazzo];
+    return GLOBALS.players[CONFIG.player.fabrissazzo];
   }
 }
 
