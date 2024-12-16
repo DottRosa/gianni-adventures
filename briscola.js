@@ -1,8 +1,19 @@
 class Briscola {
   availablePartners = [];
+  background;
 
-  constructor({ adversaries = [] }) {
+  constructor({
+    adversaries = [],
+    background = `${CONFIG.assets.folder}/battle.jpg`,
+  }) {
     this.adversaries = adversaries;
+    this.background = new Layer({
+      position: {
+        x: 0,
+        y: 0,
+      },
+      imageSrc: background,
+    });
 
     const adversaryIds = adversaries.map((adversary) => {
       return adversary.id;
@@ -17,7 +28,6 @@ class Briscola {
       },
       []
     );
-    console.log(this.availablePartners);
   }
 }
 

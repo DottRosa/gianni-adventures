@@ -189,6 +189,18 @@ const CONFIG = {
       quantityToDisplay: 4,
     },
   },
+  briscola: {
+    phases: {
+      partnerChoice: "partnerChoice", // il giocatore sceglie il suo partner
+    },
+    partnerSelection: {
+      cell: 75, // larghezza e altezza della cella di un partner
+      detailsBox: {
+        height: 200,
+        font: "bold 25px Comic Sans MS",
+      },
+    },
+  },
 };
 
 CONFIG.tile.tilesFromCenterX = Math.floor(CONFIG.tile.tilesPerX / 2);
@@ -242,6 +254,12 @@ const NPC_IDS = {
   furlanetto: "furlanetto",
   cozza: "cozza",
   tumus: "tumus",
+  tartaglione: "tartaglione",
+  simonato: "simonato",
+  rosa: "rosa",
+  cristante: "cristante",
+  ceccobelli: "ceccobelli",
+  denis: "denis",
 };
 
 const canvas = document.querySelector("canvas");
