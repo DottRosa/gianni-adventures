@@ -142,7 +142,7 @@ const BRISCOLA_PLAYERS = {
       },
       {
         title: "Compagno fidato",
-        description: "Esegue motti comprensibili",
+        description: "I motti sono piu comprensibili del normale",
       },
     ],
     cons: [
@@ -168,7 +168,7 @@ const BRISCOLA_PLAYERS = {
     cons: [
       {
         title: "Anacronistico",
-        description: "Non fa motti, non fa Mu, non fa pesca con rivelazione",
+        description: "Non fa motti, non fa Mu, non fa pesca con rivelazione.",
       },
     ],
   }),
@@ -178,7 +178,12 @@ const BRISCOLA_PLAYERS = {
       {
         title: "Professionista",
         description:
-          "Quando incita la carica, il piglio verrà sicuramente portato a casa",
+          "Quando incita la carica sai che il piglio verrà sicuramente portato a casa.",
+      },
+      {
+        title: "Maschio alfa",
+        description:
+          "Ad ogni turno, con una probabilità del 20%, intimidisce gli avversari, sbeffeggiandoli e fancendo calare il loro Morale",
       },
     ],
     cons: [

@@ -43,7 +43,7 @@ const BESTIARY = {
       return `${this.firstName} ${this.lastName}`;
     },
     nickname: {
-      [CONFIG.player.fabrissazzo]: "Tumus culattore",
+      [CONFIG.player.fabrissazzo]: "Tumus Culattone",
       [CONFIG.player.gianni]: "Bertolin",
     },
   },

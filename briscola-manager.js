@@ -165,9 +165,12 @@ class BriscolaManager {
     ctx.fillStyle = "black";
 
     if (partner) {
-      const posX = canvasWidth / 2 - textWidth(partner.character.name) / 2;
+      const partnerName =
+        partner.character.details?.nickname.fabrissazzo ??
+        partner.character.name;
+      const posX = canvasWidth / 2 - textWidth(partnerName) / 2;
       const posY = y + cell / 3;
-      ctx.fillText(partner.character.name, posX, posY);
+      ctx.fillText(partnerName, posX, posY);
 
       let distance = 35;
 
