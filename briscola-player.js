@@ -34,7 +34,7 @@ const BRISCOLA_PLAYERS = {
       {
         title: "Sicurezza matematica",
         description:
-          "Conta i punti e guadagna Morale ad ogni turno se sono superiori a quelli degli avversati",
+          "Conta i punti e ad ogni turno, se questi sono superiori a quelli avversari, guadagna Morale",
       },
       {
         title: "Vantaggio",
@@ -158,11 +158,11 @@ const BRISCOLA_PLAYERS = {
       {
         title: "Impassibile",
         description:
-          "Qualunque calo di Morale che lo riguarda, viene annullato",
+          "Quando le sue carte vengono sbriciate, non altera il Morale della squadra",
       },
       {
         title: "Statistico",
-        description: "",
+        description: "Mostra le briscole giocate durante tutta la partita",
       },
     ],
     cons: [
@@ -178,7 +178,7 @@ const BRISCOLA_PLAYERS = {
       {
         title: "Professionista",
         description:
-          "Quando incita la carica, la giocata verrà sicuramente vinta",
+          "Quando incita la carica, il piglio verrà sicuramente portato a casa",
       },
     ],
     cons: [

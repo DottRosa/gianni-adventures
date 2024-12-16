@@ -196,8 +196,10 @@ const CONFIG = {
     partnerSelection: {
       cell: 75, // larghezza e altezza della cella di un partner
       detailsBox: {
-        height: 200,
-        font: "bold 25px Comic Sans MS",
+        height: 300,
+        fontName: "bold 25px Comic Sans MS",
+        fontTitle: "bold 13px Comic Sans MS",
+        fontDescription: "11px Comic Sans MS",
       },
     },
   },

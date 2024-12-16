@@ -161,12 +161,30 @@ class BriscolaManager {
 
     const partner = this.partnerHovered;
 
-    ctx.font = detailsBox.font;
+    ctx.font = detailsBox.fontName;
     ctx.fillStyle = "black";
 
     if (partner) {
       const posX = canvasWidth / 2 - textWidth(partner.character.name) / 2;
-      ctx.fillText(partner.character.name, posX, y + cell / 3);
+      const posY = y + cell / 3;
+      ctx.fillText(partner.character.name, posX, posY);
+
+      let distance = 35;
+
+      [...partner.pros, ...partner.cons].forEach((item, index) => {
+        ctx.font = detailsBox.fontDescription; //serve ai fini del calcolo
+        const wrappedDescription = wrapText(item.description, cell * 5 - 20);
+        ctx.font = detailsBox.fontTitle;
+
+        ctx.fillText(item.title, x + 10, posY + distance);
+
+        ctx.font = detailsBox.fontDescription;
+        wrappedDescription.forEach((line, index) => {
+          distance += 20;
+          ctx.fillText(line, x + 10, y + cell / 3 + distance);
+        });
+        distance += 35;
+      });
     } else {
       const noPartnerMessage = "Scelta causale";
       const posX = canvasWidth / 2 - textWidth(noPartnerMessage) / 2;
