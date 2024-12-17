@@ -8,6 +8,8 @@ class Keyboard {
     Switch: false,
     Interact: false,
     Cancel: false,
+    LeftTrigger: false,
+    RightTrigger: false,
   };
 
   // This is a unique ID that identifies a key press. It is based on the timestamp,
@@ -41,6 +43,12 @@ class Keyboard {
       case CONFIG.keyboard.cancelKey: {
         return this.keysPressed.Cancel;
       }
+      case CONFIG.keyboard.leftTriggerKey: {
+        return this.keysPressed.LeftTrigger;
+      }
+      case CONFIG.keyboard.rightTriggerKey: {
+        return this.keysPressed.RightTrigger;
+      }
     }
 
     return this.keysPressed[keyboardEvent.key];
@@ -60,6 +68,14 @@ class Keyboard {
       }
       case CONFIG.keyboard.cancelKey: {
         this.keysPressed.Cancel = pressed;
+        return;
+      }
+      case CONFIG.keyboard.leftTriggerKey: {
+        this.keysPressed.LeftTrigger = pressed;
+        return;
+      }
+      case CONFIG.keyboard.rightTriggerKey: {
+        this.keysPressed.RightTrigger = pressed;
         return;
       }
     }
@@ -104,6 +120,14 @@ class Keyboard {
 
   get isCancel() {
     return this.keysPressed.Cancel;
+  }
+
+  get isLeftTrigger() {
+    return this.keysPressed.LeftTrigger;
+  }
+
+  get isRightTrigger() {
+    return this.keysPressed.RightTrigger;
   }
 
   unsetSwitch() {

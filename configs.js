@@ -50,6 +50,8 @@ const CONFIG = {
     animationCooldown: 50,
     switchKey: "s",
     interactKey: "z",
+    leftTriggerKey: "a",
+    rightTriggerKey: "d",
     cancelKey: "x",
   },
   dialogue: {
@@ -196,7 +198,7 @@ const CONFIG = {
     partnerSelection: {
       cell: 75, // larghezza e altezza della cella di un partner
       detailsBox: {
-        height: 300,
+        height: 350,
         fontName: "bold 25px Comic Sans MS",
         fontTitle: "bold 13px Comic Sans MS",
         fontDescription: "11px Comic Sans MS",
@@ -279,6 +281,14 @@ const BUTTONS = {
   horizontalScroll: {
     key: "⇄",
     label: "Scorri",
+  },
+  briscolaPlayerDetails: {
+    key: CONFIG.keyboard.rightTriggerKey,
+    label: "Mostra le statistiche",
+  },
+  briscolaPlayerDetailsBack: {
+    key: CONFIG.keyboard.rightTriggerKey,
+    label: "Mostra le abilità",
   },
 };
 

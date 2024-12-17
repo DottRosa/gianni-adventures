@@ -1,6 +1,6 @@
 const BRISCOLA_PLAYER_DEFAULT_STATS = {
   muExecution: 0.5, // probabilità di fare mu quando viene effettivamente pescato
-  muPower: 1, // indica il potere del Mu. Se 1 il potere rimane quello di default
+  muPower: 0, // indica il potere del Mu. Se 0 il potere rimane quello di default
 
   revelationDrawExecution: 0.2, // probabilità di fare pesca con rivelazione ad ogni pescata
 
@@ -18,12 +18,55 @@ const BRISCOLA_PLAYER_DEFAULT_STATS = {
   moraleDrop: 0, // indica il decremento di morale quando questo viene triggherato. Se 0, non c'è diminuzione oltre a quello standard
 };
 
+const BRISCOLA_PLAYER_DEFAULT_STATS_LABELS = {
+  muExecution: "Probabilità di fare Mu",
+  muPower: "Potere del Mu",
+  revelationDrawExecution: "Probabilità di eseguire pesca con rivelazione",
+  loadExecution: "Probabilità di incitare la carica",
+  peekExecution: "Probabilità di eseguire la sbriciata",
+  peekAbility: "Abilità nello sbirciare",
+  sendUpInSmoke: "Probabilità di mandare a monte con Morale basso",
+  mottoExecution: "Probabilità di esecuzione dei motti",
+  mottoPrecision: "Precisione dei motti",
+  moraleBoost: "Incremento di morale",
+  moraleDrop: "Decremento di morale",
+};
+
 class BriscolaPlayer {
-  constructor({ character, pros = [], cons = [], stats = {} }) {
+  constructor({
+    character,
+    pros = [],
+    cons = [],
+    stats = {},
+    description = "",
+  }) {
     this.character = character;
     this.pros = pros;
     this.cons = cons;
+    this.description = description;
     this.stats = { ...BRISCOLA_PLAYER_DEFAULT_STATS, ...stats };
+  }
+
+  getVisualStatValue(stat) {
+    const value = Math.floor(this.stats[stat] * 100);
+
+    switch (stat) {
+      case "muPower":
+      case "moraleBoost":
+      case "moraleDrop":
+      case "peekAbility": {
+        return `${this.stats[stat] >= 0 ? "+" : "-"}${value}%`;
+      }
+      case "muExecution":
+      case "revelationDrawExecution":
+      case "loadExecution":
+      case "peekExecution":
+      case "sendUpInSmoke":
+      case "mottoExecution":
+      case "mottoPrecision": {
+        return `${value}%`;
+      }
+    }
   }
 }
 
@@ -50,6 +93,8 @@ const BRISCOLA_PLAYERS = {
     stats: {
       sendUpInSmoke: 0.4,
     },
+    description:
+      "Giocatore abile che adotta svariate strategie pur di vincere, rispettando comunque le regole.",
   }),
   tumus: new BriscolaPlayer({
     character: NPCS[MAP_IDS.intro].tumus,
@@ -71,6 +116,8 @@ const BRISCOLA_PLAYERS = {
       peekExecution: 0.6,
       peekAbility: 0.75,
     },
+    description:
+      "Giocatore contraddistinto dalla fortuna e dal continuo incitamento, nei confronti degli avversari, a proseguire. Usa frasi del tipo 'Allora ti muovi?'",
   }),
   gianni: new BriscolaPlayer({
     character: GLOBALS.players.gianni,

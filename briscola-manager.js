@@ -4,6 +4,7 @@ class BriscolaManager {
   briscolaPlayers;
   deck;
   phasesHistory = [CONFIG.briscola.phases.partnerChoice];
+  showPlayerDetails = false;
   partnerChoicePointer = {
     x: 0,
     y: 0,
@@ -98,6 +99,10 @@ class BriscolaManager {
         this.partnerChoicePointer.x += this.partnerChoicePointer.x < 4 ? 1 : 0;
         return;
       }
+      case GLOBALS.keyboard.isRightTrigger: {
+        this.showPlayerDetails = !this.showPlayerDetails;
+        return;
+      }
     }
   }
 
@@ -153,11 +158,13 @@ class BriscolaManager {
     const { cell, detailsBox } = CONFIG.briscola.partnerSelection;
     const { canvasHeight, canvasWidth } = CONFIG.tile;
 
+    const boxWidth = cell * 5;
+
     const x = canvasWidth / 2 - cell * 2 - cell / 2;
     const y = canvasHeight - cell * 2 - cell - detailsBox.height;
 
-    ctx.fillRect(x, y, cell * 5, detailsBox.height);
-    ctx.strokeRect(x, y, cell * 5, detailsBox.height);
+    ctx.fillRect(x, y, boxWidth, detailsBox.height);
+    ctx.strokeRect(x, y, boxWidth, detailsBox.height);
 
     const partner = this.partnerHovered;
 
@@ -172,26 +179,63 @@ class BriscolaManager {
       const posY = y + cell / 3;
       ctx.fillText(partnerName, posX, posY);
 
-      let distance = 35;
+      let distance = 15;
 
-      [...partner.pros, ...partner.cons].forEach((item, index) => {
-        ctx.font = detailsBox.fontDescription; //serve ai fini del calcolo
-        const wrappedDescription = wrapText(item.description, cell * 5 - 20);
-        ctx.font = detailsBox.fontTitle;
+      ctx.font = detailsBox.fontDescription;
+      const wrappedDescription = wrapText(partner.description, boxWidth - 20);
 
-        ctx.fillText(item.title, x + 10, posY + distance);
-
-        ctx.font = detailsBox.fontDescription;
-        wrappedDescription.forEach((line, index) => {
-          distance += 20;
-          ctx.fillText(line, x + 10, y + cell / 3 + distance);
-        });
-        distance += 35;
+      wrappedDescription.forEach((line, index) => {
+        distance += 20;
+        ctx.fillText(line, x + 10, y + cell / 3 + distance);
       });
+      // ctx.fillText(partner.description, posX, posY + distance);
+
+      let button = BUTTONS.briscolaPlayerDetails;
+
+      distance += 35;
+      if (this.showPlayerDetails) {
+        button = BUTTONS.briscolaPlayerDetailsBack;
+        ctx.font = detailsBox.fontDescription;
+
+        Object.keys(BRISCOLA_PLAYER_DEFAULT_STATS).forEach((stat) => {
+          ctx.fillText(
+            BRISCOLA_PLAYER_DEFAULT_STATS_LABELS[stat],
+            x + 10,
+            posY + distance
+          );
+          ctx.fillText(
+            partner.getVisualStatValue(stat),
+            x + boxWidth - 50,
+            posY + distance
+          );
+          distance += 20;
+        });
+      } else {
+        [...partner.pros, ...partner.cons].forEach((item, index) => {
+          ctx.font = detailsBox.fontDescription; //serve ai fini del calcolo
+          const wrappedDescription = wrapText(item.description, boxWidth - 20);
+          ctx.font = detailsBox.fontTitle;
+
+          ctx.fillText(item.title, x + 10, posY + distance);
+
+          ctx.font = detailsBox.fontDescription;
+          wrappedDescription.forEach((line, index) => {
+            distance += 20;
+            ctx.fillText(line, x + 10, y + cell / 3 + distance);
+          });
+          distance += 35;
+        });
+      }
+      drawHotkey(
+        ctx,
+        x + boxWidth - button.width - 10,
+        y + detailsBox.height - 30,
+        button
+      );
     } else {
       const noPartnerMessage = "Scelta causale";
       const posX = canvasWidth / 2 - textWidth(noPartnerMessage) / 2;
-      ctx.fillText(noPartnerMessage, posX, y + cell / 3);
+      ctx.fillText(noPartnerMessage, posX, y + detailsBox.height / 2);
     }
   }
 
