@@ -25,7 +25,17 @@ class BriscolaManager {
     this.adversariesTeam = this.briscola.adversaries;
   }
 
-  createDeck() {}
+  /**
+   * Imposta la fase corrente a quella successiva
+   */
+  nextPhase() {
+    switch (this.currentPhase) {
+      case CONFIG.briscola.phases.partnerChoice: {
+        this.phasesHistory.push(CONFIG.briscola.phases.gameStart);
+        return;
+      }
+    }
+  }
 
   init() {
     this.inProgress = true;
@@ -77,12 +87,6 @@ class BriscolaManager {
    */
   handlPartnerChoicePhase() {
     switch (true) {
-      case GLOBALS.keyboard.isInteract: {
-        // this.nextPhase();
-        // this.actionPointer = 0; // resetto per usarlo per il submenu
-        // ASSETS.soundEffects.selection.play();
-        return;
-      }
       case GLOBALS.keyboard.isUp: {
         this.partnerChoicePointer.y -= this.partnerChoicePointer.y > 0 ? 1 : 0;
         return;
@@ -101,6 +105,10 @@ class BriscolaManager {
       }
       case GLOBALS.keyboard.isRightTrigger: {
         this.showPlayerDetails = !this.showPlayerDetails;
+        return;
+      }
+      case GLOBALS.keyboard.isInteract: {
+        this.nextPhase();
         return;
       }
     }
@@ -229,9 +237,15 @@ class BriscolaManager {
       }
       drawHotkey(
         ctx,
-        x + boxWidth - button.width - 10,
+        x + boxWidth - BUTTONS.confirm.width - button.width - 20,
         y + detailsBox.height - 30,
         button
+      );
+      drawHotkey(
+        ctx,
+        x + boxWidth - BUTTONS.confirm.width - 10,
+        y + detailsBox.height - 30,
+        BUTTONS.confirm
       );
     } else {
       const noPartnerMessage = "Scelta causale";

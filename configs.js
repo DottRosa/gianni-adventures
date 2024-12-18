@@ -194,6 +194,7 @@ const CONFIG = {
   briscola: {
     phases: {
       partnerChoice: "partnerChoice", // il giocatore sceglie il suo partner
+      gameStart: "gameStart",
     },
     partnerSelection: {
       cell: 75, // larghezza e altezza della cella di un partner
