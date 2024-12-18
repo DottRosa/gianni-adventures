@@ -181,19 +181,10 @@ class BriscolaManager {
 
       let distance = 15;
 
-      ctx.font = detailsBox.fontDescription;
-      const wrappedDescription = wrapText(partner.description, boxWidth - 20);
-
-      wrappedDescription.forEach((line, index) => {
-        distance += 20;
-        ctx.fillText(line, x + 10, y + cell / 3 + distance);
-      });
-      // ctx.fillText(partner.description, posX, posY + distance);
-
       let button = BUTTONS.briscolaPlayerDetails;
 
-      distance += 35;
       if (this.showPlayerDetails) {
+        distance += 30;
         button = BUTTONS.briscolaPlayerDetailsBack;
         ctx.font = detailsBox.fontDescription;
 
@@ -211,6 +202,16 @@ class BriscolaManager {
           distance += 20;
         });
       } else {
+        ctx.font = detailsBox.fontDescription;
+        const wrappedDescription = wrapText(partner.description, boxWidth - 20);
+
+        wrappedDescription.forEach((line, index) => {
+          distance += 20;
+          ctx.fillText(line, x + 10, y + cell / 3 + distance);
+        });
+
+        distance += 35;
+
         [...partner.pros, ...partner.cons].forEach((item, index) => {
           ctx.font = detailsBox.fontDescription; //serve ai fini del calcolo
           const wrappedDescription = wrapText(item.description, boxWidth - 20);

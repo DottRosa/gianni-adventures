@@ -24,7 +24,7 @@ const BRISCOLA_PLAYER_DEFAULT_STATS_LABELS = {
   revelationDrawExecution: "Probabilità di eseguire pesca con rivelazione",
   loadExecution: "Probabilità di incitare la carica",
   peekExecution: "Probabilità di eseguire la sbriciata",
-  peekAbility: "Abilità nello sbirciare",
+  peekAbility: "Probabilità di sbirciare con successo",
   sendUpInSmoke: "Probabilità di mandare a monte con Morale basso",
   mottoExecution: "Probabilità di esecuzione dei motti",
   mottoPrecision: "Precisione dei motti",
@@ -53,8 +53,7 @@ class BriscolaPlayer {
     switch (stat) {
       case "muPower":
       case "moraleBoost":
-      case "moraleDrop":
-      case "peekAbility": {
+      case "moraleDrop": {
         return `${this.stats[stat] >= 0 ? "+" : "-"}${value}%`;
       }
       case "muExecution":
@@ -63,7 +62,8 @@ class BriscolaPlayer {
       case "peekExecution":
       case "sendUpInSmoke":
       case "mottoExecution":
-      case "mottoPrecision": {
+      case "mottoPrecision":
+      case "peekAbility": {
         return `${value}%`;
       }
     }
@@ -94,7 +94,7 @@ const BRISCOLA_PLAYERS = {
       sendUpInSmoke: 0.4,
     },
     description:
-      "Giocatore abile che adotta svariate strategie pur di vincere, rispettando comunque le regole.",
+      "Giocatore abile che adotta svariate strategie pur di vincere, rispettando comunque le regole. Spesso le carte da lui giocate profumano di patatine delle macchinette.",
   }),
   tumus: new BriscolaPlayer({
     character: NPCS[MAP_IDS.intro].tumus,
@@ -102,7 +102,7 @@ const BRISCOLA_PLAYERS = {
       {
         title: "Birbante",
         description:
-          "Sbircia spesso e ha maggiore probabilità farlo con successo",
+          "Sbircia spesso e ha maggiore probabilità di farlo con successo",
       },
     ],
     cons: [
@@ -117,7 +117,7 @@ const BRISCOLA_PLAYERS = {
       peekAbility: 0.75,
     },
     description:
-      "Giocatore contraddistinto dalla fortuna e dal continuo incitamento, nei confronti degli avversari, a proseguire. Usa frasi del tipo 'Allora ti muovi?'",
+      "Giocatore contraddistinto dalla fortuna. Incita spesso coloro che reputa lenti a darsi una mossa, quando lui stesso ci mette piu tempo di chiunque altro. Usa frasi del tipo 'Allora ti muovi?'. Che fastidio.",
   }),
   gianni: new BriscolaPlayer({
     character: GLOBALS.players.gianni,
@@ -139,6 +139,8 @@ const BRISCOLA_PLAYERS = {
       muExecution: 0,
       moraleBoost: 0.2,
     },
+    description:
+      "Poco da dire, è Gianni. I suoi baffoni gli consentono di mantenere un'apparente faccia da poker. È un giocatore di vecchia data e non è affine ai metodi di gioco adottati dai giovani.",
   }),
   tartaglione: new BriscolaPlayer({
     character: NPCS[MAP_IDS.intro].tartaglione,
@@ -159,6 +161,8 @@ const BRISCOLA_PLAYERS = {
       mottoExecution: 0,
       loadExecution: 0,
     },
+    description:
+      "Un giocatore solitario, non comunica e non gioca di squadra. Pensa solo a se stesso. È tuttavia molto abile nel carpire informazioni dalla squadra avversaria.",
   }),
   simonato: new BriscolaPlayer({
     character: NPCS[MAP_IDS.intro].simonato,
@@ -178,6 +182,8 @@ const BRISCOLA_PLAYERS = {
       muPower: 1.5,
       revelationDrawExecution: 0.75,
     },
+    description:
+      "L'inventore del Mu, ne sforna uno nuovo ad ogni partita. Eccellente giocatore, ma pecca molto di presunzione e si fida troppo delle sue pescate.",
   }),
   rosa: new BriscolaPlayer({
     character: NPCS[MAP_IDS.intro].rosa,
@@ -195,9 +201,12 @@ const BRISCOLA_PLAYERS = {
     cons: [
       {
         title: "Spericolato",
-        description: "Incita a caricare anche con briscole molto basse",
+        description:
+          "Incita a caricare anche con briscole molto basse. Ha inoltre il 10% di probabilità di incitare la carica senza alcuna briscola.",
       },
     ],
+    description:
+      "Modestamente, un giocatore d'elite. È il tuo compagno di grandi avventure e quindi l'intesa è vincente. Ma anche io ho i miei difetti, e infatti rischio troppo.",
   }),
   furlanetto: new BriscolaPlayer({
     character: NPCS[MAP_IDS.intro].furlanetto,
@@ -218,6 +227,8 @@ const BRISCOLA_PLAYERS = {
         description: "Non fa motti, non fa Mu, non fa pesca con rivelazione.",
       },
     ],
+    description:
+      "Inutile ascoltare quello che ha da dire, la sua voce è troppo gutturale. Ha una faccia da poker invidiabile e non contempla le ragazzate tipo il Mu. Inoltre si vergogna di fare i motti.",
   }),
   cristante: new BriscolaPlayer({
     character: NPCS[MAP_IDS.intro].cristante,
@@ -239,8 +250,17 @@ const BRISCOLA_PLAYERS = {
         description: "Non sbircia mai",
       },
     ],
+    cons: [
+      {
+        title: "Redarguire con sarcasmo",
+        description:
+          "Se giochi per penultimo/ultimo e gli avversari fanno un piglio sostanzioso, ti insulta ed il Morale cala.",
+      },
+    ],
+    description:
+      "Leggende narrano che abbia inventato lui la Briscola a 4. Il suo tallone d'Achille? Non manca di sbeffeggiare il suo stesso partner.",
   }),
-  ceccobelli: new BriscolaPlayer({
+  denis: new BriscolaPlayer({
     character: NPCS[MAP_IDS.intro].denis,
     pros: [
       {
@@ -258,5 +278,7 @@ const BRISCOLA_PLAYERS = {
       mottoPrecision: 1,
       moraleDrop: 0.2,
     },
+    description:
+      "Un compagno leale e giusto. Grazie alle sua labbra carnose ogni motto è una certezza, tuttavia si abbatte facilmente e crede di più nella sfortuna che nella buona sorte.",
   }),
 };
