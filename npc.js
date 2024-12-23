@@ -79,7 +79,7 @@ class NPC extends Character {
   }
 
   get name() {
-    return this.details.fullName;
+    return `${this.details.firstName} ${this.details.lastName}`;
   }
 
   get battleDialogue() {

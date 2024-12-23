@@ -256,6 +256,7 @@ const MAP_OBJECT_IDS = {
 };
 
 const NPC_IDS = {
+  // buoni
   furlanetto: "furlanetto",
   cozza: "cozza",
   tumus: "tumus",
@@ -265,6 +266,24 @@ const NPC_IDS = {
   cristante: "cristante",
   ceccobelli: "ceccobelli",
   denis: "denis",
+  pisani: "pisani",
+  selva: "selva",
+  tramontin: "tramontin",
+  depol: "depol",
+  maiullari: "maiullari",
+  preside: "preside",
+
+  // cattivi
+  crosilla: "crosilla",
+  sbriz: "sbriz",
+  tesolin: "tesolin",
+  villalta: "villalta",
+  librincomodato: "librincomodato",
+  eliana: "eliana", // la bidella
+  smithers: "smithers",
+  pilot: "pilot",
+  colussi: "colussi",
+  forte: "forte",
 };
 
 const canvas = document.querySelector("canvas");
