@@ -25,6 +25,10 @@ class BriscolaManager {
     this.adversariesTeam = this.briscola.adversaries;
   }
 
+  get partner() {
+    return this.partnerChoicePointer;
+  }
+
   /**
    * Imposta la fase corrente a quella successiva
    */
