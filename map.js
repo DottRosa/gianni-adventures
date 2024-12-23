@@ -4,7 +4,6 @@ class Map {
     totalTilesX,
     totalTilesY,
     collisions,
-    npcs = [],
     doors = [],
     mapObjects = [],
     backgroundImages = [],
@@ -15,12 +14,19 @@ class Map {
     this.id = id;
     this.totalTilesX = totalTilesX;
     this.totalTilesY = totalTilesY;
-    this.npcs = Object.values(npcs);
-    this.collisionsDetector = new Collision(
-      collisions,
-      this.totalTilesY,
-      this.npcs
-    );
+    this.npcs = [];
+    Object.values(NPCS).forEach((npc) => {
+      if (npc.mapPositionCell[id]) {
+        this.npcs.push(npc);
+      }
+    });
+
+    this.collisionsDetector = new Collision({
+      dataArray: collisions,
+      numberTilesX: this.totalTilesY,
+      npcs: this.npcs,
+      mapId: this.id,
+    });
     this.doors = doors;
     this.mapObjects = mapObjects;
     this.backgroundImages = backgroundImages;
@@ -72,7 +78,7 @@ class Map {
     this.currentPosition.y += movY;
 
     for (let i = 0; i < this.npcs.length; i++) {
-      this.npcs[i].updatePosition(this.currentPosition);
+      this.npcs[i].updatePosition(this.currentPosition, this.id);
     }
 
     for (let i = 0; i < this.mapObjects.length; i++) {

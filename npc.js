@@ -28,7 +28,11 @@ class NPC extends Character {
     }
   }
 
-  updatePosition(position) {
+  updatePosition(position, mapId) {
+    this.mapCoords = getCoordsByCell(
+      this.mapPositionCell[mapId].cellX,
+      this.mapPositionCell[mapId].cellY
+    );
     const shiftX = position.x - this.mapCoords.x;
     const shiftY = position.y - this.mapCoords.y;
 

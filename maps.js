@@ -24,7 +24,6 @@ const MAPS = {
     backgroundImages: [`${CONFIG.assets.folder}/first-map.png`],
     foregroundImages: [`${CONFIG.assets.folder}/foreground.png`],
     startPosition: getCoordsByCell(16, 21),
-    npcs: NPCS.intro,
   }),
   [MAP_IDS.next]: new Map({
     totalTilesX: 40,

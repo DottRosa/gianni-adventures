@@ -39,12 +39,19 @@ class BriscolaPlayer {
     cons = [],
     stats = {},
     description = "",
+    enableByEvent = null,
   }) {
     this.character = character;
     this.pros = pros;
     this.cons = cons;
     this.description = description;
     this.stats = { ...BRISCOLA_PLAYER_DEFAULT_STATS, ...stats };
+    this.enableByEvent = enableByEvent;
+  }
+
+  isUnblocked() {
+    if (this.enableByEvent === null) return true;
+    return GAME_STATE.briscolaPlayer[this.enableByEvent];
   }
 
   getVisualStatValue(stat) {
@@ -72,7 +79,7 @@ class BriscolaPlayer {
 
 const BRISCOLA_PLAYERS = {
   cozza: new BriscolaPlayer({
-    character: NPCS[MAP_IDS.intro].cozza,
+    character: NPCS.cozza,
     pros: [
       {
         title: "Sicurezza matematica",
@@ -97,7 +104,7 @@ const BRISCOLA_PLAYERS = {
       "Giocatore abile che adotta svariate strategie pur di vincere, rispettando comunque le regole. Spesso le carte da lui giocate profumano di patatine delle macchinette.",
   }),
   tumus: new BriscolaPlayer({
-    character: NPCS[MAP_IDS.intro].tumus,
+    character: NPCS.tumus,
     pros: [
       {
         title: "Birbante",
@@ -143,7 +150,7 @@ const BRISCOLA_PLAYERS = {
       "Poco da dire, è Gianni. I suoi baffoni gli consentono di mantenere un'apparente faccia da poker. È un giocatore di vecchia data e non è affine ai metodi di gioco adottati dai giovani.",
   }),
   tartaglione: new BriscolaPlayer({
-    character: NPCS[MAP_IDS.intro].tartaglione,
+    character: NPCS.tartaglione,
     pros: [
       {
         title: "Faccia tosta",
@@ -165,7 +172,7 @@ const BRISCOLA_PLAYERS = {
       "Un giocatore solitario, non comunica e non gioca di squadra. Pensa solo a se stesso. È tuttavia molto abile nel carpire informazioni dalla squadra avversaria.",
   }),
   simonato: new BriscolaPlayer({
-    character: NPCS[MAP_IDS.intro].simonato,
+    character: NPCS.simonato,
     pros: [
       {
         title: "Signore del MU",
@@ -186,7 +193,7 @@ const BRISCOLA_PLAYERS = {
       "L'inventore del Mu, ne sforna uno nuovo ad ogni partita. Eccellente giocatore, ma pecca molto di presunzione e si fida troppo delle sue pescate.",
   }),
   rosa: new BriscolaPlayer({
-    character: NPCS[MAP_IDS.intro].rosa,
+    character: NPCS.rosa,
     pros: [
       {
         title: "Profittevole",
@@ -209,7 +216,7 @@ const BRISCOLA_PLAYERS = {
       "Modestamente, un giocatore d'elite. È il tuo compagno di grandi avventure e quindi l'intesa è vincente. Ma anche io ho i miei difetti, e infatti rischio troppo.",
   }),
   furlanetto: new BriscolaPlayer({
-    character: NPCS[MAP_IDS.intro].furlanetto,
+    character: NPCS.furlanetto,
     pros: [
       {
         title: "Impassibile",
@@ -231,7 +238,7 @@ const BRISCOLA_PLAYERS = {
       "Inutile ascoltare quello che ha da dire, la sua voce è troppo gutturale. Ha una faccia da poker invidiabile e non contempla le ragazzate tipo il Mu. Inoltre si vergogna di fare i motti.",
   }),
   cristante: new BriscolaPlayer({
-    character: NPCS[MAP_IDS.intro].cristante,
+    character: NPCS.cristante,
     pros: [
       {
         title: "Professionista",
@@ -261,7 +268,7 @@ const BRISCOLA_PLAYERS = {
       "Leggende narrano che abbia inventato lui la Briscola a 4. Il suo tallone d'Achille? Non manca di sbeffeggiare il suo stesso partner.",
   }),
   denis: new BriscolaPlayer({
-    character: NPCS[MAP_IDS.intro].denis,
+    character: NPCS.denis,
     pros: [
       {
         title: "Labbra carnose",

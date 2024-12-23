@@ -1,10 +1,11 @@
 class Collision {
-  constructor(dataArray, numberTilesX, npcs = []) {
+  constructor({ dataArray, numberTilesX, npcs = [], mapId }) {
     this.dataArray = dataArray;
     this.numberTilesX = numberTilesX;
     this.npcMap = {};
+    this.mapId = mapId;
     npcs.forEach((npc) => {
-      const key = `${npc.mapPositionCell.cellX}-${npc.mapPositionCell.cellY}`;
+      const key = `${npc.mapPositionCell[mapId].cellX}-${npc.mapPositionCell[mapId].cellY}`;
       this.npcMap[key] = npc;
     });
   }
