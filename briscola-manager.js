@@ -117,6 +117,10 @@ class BriscolaManager {
         return;
       }
       case GLOBALS.keyboard.isInteract: {
+        if (this.partnerHovered?.isBlocked) {
+          ASSETS.soundEffects.wrong.play();
+          return;
+        }
         this.nextPhase();
         return;
       }
