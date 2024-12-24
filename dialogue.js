@@ -221,33 +221,38 @@ class DialogueManager {
       );
     }
 
-    // this.currentDialogue.choices?.forEach((choice, index) => {
-    //   drawRoundedRect(
-    //     ctx,
-    //     x - (index + 1) * 15,
-    //     y - (index + 1) * 15,
-    //     width,
-    //     height,
-    //     25
-    //   );
-
-    // });
-
     applyShadow({
       ...shadow,
     });
     ctx.fillStyle = backgroundColor;
 
-    drawRoundedRect(ctx, x, y, width, height, 25);
+    if (this.currentDialogue.type === "thought") {
+      drawEllipse(ctx, x, y, width, height);
 
-    // Aggiungi il triangolo in basso
-    ctx.beginPath(); // Inizia un nuovo percorso
-    ctx.moveTo(x + 20, y + CONFIG.battle.actionBox.height - 2); // Punto sinistro del triangolo
-    ctx.lineTo(x + 40, y + CONFIG.battle.actionBox.height - 2); // Punto destro del triangolo
-    ctx.lineTo(x + 30, y + CONFIG.battle.actionBox.height - 2 + 20); // Punta del triangolo
-    ctx.closePath(); // Chiude il triangolo
+      // Disegna i puntini di collegamento
+      ctx.beginPath();
+      ctx.arc(x + 40, y + height - 10, 6, 0, Math.PI * 2); // Puntino grande
+      ctx.fill();
 
-    ctx.fill(); // riempie il triangolo
+      ctx.beginPath();
+      ctx.arc(x + 35, y + height + 5, 4, 0, Math.PI * 2); // Puntino medio
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(x + 32, y + height + 15, 2, 0, Math.PI * 2); // Puntino piccolo
+      ctx.fill();
+    } else {
+      drawRoundedRect(ctx, x, y, width, height, 25);
+
+      // Aggiungi il triangolo in basso
+      ctx.beginPath(); // Inizia un nuovo percorso
+      ctx.moveTo(x + 20, y + CONFIG.battle.actionBox.height - 2); // Punto sinistro del triangolo
+      ctx.lineTo(x + 40, y + CONFIG.battle.actionBox.height - 2); // Punto destro del triangolo
+      ctx.lineTo(x + 30, y + CONFIG.battle.actionBox.height - 2 + 20); // Punta del triangolo
+      ctx.closePath(); // Chiude il triangolo
+
+      ctx.fill(); // riempie il triangolo
+    }
 
     resetShadow();
 

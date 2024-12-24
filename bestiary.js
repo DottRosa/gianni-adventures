@@ -297,7 +297,7 @@ const BESTIARY = {
     },
     description: "",
     nickname: {
-      [CONFIG.player.fabrissazzo]: "Smithers",
+      [CONFIG.player.fabrissazzo]: "La lecchina",
       [CONFIG.player.gianni]: "Segretaria",
     },
   },

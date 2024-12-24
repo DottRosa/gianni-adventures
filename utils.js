@@ -169,6 +169,72 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.fill();
 }
 
+/**
+ * Disegna un'ellisse
+ * @param {*} ctx il contesto
+ * @param {*} x posizione x del centro
+ * @param {*} y posizione y del centro
+ * @param {*} width larghezza dell'ellisse
+ * @param {*} height altezza dell'ellisse
+ */
+function drawEllipse(ctx, x, y, width, height) {
+  ctx.beginPath();
+  ctx.ellipse(
+    x + width / 2,
+    y + height / 3,
+    width / 1.8,
+    height / 1.5,
+    0,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
+}
+
+// /**
+//  * Disegna una nuvoletta per i pensieri
+//  * @param {*} ctx il contesto
+//  * @param {*} x posizione x
+//  * @param {*} y posizione y
+//  * @param {*} width larghezza della nuvoletta
+//  * @param {*} height altezza della nuvoletta
+//  */
+// function drawThoughtBubble(ctx, x, y, width, height) {
+//   // Offset per i "puntini" che collegano la nuvoletta al personaggio
+//   const bubbleOffset = 10;
+
+//   // Disegna la nuvoletta principale
+//   ctx.beginPath();
+//   ctx.moveTo(x + width * 0.2, y);
+//   ctx.bezierCurveTo(
+//     x - width * 0.2,
+//     y - height * 0.2,
+//     x - width * 0.2,
+//     y + height,
+//     x + width * 0.5,
+//     y + height
+//   );
+//   ctx.bezierCurveTo(
+//     x + width * 1.2,
+//     y + height,
+//     x + width * 1.2,
+//     y - height * 0.2,
+//     x + width * 0.8,
+//     y
+//   );
+//   ctx.bezierCurveTo(
+//     x + width * 0.6,
+//     y - height * 0.4,
+//     x + width * 0.4,
+//     y - height * 0.4,
+//     x + width * 0.2,
+//     y
+//   );
+//   ctx.closePath();
+//   ctx.fill();
+
+// }
+
 function drawHotkey(ctx, x, y, button) {
   const rectWidth = button.width;
 

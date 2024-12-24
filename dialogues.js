@@ -10,7 +10,7 @@ const NPC_DIALOGUES = {
           },
           [CONFIG.player.fabrissazzo]: {
             text: "Ciao Ruben, ho qui er mazzo da briscola. Briscolata?",
-            next: "fabris_answer",
+            next: "cozza_pensiero",
           },
         },
         conditions: [],
@@ -30,8 +30,16 @@ const NPC_DIALOGUES = {
         ],
         next: "goodbye",
       },
-      fabris_answer: {
-        id: "fabris_answer",
+      cozza_pensiero: {
+        id: "cozza_pensiero",
+        text: "Mo te apro er culo",
+        conditions: [],
+        events: [],
+        type: "thought",
+        next: "fabris_risposta",
+      },
+      fabris_risposta: {
+        id: "fabris_risposta",
         text: "Si dai",
         speaker: CONFIG.player.fabrissazzo,
         conditions: [],
@@ -39,22 +47,6 @@ const NPC_DIALOGUES = {
         next: null,
         briscolaId: "first",
       },
-      // fabris_2: {
-      //   id: "fabris_2",
-      //   text: "...",
-      //   speaker: CONFIG.player.fabrissazzo,
-      //   conditions: [],
-      //   events: [],
-      //   next: "fabris_3",
-      // },
-      // fabris_3: {
-      //   id: "fabris_3",
-      //   text: "Fanculo Cozza, a monte!",
-      //   speaker: CONFIG.player.fabrissazzo,
-      //   conditions: [],
-      //   events: [],
-      //   next: null,
-      // },
       goodbye: {
         id: "goodbye",
         text: "(sta sempre incazzato sto qua)",
