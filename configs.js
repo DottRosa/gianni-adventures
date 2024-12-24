@@ -243,8 +243,12 @@ const ASSETS = {
   images: {
     ghostRight: "assets/ghost-sprite-right.png",
     ghostLeft: "assets/ghost-sprite-left.png",
+    lock: "assets/lock.png",
   },
 };
+
+const lockImage = new Image();
+lockImage.src = ASSETS.images.lock;
 
 const MAP_IDS = {
   intro: "intro",
@@ -270,6 +274,7 @@ const NPC_IDS = {
   selva: "selva",
   tramontin: "tramontin",
   depol: "depol",
+  carrellino: "carrellino", // di depol
   maiullari: "maiullari",
   preside: "preside",
 

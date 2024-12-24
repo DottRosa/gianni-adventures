@@ -39,19 +39,19 @@ class BriscolaPlayer {
     cons = [],
     stats = {},
     description = "",
-    enableByEvent = null,
+    enabledByEvent = null,
   }) {
     this.character = character;
     this.pros = pros;
     this.cons = cons;
     this.description = description;
     this.stats = { ...BRISCOLA_PLAYER_DEFAULT_STATS, ...stats };
-    this.enableByEvent = enableByEvent;
+    this.enabledByEvent = enabledByEvent;
   }
 
-  isUnblocked() {
-    if (this.enableByEvent === null) return true;
-    return GAME_STATE.briscolaPlayer[this.enableByEvent];
+  get isBlocked() {
+    if (this.enabledByEvent === null) return false;
+    return !GAME_STATE.briscolaPlayer[this.enabledByEvent];
   }
 
   getVisualStatValue(stat) {
@@ -237,8 +237,30 @@ const BRISCOLA_PLAYERS = {
     description:
       "Inutile ascoltare quello che ha da dire, la sua voce è troppo gutturale. Ha una faccia da poker invidiabile e non contempla le ragazzate tipo il Mu. Inoltre si vergogna di fare i motti.",
   }),
+  denis: new BriscolaPlayer({
+    character: NPCS.denis,
+    pros: [
+      {
+        title: "Labbra carnose",
+        description: "Ogni motto che esegue è comprensibile al 100%",
+      },
+    ],
+    cons: [
+      {
+        title: "Pessimista",
+        description: "Qualunque calo di morale è incrementato",
+      },
+    ],
+    stats: {
+      mottoPrecision: 1,
+      moraleDrop: 0.2,
+    },
+    description:
+      "Un compagno leale e giusto. Grazie alle sua labbra carnose ogni motto è una certezza, tuttavia si abbatte facilmente e crede di più nella sfortuna che nella buona sorte.",
+  }),
   cristante: new BriscolaPlayer({
     character: NPCS.cristante,
+    enabledByEvent: "cristante",
     pros: [
       {
         title: "Professionista",
@@ -267,25 +289,126 @@ const BRISCOLA_PLAYERS = {
     description:
       "Leggende narrano che abbia inventato lui la Briscola a 4. Il suo tallone d'Achille? Non manca di sbeffeggiare il suo stesso partner.",
   }),
-  denis: new BriscolaPlayer({
-    character: NPCS.denis,
+
+  depol: new BriscolaPlayer({
+    character: NPCS.depol,
+    enabledByEvent: "depol",
     pros: [
       {
-        title: "Labbra carnose",
-        description: "Ogni motto che esegue è comprensibile al 100%",
+        title: "Potere dell'8",
+        description:
+          "Se il piglio vale 8 punti od un suo multiplo oppure se pesca un fante, il morale cresce a dismisura.",
       },
     ],
     cons: [
       {
-        title: "Pessimista",
-        description: "Qualunque calo di morale è incrementato",
+        title: "Fuori controllo",
+        description:
+          "Quando il morale cala troppo, invece che mandare a monte, si infuria ed esegue mosse a caso.",
       },
     ],
-    stats: {
-      mottoPrecision: 1,
-      moraleDrop: 0.2,
-    },
+    stats: {},
     description:
-      "Un compagno leale e giusto. Grazie alle sua labbra carnose ogni motto è una certezza, tuttavia si abbatte facilmente e crede di più nella sfortuna che nella buona sorte.",
+      "Un compagno leale e gentile che ti ascolta sempre. Ma tutti hanno una doppia faccia. Una belva si nasconde in lui e gli farà perdere il controllo.",
+  }),
+  carrellino: new BriscolaPlayer({
+    character: NPCS.carrellino,
+    enabledByEvent: "carrellino",
+    pros: [
+      {
+        title: "Oggetto inanimato",
+        description: "Il suo Morale non scende mai.",
+      },
+    ],
+    cons: [
+      {
+        title: "Come parlare con un muro",
+        description:
+          "Non fa motti, Mu, pesca con rivelazione, non incita alla carica",
+      },
+    ],
+    stats: {},
+    description:
+      "Compagno fedele di De Pol da quando è stato costruito. È insensibile e non è possibile interagirvi con successo.",
+  }),
+  selva: new BriscolaPlayer({
+    character: NPCS.selva,
+    enabledByEvent: "selva",
+    pros: [
+      // {
+      //   title: "Labbra carnose",
+      //   description: "Ogni motto che esegue è comprensibile al 100%",
+      // },
+    ],
+    cons: [
+      // {
+      //   title: "Pessimista",
+      //   description: "Qualunque calo di morale è incrementato",
+      // },
+    ],
+    stats: {},
+    description:
+      "Non distrarti o tenterà di venderti un cellulare brandizzato 3!. A parte questo, è un giocatore un pò brichino, ma molto sportivo.",
+  }),
+  tramontin: new BriscolaPlayer({
+    character: NPCS.tramontin,
+    enabledByEvent: "tramontin",
+    pros: [
+      {
+        title: "Lingua straniera",
+        description:
+          "Parla solo in inglese e per questo può comunicarti, ad ogni turno, le carte che ha in mano, senza farsi scoprire dagli altri.",
+      },
+    ],
+    cons: [
+      {
+        title: "Antica",
+        description:
+          "Non esegue motti, Mu, pesca con rivelazione e non incita la carica.",
+      },
+    ],
+    stats: {},
+    description:
+      "Ha insegnato inglese all'inventore della Briscola. Se non si è persa per l'istituto è un'ottima giocatrice, anche se molto all'antica.",
+  }),
+  colussi: new BriscolaPlayer({
+    character: NPCS.colussi,
+    enabledByEvent: "colussi",
+    pros: [
+      // {
+      //   title: "Labbra carnose",
+      //   description: "Ogni motto che esegue è comprensibile al 100%",
+      // },
+    ],
+    cons: [
+      {
+        title: "Giornalaio",
+        description:
+          "Ogni tanto si perde a leggere il giornale, la probabilità di incitamento alla carica viene dimezzata.",
+      },
+    ],
+    stats: {},
+    description:
+      "Un'enciclopedia con le gambe, sempre sul pezzo quando si parla di cultura o notizie. Non è molto interessato alla Briscola, ma non si pu dire che sia scarso.",
+  }),
+  maiullari: new BriscolaPlayer({
+    character: NPCS.maiullari,
+    enabledByEvent: "maiullari",
+    pros: [
+      // {
+      //   title: "Labbra carnose",
+      //   description: "Ogni motto che esegue è comprensibile al 100%",
+      // },
+    ],
+    cons: [
+      {
+        title: "Terrone",
+        description:
+          "È estramemente permaloso ed il Morale cala con maggiore intensità.",
+      },
+    ],
+    stats: {},
+    description:
+      "Forse il giocatore piu disponibile e gentile di tutti. La sua permalosità è purtroppo un grave fardello.",
   }),
 };

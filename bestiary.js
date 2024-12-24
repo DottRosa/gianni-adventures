@@ -169,6 +169,19 @@ const BESTIARY = {
       [CONFIG.player.gianni]: "Ivano",
     },
   },
+  [NPC_IDS.carrellino]: {
+    firstName: "Carrellino",
+    lastName: "di De Pol",
+    spriteImages: {
+      left: `${CONFIG.assets.folder}/cozza.png`,
+      right: `${CONFIG.assets.folder}/cozza.png`,
+    },
+    description: "",
+    nickname: {
+      [CONFIG.player.fabrissazzo]: "Carrellino",
+      [CONFIG.player.gianni]: "Carrellino",
+    },
+  },
   [NPC_IDS.maiullari]: {
     firstName: "Paolo",
     lastName: "Maiullari",

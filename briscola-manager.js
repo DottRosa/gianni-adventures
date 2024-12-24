@@ -19,6 +19,7 @@ class BriscolaManager {
     this.briscolaPlayers = Object.keys(BRISCOLA_PLAYERS).map((key) => {
       return BRISCOLA_PLAYERS[key];
     });
+
     this.fabrisTeam = [
       new BriscolaPlayer({ character: GLOBALS.players.fabrissazzo }),
     ];
@@ -104,7 +105,11 @@ class BriscolaManager {
         return;
       }
       case GLOBALS.keyboard.isRight: {
-        this.partnerChoicePointer.x += this.partnerChoicePointer.x < 4 ? 1 : 0;
+        this.partnerChoicePointer.x +=
+          this.partnerChoicePointer.x <
+          Math.floor(this.briscolaPlayers.length / 2)
+            ? 1
+            : 0;
         return;
       }
       case GLOBALS.keyboard.isRightTrigger: {
@@ -126,13 +131,14 @@ class BriscolaManager {
     const { cell, detailsBox } = CONFIG.briscola.partnerSelection;
     const { canvasHeight, canvasWidth } = CONFIG.tile;
 
-    const x = canvasWidth / 2 - cell * 2 - cell / 2;
+    const x =
+      canvasWidth / 2 - Math.ceil(this.briscolaPlayers.length / 4) * cell;
     const y = canvasHeight - cell * 2 - cell / 2;
     let shift = cell;
     let partnerIndex = 0;
 
     for (var i = 0; i < 2; i++) {
-      for (var j = 0; j < 5; j++) {
+      for (var j = 0; j <= Math.floor(this.briscolaPlayers.length / 2); j++) {
         if (
           this.partnerChoicePointer.x === j &&
           this.partnerChoicePointer.y === i
@@ -144,10 +150,20 @@ class BriscolaManager {
         ctx.fillRect(x + shift * j, y + shift * i, cell, cell);
         ctx.strokeRect(x + shift * j, y + shift * i, cell, cell);
         if (this.briscolaPlayers[partnerIndex]) {
-          this.briscolaPlayers[partnerIndex].character.drawIcon(
-            x + shift * j,
-            y + shift * i
-          );
+          if (this.briscolaPlayers[partnerIndex].isBlocked) {
+            ctx.drawImage(
+              lockImage,
+              x + shift * j,
+              y + shift * i,
+              cell / 2,
+              cell / 2
+            );
+          } else {
+            this.briscolaPlayers[partnerIndex].character.drawIcon(
+              x + shift * j,
+              y + shift * i
+            );
+          }
         } else {
           ctx.font = detailsBox.font;
           ctx.fillStyle = "black";
@@ -162,7 +178,9 @@ class BriscolaManager {
 
   get partnerHovered() {
     const partnerIndex =
-      this.partnerChoicePointer.y * 5 + this.partnerChoicePointer.x;
+      this.partnerChoicePointer.y * Math.ceil(this.briscolaPlayers.length / 2) +
+      this.partnerChoicePointer.x;
+
     return this.briscolaPlayers[partnerIndex];
   }
 
@@ -183,79 +201,86 @@ class BriscolaManager {
     ctx.font = detailsBox.fontName;
     ctx.fillStyle = "black";
 
-    if (partner) {
-      const partnerName =
-        partner.character.details?.nickname.fabrissazzo ??
-        partner.character.name;
-      const posX = canvasWidth / 2 - textWidth(partnerName) / 2;
-      const posY = y + cell / 3;
-      ctx.fillText(partnerName, posX, posY);
+    if (!partner) {
+      const noPartnerMessage = "Scelta causale";
+      const posX = canvasWidth / 2 - textWidth(noPartnerMessage) / 2;
+      ctx.fillText(noPartnerMessage, posX, y + detailsBox.height / 2);
+      return;
+    }
 
-      let distance = 15;
+    if (partner.isBlocked) {
+      const blockedPartner = "Personaggio bloccato";
+      const posX = canvasWidth / 2 - textWidth(blockedPartner) / 2;
+      ctx.fillText(blockedPartner, posX, y + detailsBox.height / 2);
+      return;
+    }
 
-      let button = BUTTONS.briscolaPlayerDetails;
+    const partnerName =
+      partner.character.details?.nickname.fabrissazzo ?? partner.character.name;
+    const posX = canvasWidth / 2 - textWidth(partnerName) / 2;
+    const posY = y + cell / 3;
+    ctx.fillText(partnerName, posX, posY);
 
-      if (this.showPlayerDetails) {
-        distance += 30;
-        button = BUTTONS.briscolaPlayerDetailsBack;
+    let distance = 15;
+
+    let button = BUTTONS.briscolaPlayerDetails;
+
+    if (this.showPlayerDetails) {
+      distance += 30;
+      button = BUTTONS.briscolaPlayerDetailsBack;
+      ctx.font = detailsBox.fontDescription;
+
+      Object.keys(BRISCOLA_PLAYER_DEFAULT_STATS).forEach((stat) => {
+        ctx.fillText(
+          BRISCOLA_PLAYER_DEFAULT_STATS_LABELS[stat],
+          x + 10,
+          posY + distance
+        );
+        ctx.fillText(
+          partner.getVisualStatValue(stat),
+          x + boxWidth - 50,
+          posY + distance
+        );
+        distance += 20;
+      });
+    } else {
+      ctx.font = detailsBox.fontDescription;
+      const wrappedDescription = wrapText(partner.description, boxWidth - 20);
+
+      wrappedDescription.forEach((line, index) => {
+        distance += 20;
+        ctx.fillText(line, x + 10, y + cell / 3 + distance);
+      });
+
+      distance += 35;
+
+      [...partner.pros, ...partner.cons].forEach((item, index) => {
+        ctx.font = detailsBox.fontDescription; //serve ai fini del calcolo
+        const wrappedDescription = wrapText(item.description, boxWidth - 20);
+        ctx.font = detailsBox.fontTitle;
+
+        ctx.fillText(item.title, x + 10, posY + distance);
+
         ctx.font = detailsBox.fontDescription;
-
-        Object.keys(BRISCOLA_PLAYER_DEFAULT_STATS).forEach((stat) => {
-          ctx.fillText(
-            BRISCOLA_PLAYER_DEFAULT_STATS_LABELS[stat],
-            x + 10,
-            posY + distance
-          );
-          ctx.fillText(
-            partner.getVisualStatValue(stat),
-            x + boxWidth - 50,
-            posY + distance
-          );
-          distance += 20;
-        });
-      } else {
-        ctx.font = detailsBox.fontDescription;
-        const wrappedDescription = wrapText(partner.description, boxWidth - 20);
-
         wrappedDescription.forEach((line, index) => {
           distance += 20;
           ctx.fillText(line, x + 10, y + cell / 3 + distance);
         });
-
         distance += 35;
-
-        [...partner.pros, ...partner.cons].forEach((item, index) => {
-          ctx.font = detailsBox.fontDescription; //serve ai fini del calcolo
-          const wrappedDescription = wrapText(item.description, boxWidth - 20);
-          ctx.font = detailsBox.fontTitle;
-
-          ctx.fillText(item.title, x + 10, posY + distance);
-
-          ctx.font = detailsBox.fontDescription;
-          wrappedDescription.forEach((line, index) => {
-            distance += 20;
-            ctx.fillText(line, x + 10, y + cell / 3 + distance);
-          });
-          distance += 35;
-        });
-      }
-      drawHotkey(
-        ctx,
-        x + boxWidth - BUTTONS.confirm.width - button.width - 20,
-        y + detailsBox.height - 30,
-        button
-      );
-      drawHotkey(
-        ctx,
-        x + boxWidth - BUTTONS.confirm.width - 10,
-        y + detailsBox.height - 30,
-        BUTTONS.confirm
-      );
-    } else {
-      const noPartnerMessage = "Scelta causale";
-      const posX = canvasWidth / 2 - textWidth(noPartnerMessage) / 2;
-      ctx.fillText(noPartnerMessage, posX, y + detailsBox.height / 2);
+      });
     }
+    drawHotkey(
+      ctx,
+      x + boxWidth - BUTTONS.confirm.width - button.width - 20,
+      y + detailsBox.height - 30,
+      button
+    );
+    drawHotkey(
+      ctx,
+      x + boxWidth - BUTTONS.confirm.width - 10,
+      y + detailsBox.height - 30,
+      BUTTONS.confirm
+    );
   }
 
   drawPartnerChoice() {
