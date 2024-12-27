@@ -225,10 +225,11 @@ class DialogueManager {
       ...shadow,
     });
     ctx.fillStyle = backgroundColor;
+    drawRoundedRect(ctx, x, y, width, height, 25);
 
-    if (this.currentDialogue.type === "thought") {
-      drawEllipse(ctx, x, y, width, height);
+    const isThought = this.currentDialogue.type === "thought";
 
+    if (isThought) {
       // Disegna i puntini di collegamento
       ctx.beginPath();
       ctx.arc(x + 40, y + height - 10, 6, 0, Math.PI * 2); // Puntino grande
@@ -242,8 +243,6 @@ class DialogueManager {
       ctx.arc(x + 32, y + height + 15, 2, 0, Math.PI * 2); // Puntino piccolo
       ctx.fill();
     } else {
-      drawRoundedRect(ctx, x, y, width, height, 25);
-
       // Aggiungi il triangolo in basso
       ctx.beginPath(); // Inizia un nuovo percorso
       ctx.moveTo(x + 20, y + CONFIG.battle.actionBox.height - 2); // Punto sinistro del triangolo
@@ -300,7 +299,17 @@ class DialogueManager {
       );
 
       wrappedDescription.forEach((line, index) => {
-        ctx.fillText(line, x + padding, y + padding * 3.5 + index * 20);
+        let text = line;
+
+        if (isThought) {
+          if (index === 0) {
+            text = `(${line}`;
+          }
+          if (index === wrappedDescription.length - 1) {
+            text = `${text})`;
+          }
+        }
+        ctx.fillText(text, x + padding, y + padding * 3.5 + index * 20);
       });
     }
 
