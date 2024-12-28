@@ -194,6 +194,7 @@ const CONFIG = {
   briscola: {
     phases: {
       partnerChoice: "partnerChoice", // il giocatore sceglie il suo partner
+      partnerConfirmation: "partnerConfirmation", // il giocatore conferma il partner scelto
       gameStart: "gameStart",
     },
     partnerSelection: {
@@ -277,6 +278,7 @@ const NPC_IDS = {
   carrellino: "carrellino", // di depol
   maiullari: "maiullari",
   preside: "preside",
+  doni: "doni",
 
   // cattivi
   crosilla: "crosilla",
@@ -302,6 +304,10 @@ const BUTTONS = {
   confirm: {
     key: CONFIG.keyboard.interactKey,
     label: "Conferma",
+  },
+  back: {
+    key: CONFIG.keyboard.cancelKey,
+    label: "Indietro",
   },
   horizontalScroll: {
     key: "⇄",

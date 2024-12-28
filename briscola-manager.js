@@ -23,11 +23,22 @@ class BriscolaManager {
     this.fabrisTeam = [
       new BriscolaPlayer({ character: GLOBALS.players.fabrissazzo }),
     ];
+
     this.adversariesTeam = this.briscola.adversaries;
   }
 
   get partner() {
     return this.partnerChoicePointer;
+  }
+
+  isAdversary(character) {
+    return this.adversariesTeam.some((adversary) => {
+      return adversary.character.id === character.id;
+    });
+  }
+
+  prevPhase() {
+    this.phasesHistory.pop();
   }
 
   /**
@@ -36,6 +47,10 @@ class BriscolaManager {
   nextPhase() {
     switch (this.currentPhase) {
       case CONFIG.briscola.phases.partnerChoice: {
+        this.phasesHistory.push(CONFIG.briscola.phases.partnerConfirmation);
+        return;
+      }
+      case CONFIG.briscola.phases.partnerConfirmation: {
         this.phasesHistory.push(CONFIG.briscola.phases.gameStart);
         return;
       }
@@ -61,6 +76,10 @@ class BriscolaManager {
     return this.currentPhase === CONFIG.briscola.phases.partnerChoice;
   }
 
+  get phaseIsPartnerConfirmation() {
+    return this.currentPhase === CONFIG.briscola.phases.partnerConfirmation;
+  }
+
   /**
    * Gestisce le interazioni con la tastiera in base ai tasti premuti ed alla fase in corso
    */
@@ -81,6 +100,10 @@ class BriscolaManager {
 
       if (this.phaseIsPartnerChoice) {
         this.handlPartnerChoicePhase();
+        return;
+      }
+      if (this.phaseIsPartnerConfirmation) {
+        this.handlPartnerConfirmationPhase();
         return;
       }
     }
@@ -117,11 +140,28 @@ class BriscolaManager {
         return;
       }
       case GLOBALS.keyboard.isInteract: {
-        if (this.partnerHovered?.isBlocked) {
+        if (
+          this.partnerHovered?.isBlocked ||
+          this.isAdversary(this.partnerHovered.character)
+        ) {
           ASSETS.soundEffects.wrong.play();
           return;
         }
+        ASSETS.soundEffects.selection.play();
         this.nextPhase();
+        return;
+      }
+    }
+  }
+
+  handlPartnerConfirmationPhase() {
+    switch (true) {
+      case GLOBALS.keyboard.isInteract: {
+        this.nextPhase();
+        return;
+      }
+      case GLOBALS.keyboard.isCancel: {
+        this.prevPhase();
         return;
       }
     }
@@ -167,6 +207,14 @@ class BriscolaManager {
               x + shift * j,
               y + shift * i
             );
+
+            if (
+              this.isAdversary(this.briscolaPlayers[partnerIndex].character)
+            ) {
+              ctx.font = detailsBox.fontDescription;
+              ctx.fillStyle = "black";
+              ctx.fillText("CPU", x + 5 + shift * j, y + 12.5 + shift * i);
+            }
           }
         } else {
           ctx.font = detailsBox.font;
@@ -287,6 +335,50 @@ class BriscolaManager {
     );
   }
 
+  drawPartnerChoiceConfirmationModal() {
+    const { cell, detailsBox } = CONFIG.briscola.partnerSelection;
+    const { canvasHeight, canvasWidth } = CONFIG.tile;
+
+    const boxWidth = cell * 5;
+
+    const x = canvasWidth / 2 - cell * 2 - cell / 2;
+    const y = canvasHeight - cell * 2 - cell - detailsBox.height;
+
+    ctx.fillRect(x, y, boxWidth, detailsBox.height);
+    ctx.strokeRect(x, y, boxWidth, detailsBox.height);
+
+    ctx.font = detailsBox.fontName;
+    ctx.fillStyle = "black";
+
+    const partner = this.partnerHovered;
+
+    const partnerName =
+      partner.character.details?.nickname.fabrissazzo ?? partner.character.name;
+    const posX = canvasWidth / 2 - textWidth(partnerName) / 2;
+    const posY = y + cell / 3;
+    ctx.fillText(partnerName, posX, posY);
+
+    ctx.font = detailsBox.fontDescription;
+    const choiceQuestion = "Sei VERAMENTE sicuro della tua scelta?";
+    const questionPosX = canvasWidth / 2 - textWidth(choiceQuestion) / 2;
+    ctx.fillText(choiceQuestion, questionPosX, y + detailsBox.height / 2);
+
+    const button = BUTTONS.back;
+
+    drawHotkey(
+      ctx,
+      x + boxWidth - BUTTONS.confirm.width - button.width - 20,
+      y + detailsBox.height - 30,
+      button
+    );
+    drawHotkey(
+      ctx,
+      x + boxWidth - BUTTONS.confirm.width - 10,
+      y + detailsBox.height - 30,
+      BUTTONS.confirm
+    );
+  }
+
   drawPartnerChoice() {
     if (this.phaseIsPartnerChoice) {
       this.drawPartnerChoiceGrid();
@@ -294,6 +386,15 @@ class BriscolaManager {
       this.drawParterChoiceDetails();
     }
   }
+
+  drawPartnerConfirmation() {
+    if (this.phaseIsPartnerConfirmation) {
+      this.drawPartnerChoiceGrid();
+      this.drawCharacters();
+      this.drawPartnerChoiceConfirmationModal();
+    }
+  }
+
   drawCharacters() {
     if (this.phaseIsPartnerChoice) {
       // da fare con le grafiche giuste
@@ -303,5 +404,6 @@ class BriscolaManager {
   draw() {
     this.briscola.background.draw();
     this.drawPartnerChoice();
+    this.drawPartnerConfirmation();
   }
 }

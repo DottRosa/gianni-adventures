@@ -196,8 +196,8 @@ const BESTIARY = {
     },
   },
   [NPC_IDS.preside]: {
-    firstName: "",
-    lastName: "",
+    firstName: "Giuliana",
+    lastName: "Cinelli",
     spriteImages: {
       left: `${CONFIG.assets.folder}/cozza.png`,
       right: `${CONFIG.assets.folder}/cozza.png`,
