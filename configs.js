@@ -195,7 +195,7 @@ const CONFIG = {
     phases: {
       partnerChoice: "partnerChoice", // il giocatore sceglie il suo partner
       partnerConfirmation: "partnerConfirmation", // il giocatore conferma il partner scelto
-      gameStart: "gameStart",
+      deckPreparation: "deckPreparation",
     },
     partnerSelection: {
       cell: 75, // larghezza e altezza della cella di un partner

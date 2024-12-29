@@ -80,6 +80,10 @@ class BriscolaManager {
     return this.currentPhase === CONFIG.briscola.phases.partnerConfirmation;
   }
 
+  get phaseIsDeckPreparation() {
+    return this.currentPhase === CONFIG.briscola.phases.gameStart;
+  }
+
   /**
    * Gestisce le interazioni con la tastiera in base ai tasti premuti ed alla fase in corso
    */
@@ -106,8 +110,17 @@ class BriscolaManager {
         this.handlPartnerConfirmationPhase();
         return;
       }
+      if (this.phaseIsDeckPreparation) {
+        this.handleDeckPreparation();
+        return;
+      }
     }
   }
+
+  /**
+   * Gestisce il mescolamento
+   */
+  handleDeckPreparation() {}
 
   /**
    * Gestisce la fase di selezione iniziale. All'inizio si può scegliere di eseguire un attacco,
@@ -401,9 +414,36 @@ class BriscolaManager {
     }
   }
 
+  drawHUD() {
+    if (this.phaseIsPartnerChoice || this.phaseIsPartnerConfirmation) {
+      return;
+    }
+
+    const { canvasHeight, canvasWidth } = CONFIG.tile;
+
+    const partnerName = this.partnerHovered.character.name;
+
+    ctx.fillStyle = "black";
+
+    ctx.fillText(partnerName, canvasWidth / 2 - textWidth(partnerName) / 2, 20);
+  }
+
   draw() {
     this.briscola.background.draw();
     this.drawPartnerChoice();
     this.drawPartnerConfirmation();
+    this.drawHUD();
   }
+}
+
+function convertArrayToObject(array, maxX, maxY) {
+  const result = {};
+  for (let i = 0; i < array.length; i++) {
+    if (array[i] !== 0) {
+      const x = i % maxX;
+      const y = Math.floor(i / maxX);
+      result[`${x},${y}`] = array[i];
+    }
+  }
+  return result;
 }

@@ -298,21 +298,16 @@ const NPCS = {
     }),
     attacks: ATTACKS[[NPC_IDS.tumus]],
   }),
-
-  // di supporto (da non usare come npc)
-  blurred: new NPC({
-    details: {
-      firstName: "",
-      lastName: "",
-      spriteImages: {
-        left: `${CONFIG.assets.folder}/blurred-sprite.png`,
-        right: `${CONFIG.assets.folder}/blurred-sprite.png`,
-      },
-      description: "",
-      nickname: {
-        [CONFIG.player.fabrissazzo]: "",
-        [CONFIG.player.gianni]: "",
-      },
-    },
-  }),
 };
+
+Object.keys(NPCS).forEach((npcId) => {
+  if (!NPC_IDS[npcId]) {
+    console.error(`NPC "${npcId}" is not in the NPC_IDS list`);
+  }
+});
+
+Object.keys(NPC_IDS).forEach((npcId) => {
+  if (!NPCS[npcId]) {
+    console.error(`NPC "${npcId}" is not in the NPCS list`);
+  }
+});

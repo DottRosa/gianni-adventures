@@ -1,8 +1,8 @@
 const MAPS = {
   [MAP_IDS.intro]: new Map({
     id: MAP_IDS.intro,
-    totalTilesX: 40,
-    totalTilesY: 70,
+    totalTilesX: 50,
+    totalTilesY: 50,
     collisions: COLLISIONS_FIRST_MAP,
     doors: [
       new Door({
@@ -21,9 +21,9 @@ const MAPS = {
         dialogues: MAP_OBJECT_DIALOGUES.intro[MAP_OBJECT_IDS.fiorellino],
       }),
     ],
-    backgroundImages: [`${CONFIG.assets.folder}/first-map.png`],
+    backgroundImages: [`${CONFIG.assets.folder}/maps/5F.png`],
     foregroundImages: [`${CONFIG.assets.folder}/foreground.png`],
-    startPosition: getCoordsByCell(16, 21),
+    startPosition: getCoordsByCell(16, 25),
   }),
   [MAP_IDS.next]: new Map({
     totalTilesX: 40,
