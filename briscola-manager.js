@@ -435,15 +435,3 @@ class BriscolaManager {
     this.drawHUD();
   }
 }
-
-function convertArrayToObject(array, maxX, maxY) {
-  const result = {};
-  for (let i = 0; i < array.length; i++) {
-    if (array[i] !== 0) {
-      const x = i % maxX;
-      const y = Math.floor(i / maxX);
-      result[`${x},${y}`] = array[i];
-    }
-  }
-  return result;
-}

@@ -274,7 +274,7 @@ function animate() {
     }
   }
 
-  debug();
+  // debug();
 
   window.requestAnimationFrame(animate);
 }

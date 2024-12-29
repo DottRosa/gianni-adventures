@@ -4,8 +4,8 @@ const NPCS = {
     details: BESTIARY[NPC_IDS.furlanetto],
     mapPositionCell: {
       [MAP_IDS.intro]: {
-        cellX: 17,
-        cellY: 22,
+        cellX: 21,
+        cellY: 26,
       },
     },
     dialogues: NPC_DIALOGUES.intro[NPC_IDS.furlanetto],
@@ -20,8 +20,8 @@ const NPCS = {
     details: BESTIARY[NPC_IDS.cozza],
     mapPositionCell: {
       [MAP_IDS.intro]: {
-        cellX: 19,
-        cellY: 21,
+        cellX: 24,
+        cellY: 30,
       },
     },
     dialogues: NPC_DIALOGUES.intro[NPC_IDS.cozza],

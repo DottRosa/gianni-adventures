@@ -1,6 +1,6 @@
 class Collision {
-  constructor({ dataArray, numberTilesX, npcs = [], mapId }) {
-    this.dataArray = dataArray;
+  constructor({ collisionCells, numberTilesX, npcs = [], mapId }) {
+    this.collisionCells = collisionCells;
     this.numberTilesX = numberTilesX;
     this.npcMap = {};
     this.mapId = mapId;
@@ -18,8 +18,8 @@ class Collision {
       return true;
     }
 
-    const index = cell.cellY * this.numberTilesX + cell.cellX;
+    // const index = cell.cellY * this.numberTilesX + cell.cellX;
 
-    return this.dataArray[index] !== 0;
+    return this.collisionCells[key];
   }
 }

@@ -22,7 +22,11 @@ class Map {
     });
 
     this.collisionsDetector = new Collision({
-      dataArray: collisions,
+      collisionCells: convertArrayToObject(
+        collisions,
+        totalTilesX,
+        totalTilesY
+      ),
       numberTilesX: this.totalTilesY,
       npcs: this.npcs,
       mapId: this.id,
